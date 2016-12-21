@@ -1,0 +1,53 @@
+<!--
+  Generated template for the SendPage page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>{{"send" | translate}}</ion-title>
+        <button ion-button menuToggle start>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-buttons ion-button end>
+            <button (click)="toggleRightMenu()">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-item ng-if="showDestTag && destInfo.memo">
+        <ion-label>Destination Address: </ion-label>
+        <ion-input type="text" [(ngModel)]="paymentData.destAddress" placeholder='{{"destaddr" | translate}}'></ion-input>
+    </ion-item>
+    <div class="row no-padding">
+        <ion-item>
+            <ion-label>Payment Amount {{paymentData.amount}}: </ion-label>
+            <ion-input type="text" [(ngModel)]="paymentData.amount" placeholder="0"></ion-input>
+        </ion-item>
+    </div>
+    <ion-item ng-if="showDestTag && !destInfo.memo">
+        <ion-label>Payment Destinationtag: </ion-label>
+        <ion-input type="text" [(ngModel)]="paymentData.destTag" placeholder='{{"desttag" | translate}}'></ion-input>
+    </ion-item>
+    <ion-item ng-if="showDestTag && destInfo.memo">
+        <ion-label>Payment Amount: </ion-label>
+        <ion-input type="text" [(ngModel)]="destInfo.memo" placeholder="0"></ion-input>
+    </ion-item>
+    
+    <button ion-button on-tap="sendPayment()" class="button button-block button-positive">
+        {{"send" | translate}}
+    </button>
+    <div class="item item-body narrow">
+        <button ion-button (click)="scanCode()" class="button button-block">
+            <i class="icon ion-qr-scanner"></i> {{"scan" | translate}}
+        </button>
+        <button ion-button (click)="donate()" class="button button-block">
+            <i class="icon ion-star"></i>
+            <font size="-1">{{"donate" | translate}}</font>
+        </button>
+    </div>
+</ion-content>

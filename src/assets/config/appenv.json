@@ -1,0 +1,7 @@
+{
+  "AppPlatform": "STELLAR",
+  "AppMode": "DEV",
+  "AppCurrency": "USD",
+  "AppLanguage": "EN",
+  "PaymentMethod": "WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT"
+}

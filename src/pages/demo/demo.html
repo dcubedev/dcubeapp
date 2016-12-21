@@ -1,0 +1,142 @@
+<!--
+  Author: Stephen Agyepong
+
+    This page demonstrates the features and capabilities of the application
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>Application Demonstration</ion-title>
+        <button ion-button menuToggle start>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-buttons ion-button end>
+            <button (click)="toggleRightMenu()">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ion-item *ngFor="let asset of accountBalances">
+            Account Balance for <font size="+2">({{asset.asset_code}})</font>: <font size="+2">{{asset.balance.toFixed(2)}}</font>
+        </ion-item>
+    </ion-list>
+    <ion-grid>
+        <ion-row>
+            <ion-col width-20>Address:</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="keysStored.address" type="text" placeholder="Account ID" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Secret:</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="keysStored.secret" type="text" placeholder="Key seed" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Send Payment to (receiver):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.destaddress" type="text" placeholder="Destination address" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Receiver Secret:</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.destsecret" type="text" placeholder="Destination seed" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Asset code (GHS,USD,XLM):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.asset_code" type="text" placeholder="Asset code" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Payment Amount:</ion-col>
+            <ion-col width-80><input size="10" [(ngModel)]="account.pymtamt" type="text" placeholder="Payment amount" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Memo:</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.memo" type="text" placeholder="Max 28 characters" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Memo type (text,id,hash,return):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.memo_type" type="text" placeholder="Memo type" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Extra Memo (for compliance):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.extra_memo" type="text" placeholder="extra memo for compliance" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Limit on asset trustline amount:</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.trustLimitAmt" type="text" placeholder="Limit amoumt" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Sender name (eg stephen*dcude.com):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.sender_ename" type="text" placeholder="sender name" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Receiver name (eg sophia*dcude.com):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.receiver_ename" type="text" placeholder="receiver name" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Request type (name,id,txid):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.req_type" type="text" placeholder="request type" /></ion-col>
+        </ion-row>
+        <ion-item>
+            <ion-label>Output:</ion-label>
+            <ion-textarea [(ngModel)]="outArea" name="outTextArea" rows="6" placeholder="output will go here..."></ion-textarea>
+        </ion-item>
+        <div class="button-bar">
+            <button ion-button class="button button-block" (click)="genKeyAndFundAccount()">
+                <ion-icon name="share"></ion-icon>
+                Generate Keypair and fund account
+            </button>
+            <button ion-button class="button button-block" (click)="genKeypair()">
+                <ion-icon name="share"></ion-icon>
+                Generate Keypair
+            </button>
+            <button ion-button class="button button-block" (click)="saveKeypair()">
+                <ion-icon name="archive"></ion-icon>
+                Save Keypair
+            </button>
+            <button ion-button class="button button-block" (click)="changeTrustline()">
+                <ion-icon name="archive"></ion-icon>
+                Change Trustline
+            </button>
+            <button ion-button class="button button-block" (click)="changeTrustlineAndPay()">
+                <ion-icon name="archive"></ion-icon>
+                Change Trustline and Pay
+            </button>
+            <button ion-button class="button button-block" (click)="fundAccount()">
+                <ion-icon name="archive"></ion-icon>
+                Fund Account
+            </button>
+            <button ion-button class="button button-block" (click)="getAccountBalances()">
+                <ion-icon name="archive"></ion-icon>
+                Get ALL accounts balances
+            </button>
+            <button ion-button class="button button-block" (click)="makePaymentUsingBridge()">
+                <ion-icon name="archive"></ion-icon>
+                Make Payment Using Bridge
+            </button>
+            <button ion-button class="button button-block" (click)="makePaymentUsingBridgeWithCompliance()">
+                <ion-icon name="archive"></ion-icon>
+                Make Payment Using Bridge With Compliance
+            </button>
+            <button ion-button class="button button-block" (click)="requestPayment()">
+                <ion-icon name="archive"></ion-icon>
+                Request Payment
+            </button>
+            <button ion-button class="button button-block" (click)="sendPayment()">
+                <ion-icon name="archive"></ion-icon>
+                Send Payment
+            </button>
+            <button ion-button class="button button-block" (click)="getPaymentInfo()">
+                <ion-icon name="archive"></ion-icon>
+                Get Payment Information
+            </button>
+            <button ion-button class="button button-block" (click)="sendFederationRequest()">
+                <ion-icon name="archive"></ion-icon>
+                Send a Federation request
+            </button>
+            <button ion-button class="button button-block" (click)="getBuySellTradeInfo()">
+                <ion-icon name="archive"></ion-icon>
+                Get Buy/Sell Trade Info
+            </button>
+        </div>
+    </ion-grid>
+</ion-content>

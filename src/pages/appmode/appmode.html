@@ -1,0 +1,47 @@
+<!--
+  Generated template for the AppmodePage page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>Application Mode Setup</ion-title>
+        <button ion-button menuToggle start>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-buttons ion-button end>
+            <button (click)="toggleRightMenu()">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list radio-group [(ngModel)]="appmode" (ionChange)="appModeChanged($event)">
+        <ion-list-header>
+            Application modes supported
+        </ion-list-header>
+
+        <ion-item>
+            <ion-label>Development</ion-label>
+            <ion-radio checked="true" value="DEV"></ion-radio>
+        </ion-item>
+
+        <ion-item>
+            <ion-label>Testing/QA</ion-label>
+            <ion-radio value="TEST"></ion-radio>
+        </ion-item>
+
+        <ion-item>
+            <ion-label>Demonstration</ion-label>
+            <ion-radio value="DEMO"></ion-radio>
+        </ion-item>
+
+        <ion-item>
+            <ion-label>Production</ion-label>
+            <ion-radio value="PROD"></ion-radio>
+        </ion-item>
+    </ion-list>
+</ion-content>

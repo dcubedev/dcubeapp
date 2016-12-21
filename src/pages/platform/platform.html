@@ -1,0 +1,28 @@
+<!--
+  Author: Stephen Agyepong
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>Application Platform Setup</ion-title>
+        <button ion-button menuToggle start>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-buttons ion-button end>
+            <button (click)="toggleRightMenu()">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-content padding>
+    <ion-list-header>
+        Digital Currency Platform Setup
+    </ion-list-header>
+    
+    <ion-list radio-group [(ngModel)]="appplatform" (ionChange)="platformChanged($event)">
+        <ion-item *ngFor="let item of supportedPlatforms">
+            <ion-label>{{item.label}}</ion-label>
+            <ion-radio checked={{item.checked}} value={{item.value}}></ion-radio>
+        </ion-item>
+    </ion-list>
+</ion-content>

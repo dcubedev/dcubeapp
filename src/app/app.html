@@ -1,0 +1,68 @@
+<ion-menu side="left" [content]="content">
+    <ion-toolbar>
+        <ion-title>{{ "mainmenu" | translate }}</ion-title>
+    </ion-toolbar>
+
+    <ion-content>
+        <ion-list>
+            <button menuClose ion-item *ngFor="let p of mainpages" (click)="openPage(p)">
+                {{p.title}}
+            </button>
+        </ion-list>
+    </ion-content>
+
+</ion-menu>
+<ion-menu side="right" [content]="content">
+    <ion-toolbar>
+        <ion-title><ion-title>{{ "settingsmenu" | translate }}</ion-title></ion-title>
+    </ion-toolbar>
+
+    <ion-content>
+        <ion-list>
+            <button menuClose ion-item *ngFor="let p of setuppages" (click)="openPage(p)">
+                {{p.title}}
+            </button>
+        </ion-list>
+    </ion-content>
+
+</ion-menu>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-row>
+            <ion-col>
+                <button ion-button full (click)="openPageFromFooter(0)">
+                    <ion-icon name="contacts"></ion-icon>
+                    {{ "contacts" | translate }}
+                </button>
+            </ion-col>
+            <ion-col>
+                <button ion-button full (click)="openPageFromFooter(1)">
+                    <ion-icon name="arrow-round-back"></ion-icon>
+                    {{ "receive" | translate }}
+                </button>
+            </ion-col>
+            <ion-col>
+                <button ion-button full (click)="openPageFromFooter(2)">
+                    <ion-icon name="home"></ion-icon>
+                    {{ "wallet" | translate }}
+                </button>
+            </ion-col>
+            <ion-col>
+                <button ion-button full (click)="openPageFromFooter(3)">
+                    <ion-icon name="send"></ion-icon>
+                    {{ "send" | translate }}
+                </button>
+            </ion-col>
+            <ion-col>
+                <button ion-button full (click)="openPageFromFooter(4)">
+                    <ion-icon name="archive"></ion-icon>
+                    {{ "trx" | translate }}
+                </button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>
+
+<!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
