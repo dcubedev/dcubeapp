@@ -4,9 +4,10 @@ import 'rxjs/add/operator/map';
 import { CommonService } from '../common-service/common-service';
 import * as CommonConstants from '../common-service/common-service';
 
-import * as StellarConstants from "../stellar-constants/stellar-constants";
+import { StellarCommonService } from '../stellar-common-service/stellar-common-service';
+//import * as StellarConstants from "../stellar-constants/stellar-constants";
 import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
-import * as StellarKeySettingsConstants from '../stellar-key-settings-service/stellar-key-settings-service';
+//import * as StellarKeySettingsConstants from '../stellar-key-settings-service/stellar-key-settings-service';
 import { StellarRemoteService } from '../stellar-remote-service/stellar-remote-service';
 
 declare var StellarSdk: any;
@@ -23,17 +24,10 @@ export class StellarAnchorService {
     config: any = {};
     assets: any = [];
 
-    constructor(private comSrvc: CommonService,
+    constructor(private commonSvrc: CommonService,
+        private stellarCommonSvrc: StellarCommonService,
         private keysettings: StellarKeySettingsService,
         private srsSrvc: StellarRemoteService) {
-    }
-
-    isAssetNative(curr): boolean {
-        if (curr === 'native' || curr === StellarConstants.NATIVE_CURRENCY_XLM || curr == null) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     // https://www.stellar.org/developers/guides/anchor.html
@@ -58,10 +52,10 @@ export class StellarAnchorService {
 
         // Specify the non-native assets you'll accept
         this.assets = [
-            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.GHS], StellarKeySettingsConstants.ZOOMSIKA_DEV_KEYS),
-            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.NGN], StellarKeySettingsConstants.ZOOMSIKA_DEV_KEYS),
-            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.USD], StellarKeySettingsConstants.ZOOMSIKA_DEV_KEYS),
-            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.XOF], StellarKeySettingsConstants.ZOOMSIKA_DEV_KEYS)]
+            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.GHS], this.keysettings.dbKeys['DCUBE_GHS_BASE_KEYS']),
+            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.NGN], this.keysettings.dbKeys['DCUBE_NGN_BASE_KEYS']),
+            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.USD], this.keysettings.dbKeys['DCUBE_USD_BASE_KEYS']),
+            new StellarSdk.Asset(CommonConstants.AppCurrency[CommonConstants.AppCurrency.XOF], this.keysettings.dbKeys['DCUBE_XOF_BASE_KEYS'])]
 
         // Get the latest cursor position
         let lastToken = this.latestFromDB("StellarCursor");
@@ -93,7 +87,7 @@ export class StellarAnchorService {
         }
 
         // As an anchor, you shouldn't be getting native lumens
-        if (this.isAssetNative(record.asset_code)) {
+        if (this.stellarCommonSvrc.isAssetNative(record.asset_code)) {
             return;
         }
 

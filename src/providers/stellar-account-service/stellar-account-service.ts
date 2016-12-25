@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptionsArgs } from '@angular/http';
 import { RequestMethod } from '@angular/http';
 import { EventEmitter } from '@angular/core';
-import 'rxjs/add/operator/map';
 
 import * as AppConstants from '../app-constants/app-constants';
 import { CommonService } from '../common-service/common-service';
@@ -12,7 +11,7 @@ import * as StellarKeySettingsConstants from '../stellar-key-settings-service/st
 import { StellarRemoteService } from '../stellar-remote-service/stellar-remote-service';
 
 import * as StellarConstants from "../stellar-constants/stellar-constants";
-import { StellarCommon } from "../stellar-common/stellar-common";
+import { StellarCommonService } from "../stellar-common-service/stellar-common-service";
 
 declare var StellarSdk: any;
 
@@ -37,10 +36,10 @@ export class StellarAccountService {
     constructor(private http: Http, private comSrvc: CommonService,
         private keysettings: StellarKeySettingsService,
         private srsSrvc: StellarRemoteService,
-        private scsSrvc: StellarCommon) {
+        private scsSrvc: StellarCommonService) {
         this.acctEvent$ = new EventEmitter();
-        keysettings.initKeys();
-        this.resetAccount(this.keysettings.loadKeysStore().address);
+
+        this.resetAccount("");
     }
 
     getAccountAddress() {
@@ -69,18 +68,13 @@ export class StellarAccountService {
     }
 
     healthCheck() {
-        let isundef = 'undefined' === this.keysettings.keysStored.mode;
-        console.log('SAS healthCheck: mode isundef: ' + isundef);
-        if ('undefined' === this.keysettings.keysStored.mode) {
-            this.keysettings.initKeys();
-            this.keysChanged = true;
-        }
-        //console.log('SAS healthCheck: this.srsSrvc.isConnected(): ' + this.srsSrvc.isConnected());
+        console.log('SAS healthCheck: this.srsSrvc.isConnected(): ' + this.srsSrvc.isConnected());
         if (!this.srsSrvc.isConnected()) {
             this.srsSrvc.initServer();
             this.connectionChanged = true;
         }
-        if ((this.keysChanged || this.connectionChanged) && this.srsSrvc.isConnected()) {
+
+        if (this.srsSrvc.isConnected()) {
             // Now get account balances
             this.attachToKeys();
             this.keysChanged = false;
@@ -111,14 +105,14 @@ export class StellarAccountService {
         this.getAccountBalanceForKey();
     }
 
-    getAccountBalancesCallback() {    
+    getAccountBalancesCallback() {
         let balances: CommonConstants.IAccountBalance[] = [];
         let balance: CommonConstants.IAccountBalance = {
             asset_code: CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM],
             balance: this.account.balance
         };
         balances.push(balance);
-        
+
         for (let index = 0; index < this.account.otherCurrencies.length; ++index) {
             let entry = this.account.otherCurrencies[index];
             balance = {
@@ -172,82 +166,91 @@ export class StellarAccountService {
         return promise;
     }
 
+    getKeyAddress() {
+        let keyaddr = null;
+        if (undefined !== this.account && null !== this.account && undefined !== this.account.address && null !== this.account.address) {
+            if (this.account.address.length > 0) {
+                keyaddr = this.account.address;
+            } else {
+                keyaddr = this.keysettings.loadKeysStore().address;
+            }
+        } else {
+            keyaddr = this.keysettings.loadKeysStore().address;
+        }
+
+        return keyaddr;
+    }
+
     getAccountBalanceForKey() {
         // get initial account balances
         let self = this;
-        let keyaddr = self.keysettings.loadKeysStore().address;
-        //console.log("\n\getAccountBalanceForKey keyaddr: " + keyaddr);
+        let keyaddr = this.getKeyAddress();
+
         self.resetAccount(keyaddr);
-        //console.log("getAccountBalanceForKey self.account.balance: " + self.account.balance);
-        self.srsSrvc.getServer().accounts()
-            .accountId(self.account.address)
-            .call()
-            .then(function (acc) {
-                //console.log("getAccountBalanceForKey() acctResponse: " + JSON.stringify(acc));
-                //console.log("getAccountBalanceForKey() acc.balances.length: " + acc.balances.length);
-                let reserveChunks = 1 + acc.signers.length; // minimum reserve
-                for (let i = 0; i < acc.balances.length; i++) {
-                    let bal = acc.balances[i];
-                    //let amount: number = parseFloat(bal.balance);
-                    if (bal.asset_code)
-                        reserveChunks++;
-                    //console.log("getAccountBalanceForKey() bal.asset_code: " + bal.asset_code);
-                    //console.log("getAccountBalanceForKey() amount: " + amount);
-                    //self.addToBalance(bal.asset_code, amount);
-                }
-                self.account.sequence = acc.sequence;
-                if (acc.offers && acc.offers.length) {
-                    for (let i = 0; i < acc.offers.length; i++) {
-                        let offer = acc.offers[i];
-                        if (offer)
+
+        if (undefined !== self.account.address && self.account.address.length > 0) {
+            self.srsSrvc.getServer().accounts()
+                .accountId(self.account.address)
+                .call()
+                .then(function (acc) {
+                    let reserveChunks = 1 + acc.signers.length; // minimum reserve
+                    for (let i = 0; i < acc.balances.length; i++) {
+                        let bal = acc.balances[i];
+                        if (bal.asset_code)
                             reserveChunks++;
                     }
-                }
-                self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
-            })
-            .catch(StellarSdk.NotFoundError, function (err) {
-                console.log("attachToKeys account not found");
-            })
-            .catch(function (err) {
-                console.log("attachToKeys() err: " + (err.stack || err));
-            })
+                    self.account.sequence = acc.sequence;
+                    if (acc.offers && acc.offers.length) {
+                        for (let i = 0; i < acc.offers.length; i++) {
+                            let offer = acc.offers[i];
+                            if (offer)
+                                reserveChunks++;
+                        }
+                    }
+                    self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
+                })
+                .catch(StellarSdk.NotFoundError, function (err) {
+                    console.log("attachToKeys account not found");
+                })
+                .catch(function (err) {
+                    console.log("attachToKeys() err: " + (err.stack || err));
+                })
 
-        self.srsSrvc.getServer().effects()
-            .forAccount(self.account.address)
-            .limit(StellarConstants.accountEffectLimit)
-            .order('desc')
-            .call()
-            .then(function (effectResults) {
-                //console.log("getAccountBalanceForKey() effectResponse: " + JSON.stringify(effectResults));
-                let length = effectResults.records ? effectResults.records.length : 0;
-                for (let index = length - 1; index >= 0; index--) {
-                    let currentEffect = effectResults.records[index];
-                    self.applyToBalance(currentEffect);
-                }
+            self.srsSrvc.getServer().effects()
+                .forAccount(self.account.address)
+                .limit(StellarConstants.accountEffectLimit)
+                .order('desc')
+                .call()
+                .then(function (effectResults) {
+                    //console.log("getAccountBalanceForKey() effectResponse: " + JSON.stringify(effectResults));
+                    let length = effectResults.records ? effectResults.records.length : 0;
+                    for (let index = length - 1; index >= 0; index--) {
+                        let currentEffect = effectResults.records[index];
+                        self.applyToBalance(currentEffect);
+                    }
 
-                self.acctEvent$.emit({
-                    memo: AppConstants.ACCT_INFO_LOADED,
-                    status: self.getAccountBalancesCallback()
+                    self.acctEvent$.emit({
+                        memo: AppConstants.ACCT_INFO_LOADED,
+                        status: self.getAccountBalancesCallback()
+                    });
+                })
+                .catch(function (err) {
+                    //self.attachToPaymentsStream('now');
+                    console.log("getAccountBalanceForKey err: " + err)
                 });
-            })
-            .catch(function (err) {
-                //self.attachToPaymentsStream('now');
-                console.log("getAccountBalanceForKey err: " + err)
-            });
+        }
     }
 
     attachToKeys() {
         // get initial account balances
         let self = this;
-        let keyaddr = self.keysettings.loadKeysStore().address;
-        //console.log("\n\nattachToKeys keyaddr: " + keyaddr);
-        self.resetAccount(keyaddr);
-        //console.log("attachToKeys self.account.balance: " + self.account.balance);
+        let keyaddr = this.getKeyAddress();
+        this.resetAccount(keyaddr);
         self.srsSrvc.getServer().accounts()
             .accountId(self.account.address)
             .call()
             .then(function (acc) {
-                console.log("acctResponse: " + JSON.stringify(acc));
+                //console.log("acctResponse: " + JSON.stringify(acc));
                 let reserveChunks = 1 + acc.signers.length; // minimum reserve
                 for (let i = 0; i < acc.balances.length; i++) {
                     let bal = acc.balances[i];
@@ -265,14 +268,9 @@ export class StellarAccountService {
                     }
                 }
                 self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
-                //if (!acc.inflation_destination || !acc.home_domain)
-                //    self.setInflationDestination();
-                //$rootScope.$broadcast(StellarConstants.ACCT_INFO_LOADED);
-                //console.log("sas.attachToKeys() self: " + self);
             })
             .catch(StellarSdk.NotFoundError, function (err) {
                 console.log("attachToKeys account not found");
-                //Remote.getServer().friendbot(this.account.address).call();
             })
             .catch(function (err) {
                 console.log("attachToKeys() err: " + (err.stack || err));
@@ -617,7 +615,7 @@ export class StellarAccountService {
         // You could skip this, but if the account does not exist, you will be charged
         // the transaction fee when the transaction fails.
         let asset = this.scsSrvc.getAssetObject(asset_code, srcAddrKey);
-        
+
         server.loadAccount(destkey)
             // If the account is not found, surface a nicer error message for logging.
             .catch(StellarSdk.NotFoundError, function (error) {

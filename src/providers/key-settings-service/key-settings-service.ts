@@ -14,6 +14,13 @@ export class KeySettingsService {
   
     constructor(private http: Http, private stellarKeySvrc: StellarKeySettingsService) {}
 
+    onKeyEvent(callbackObj, acctevtFunc) {
+        //console.log("KeySettingsService.onKeyEvent() acctevtFunc: " + acctevtFunc);
+        this.stellarKeySvrc.keyEvents$.subscribe(acctevt => {
+            acctevtFunc(callbackObj, acctevt);
+        });
+    }
+
     loadKeysStore(): CommonConstants.IWalletKey {
         return this.stellarKeySvrc.loadKeysStore();
     }

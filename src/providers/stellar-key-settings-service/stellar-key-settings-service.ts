@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 
 import { CommonService } from '../common-service/common-service';
@@ -6,19 +7,12 @@ import * as CommonConstants from '../common-service/common-service';
 
 declare var StellarSdk: any;
 
+export const INFLATION_DESTINATION = 'GBL7AE2HGRNQSPWV56ZFLILXNT52QWSMOQGDBBXYOP7XKMQTCKVMX2ZL';
+
+
 /*
   Author: Stephen Agyepong
 */
-
-// ZOOMSIKA_USD_CLIENT_KEYS
-// ZOOMSIKA_USD_ISSUING_KEYS
-// ZOOMSIKA_USD_BASE_KEYS
-export const ZOOMSIKA_DEV_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_DEV_BASE_ACCT_KEYS;
-//export const ZOOMSIKA_DEV_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_USD_ISSUING_KEYS;
-export const ZOOMSIKA_DEMO_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_DEV_BASE_ACCT_KEYS;
-//export const ZOOMSIKA_PROD_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_PROD_BASE_ACCT_KEYS;
-export const ZOOMSIKA_PROD_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_USD_ISSUING_KEYS;
-
 
 /*
   Generated class for the StellarKeySettingsService provider.
@@ -28,23 +22,180 @@ export const ZOOMSIKA_PROD_KEYS: CommonConstants.IWalletKey = ZOOMSIKA_USD_ISSUI
 */
 @Injectable()
 export class StellarKeySettingsService {
-    keysStored: CommonConstants.IWalletKey = null;
+    DCUBE_DEV_BASE_ACCT_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
 
-    constructor(private http: Http, private comSrvc: CommonService) {
+    DCUBE_DEMO_BASE_ACCT_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    DCUBE_PROD_BASE_ACCT_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    DCUBE_TEST_BASE_ACCT_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+
+    DCUBE_DEV_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    DCUBE_DEMO_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    DCUBE_PROD_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    DCUBE_TEST_KEYS: CommonConstants.IWalletKey = {
+        address: "",
+        secret: "",
+        mode: "undefined"
+    };
+
+    dbKeys: any;
+    keysStored: CommonConstants.IWalletKey = null;
+    public keyEvents$: EventEmitter<any>;
+
+    constructor(private http: Http, private commonSvrc: CommonService) {
+        this.keyEvents$ = new EventEmitter();
+    }
+
+    getDefaultKeys(): CommonConstants.IWalletKey {
+        this.keysStored = {
+            address: "",
+            secret: ""
+        };
+
+        // on a mobile device
+        if (this.commonSvrc.isMobile) {
+            // do nothing we already have the desired values
+        } else {
+        }
+
+        switch (this.commonSvrc.appMode) {
+            case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
+                // production mode
+                this.keysStored = this.DCUBE_PROD_KEYS;
+                break;
+            case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
+                // demonstration/learning mode
+                this.keysStored = this.DCUBE_DEMO_KEYS;
+                break;
+            case CommonConstants.AppMode[CommonConstants.AppMode.TEST]:
+                // testing mode
+                this.keysStored = this.DCUBE_TEST_KEYS;
+                break;
+            default:
+                // development mode
+                this.keysStored = this.DCUBE_DEV_KEYS;
+        }
+        
+        return this.keysStored;
+    }
+
+    getBaseKeys(): CommonConstants.IWalletKey {
+        let keys: CommonConstants.IWalletKey = {
+            secret: "",
+            address: ""
+        };
+        switch (this.commonSvrc.appMode) {
+            case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
+                // demonstration/learning mode
+                keys = this.DCUBE_DEMO_BASE_ACCT_KEYS;
+                break;
+            case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
+                // production mode
+                //keys = DCUBE_PROD_BASE_ACCT_KEYS;
+                break;
+            case CommonConstants.AppMode[CommonConstants.AppMode.TEST]:
+                // testing mode
+                keys = this.DCUBE_TEST_BASE_ACCT_KEYS;
+                break;
+            default:
+                // development mode
+                keys = this.DCUBE_DEV_BASE_ACCT_KEYS;
+        }
+
+        return keys;
+    }
+
+    loadKeysFromDatabase() {
+        let self = this;
+        let appmode = this.commonSvrc.appMode;
+
+        let url_p = this.commonSvrc.url_dcube + "dcube/getAllCurrencyAuthkeys?appmode=" + appmode;
+
+        if (url_p != null) {
+            this.commonSvrc.getHttp(url_p).then(data => {
+                self.dbKeys = data;
+
+                self.DCUBE_DEMO_KEYS = self.dbKeys['DCUBE_GHS_CLIENT_KEYS'];
+                self.DCUBE_DEV_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                self.DCUBE_PROD_KEYS = self.dbKeys['DCUBE_USD_ISSUING_KEYS'];
+                self.DCUBE_TEST_KEYS = self.dbKeys['DCUBE_USD_CLIENT_KEYS'];
+
+                self.DCUBE_DEMO_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                self.DCUBE_DEV_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                self.DCUBE_PROD_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                self.DCUBE_TEST_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+
+                self.initKeys();
+                self.keyEvents$.emit({
+                    memo: 'KEYS_LOADED_FROM_DB',
+                    status: self.getDefaultKeys()
+                });
+            }, err => {
+                console.log("loadKeysFromDatabase() err: " + JSON.stringify(err));
+            })
+        }
     }
 
     loadKeysStore(): CommonConstants.IWalletKey {
-        this.getDefaultKeys();
+        let indx: string = this.commonSvrc.appMode;
+        if (undefined !== this.keysStored && null !== this.keysStored &&
+            undefined !== this.keysStored.address && null !== this.keysStored.address) {
+        } else {
+            this.keysStored = {
+                address: "",
+                secret: "",
+                mode: "undefined"
+            };
+        }
 
-        let indx: string = this.comSrvc.appMode;
-    
+        // if we have keys stored, use them otherwise use default keys
         if (undefined !== window && null !== window &&
-            undefined !== window.localStorage && null !== window.localStorage) {
-            let winstore = window.localStorage[indx];
-            //console.log('loadKeysStore() window.localStorage[indx]: ' + winstore);
-            if (undefined !== winstore && null !== winstore) {
-                this.keysStored = JSON.parse(winstore);
+            undefined !== window.localStorage && null !== window.localStorage &&
+            undefined !== window.localStorage[indx] && null !== window.localStorage[indx] &&
+            window.localStorage[indx].length > 0) {
+            let winstore: CommonConstants.IWalletKey = <CommonConstants.IWalletKey>JSON.parse(window.localStorage[indx]);
+
+            if (undefined !== winstore && null !== winstore &&
+                undefined != winstore.address && winstore.address.length > 0) {
+                this.keysStored = winstore;
+            } else {
+                this.loadKeysFromDatabase();
             }
+        } else {
+            this.loadKeysFromDatabase();
         }
 
         return this.keysStored;
@@ -56,16 +207,26 @@ export class StellarKeySettingsService {
             address: secret,
             mode: 'stored'
         };
-        window.localStorage[indx] = JSON.stringify(this.keysStored);
+        if (undefined !== this.keysStored && null !== this.keysStored &&
+            undefined !== this.keysStored.address && null !== this.keysStored.address &&
+            this.keysStored.address.length > 0) {
+            console.log('saveKeyInStore() this.keysStored.address.length: ' + this.keysStored.address.length);
+            window.localStorage[indx] = JSON.stringify(this.keysStored);
+        }
     }
 
     saveKeysStore(keys) {
         if (undefined !== window && null !== window &&
             undefined !== window.localStorage && null !== window.localStorage) {
-            let indx: string = this.comSrvc.appMode;
+            let indx: string = this.commonSvrc.appMode;
             this.keysStored = keys;
-            
-            window.localStorage[indx] = JSON.stringify(this.keysStored);
+
+            if (undefined !== this.keysStored && null !== this.keysStored &&
+                undefined !== this.keysStored.address && null !== this.keysStored.address &&
+                this.keysStored.address.length > 0) {
+                console.log('saveKeysStore() this.keysStored.address.length: ' + this.keysStored.address.length);
+                window.localStorage[indx] = JSON.stringify(this.keysStored);
+            }
         } else {
             // alert user, we are unable to safe keys
         }
@@ -79,68 +240,7 @@ export class StellarKeySettingsService {
         }
     }
 
-    getDefaultKeys(): CommonConstants.IWalletKey {
-        this.keysStored = {
-            address: "",
-            secret: ""
-        };
-
-        // on a mobile device
-        if (this.comSrvc.isMobile) {
-            // do nothing we already have the desired values
-        } else {
-            switch (this.comSrvc.appMode) {
-                case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
-                    // production mode
-                    //this.keysStored = ZOOMSIKA_PROD_KEYS;
-                    this.keysStored = ZOOMSIKA_PROD_KEYS;
-                    break;
-                case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
-                    // demonstration/learning mode
-                    this.keysStored = ZOOMSIKA_DEMO_KEYS;
-                    break;
-                case CommonConstants.AppMode[CommonConstants.AppMode.TEST]:
-                    // demonstration/learning mode
-                    this.keysStored = ZOOMSIKA_DEV_KEYS;
-                    break;
-                default:
-                    // development/testing mode
-                    this.keysStored = ZOOMSIKA_DEV_KEYS;
-            }
-        }
-        //console.log('loadKeysStore() this.keysStored.address: ' + this.keysStored.address);
-        //console.log('loadKeysStore() this.keysStored.secret: ' + this.keysStored.secret);
-        return this.keysStored;
-    }
-
-    getBaseKeys(): CommonConstants.IWalletKey {
-        let keys: CommonConstants.IWalletKey = {
-            secret: "",
-            address: ""
-        };
-        switch (this.comSrvc.appMode) {
-            case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
-                // production mode
-                //keys = ZOOMSIKA_PROD_BASE_ACCT_KEYS;
-                break;
-            case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
-                // demonstration/learning mode
-                keys = ZOOMSIKA_DEMO_BASE_ACCT_KEYS;
-                break;
-            case CommonConstants.AppMode[CommonConstants.AppMode.TEST]:
-                // demonstration/learning mode
-                keys = ZOOMSIKA_DEV_BASE_ACCT_KEYS;
-                break;
-            default:
-                // development/testing mode
-                keys = ZOOMSIKA_DEV_BASE_ACCT_KEYS;
-        }
-
-        return keys;
-    }
-
     getStellarKeyPair(secretkey) {
-        // return StellarSdk.Keypair.fromSeed(this.keys.secret);
         return StellarSdk.Keypair.fromSeed(secretkey);
     }
 

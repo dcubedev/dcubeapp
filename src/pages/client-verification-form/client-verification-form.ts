@@ -173,7 +173,7 @@ export class ClientVerificationForm {
             let headers = new Headers();
             headers.append('Content-Type', contentType);
             //headers.append('Content-Type', 'application/text');
-            //headers.append('Content-Type', 'application/json');
+            //headers.append('Content-Type', 'application/x-www-form-urlencoded');
             //headers.append('Origin', 'http://localhost:8080');
             var reqOptions: RequestOptionsArgs = {
                 url: null,

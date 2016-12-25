@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { OnInit } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
@@ -18,9 +19,9 @@ import { AccountService } from '../../providers/account-service/account-service'
 @Component({
     templateUrl: 'wallet.html'
 })
-export class WalletPage {
+export class WalletPage implements OnInit{
     account: CommonConstants.IAccount;
-    accountBalances: CommonConstants.IAccountBalance[] = [];
+    accountBalances: CommonConstants.IAccountBalance[] = null;
     keysStored: CommonConstants.IWalletKey;
 
     constructor(private navCtrl: NavController,
@@ -28,27 +29,31 @@ export class WalletPage {
         private acctSvrc: AccountService,
         private keySvrc: KeySettingsService,
         private commonSvrc: CommonService) {
-        //console.log("Entering WalletPage.constructor() ...");
     }
 
     ngOnInit() {
-        //console.log("Entering WalletPage.ngOnInit() ...");
-        this.keysStored = this.keySvrc.loadKeysStore();
+        this.keySvrc.onKeyEvent(this, this.onKeyEvent);
 
         this.getAccountBalances();
         this.commonSvrc.initAccount(this);
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
     }
+     
+    onKeyEvent(self, acctevt: any) {
+        self.keysStored = acctevt.status;
+
+        // if we have a valid key address and account balance is not set
+        if (undefined !== self.keysStored && null !== self.keysStored && undefined !== self.keysStored.address && null !== self.keysStored.address && self.keysStored.address.length > 0
+            && ((null !== self.accountBalances && self.accountBalances.length < 1) ||
+            (null === self.accountBalances))) {
+            console.log("WalletPage.onKeyEvent() call getAccountBalances()");
+            self.getAccountBalances();
+        }
+    }
 
     onAccountEvent(self, acctevt: any) {
-        //console.log("WalletPage.onAccountEvent() acctevt: " + acctevt);
-        //console.log("WalletPage.onAccountEvent() acctevt.memo: " + acctevt.memo);
-        //console.log("WalletPage.onAccountEvent() acctevt.status: " + <CommonConstants.IAccountBalance[]>acctevt.status);
-        //console.log("Entering WalletPage.onAccountEvent() ... self.acctSvrc: " + self.acctSvrc);
         if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
             self.account = self.acctSvrc.getAccount();
-            //console.log("WalletPage.onAccountEvent() self.account: " + self.account);
-            //console.log("WalletPage.onAccountEvent() self.account.balance: " + self.account.balance);
         }
 
         if (AppConstants.ACCT_INFO_LOADED === acctevt.memo) {
@@ -58,8 +63,6 @@ export class WalletPage {
 
     getAccountBalances() {
         this.acctSvrc.getAccountBalances();
-        //console.log("getAccountBalances() this.accountBalances: " + this.accountBalances);
-        //console.log("getAccountBalances() acctBalances: " + JSON.stringify(this.acctSvrc.getAccountBalances()));
     }
 
     getAccountBalancesUseStellarBalances() {

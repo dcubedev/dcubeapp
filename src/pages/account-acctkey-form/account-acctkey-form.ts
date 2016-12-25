@@ -51,45 +51,6 @@ export class AccountAcctkeyFormPage {
         this.menuCtrl.toggle('right');
     }
 
-    getAccountAcctkeyData() {
-        let self = this;
-        let acctkeyId = this.acctAcctkeyForm.value['acctkeyId'];
-        let accountId = this.acctAcctkeyForm.value['accountId'];
-
-        let url_p = null;
-
-        if (acctkeyId != undefined &&
-            acctkeyId != null &&
-            acctkeyId.length > 10) {
-            // "GA6TQPQRV5T6PBINT6UWCTLFFDLU5YCLQR2ZZH5WUZUX3GNTWQ5MEEKB"
-            acctkeyId = acctkeyId.trim();
-            url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkeyByKey?acctkeyid=" + acctkeyId;
-        } else {
-            if (accountId != undefined &&
-                accountId != null &&
-                accountId.length > 10) {
-                // "d90b3b58-006e-434c-ac40-dcfcce0267b4"
-                accountId = accountId.trim();
-                url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkey?acctid=" + accountId;
-            }
-        }
-
-        console.log("getAccountAcctkeyData() url_p: " + url_p);
-        if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
-                //console.log("getAccountAcctkeyData() data: " + JSON.stringify(data));
-                //console.log("getAccountAcctkeyData() data['acctkeyId']: " + data['acctkeyId']);
-
-                self.acctAcctkeyForm.setValue(data);
-                self.clientAcctkeyForm.controls['acctkeyId'].setValue(data['acctkeyId']);
-                self.acctClientForm.controls['accountId'].setValue(data['accountId']);
-            }, err => {
-                console.log("getAccountAcctkeyData() err: " + JSON.stringify(err));
-            })
-        }
-        
-    }
-
     getClientAcctkeyData() {
         let self = this;
         let acctkeyId = this.clientAcctkeyForm.value['acctkeyId'];
@@ -192,6 +153,45 @@ export class AccountAcctkeyFormPage {
                 console.log("getComplianceServerInfo() err: " + JSON.stringify(err));
             });
         }
+    }
+
+    getAccountAcctkeyData() {
+        let self = this;
+        let acctkeyId = this.acctAcctkeyForm.value['acctkeyId'];
+        let accountId = this.acctAcctkeyForm.value['accountId'];
+
+        let url_p = null;
+
+        if (acctkeyId != undefined &&
+            acctkeyId != null &&
+            acctkeyId.length > 10) {
+            // "GA6TQPQRV5T6PBINT6UWCTLFFDLU5YCLQR2ZZH5WUZUX3GNTWQ5MEEKB"
+            acctkeyId = acctkeyId.trim();
+            url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkeyByKey?acctkeyid=" + acctkeyId;
+        } else {
+            if (accountId != undefined &&
+                accountId != null &&
+                accountId.length > 10) {
+                // "d90b3b58-006e-434c-ac40-dcfcce0267b4"
+                accountId = accountId.trim();
+                url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkey?acctid=" + accountId;
+            }
+        }
+
+        console.log("getAccountAcctkeyData() url_p: " + url_p);
+        if (url_p != null) {
+            this.commonSvrc.getHttp(url_p).then(data => {
+                //console.log("getAccountAcctkeyData() data: " + JSON.stringify(data));
+                //console.log("getAccountAcctkeyData() data['acctkeyId']: " + data['acctkeyId']);
+
+                self.acctAcctkeyForm.setValue(data);
+                self.clientAcctkeyForm.controls['acctkeyId'].setValue(data['acctkeyId']);
+                self.acctClientForm.controls['accountId'].setValue(data['accountId']);
+            }, err => {
+                console.log("getAccountAcctkeyData() err: " + JSON.stringify(err));
+            })
+        }
+
     }
 
     logForm() {

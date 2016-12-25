@@ -51,7 +51,7 @@ export class StellarRemoteService {
     }
 
     resetServer(self) {
-        //console.log('initServer() this.comSrvc.appMode: ', this.comSrvc.appMode);
+        //console.log('resetServer() this.comSrvc.appMode: ', this.comSrvc.appMode);
         if (CommonConstants.AppMode[CommonConstants.AppMode.PROD] === self.commonSvrc.appMode) {
             self.bridgeServerURL = StellarConstants.URL_LIVE_BRIDGE;
             self.federationServerURL = StellarConstants.URL_LIVE_FEDERATION;

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-export const HOME_DOMAIN = 'zoomsika.com';
+export const HOME_DOMAIN = 'dcubedev.com';
 
 export const URL_LIVE_NETWORK = 'https://horizon.stellar.org';
 export const URL_TEST_NETWORK = 'https://horizon-testnet.stellar.org';

@@ -40,11 +40,11 @@ export class DemoPage {
         //console.log("Entering DemoPage.constructor() ...");
     }
 
-    ngOnInit() {    
+    ngOnInit() {
         this.commonSvrc.initAccount(this);
         //console.log("DemoPage.ngOnInit() this.account: " + this.account);
         //console.log("DemoPage.ngOnInit() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
-        this.keysStored = this.keySettingsService.loadKeysStore();
+        //this.keysStored = this.keySettingsService.loadKeysStore();
         //this.getAccountBalances();
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
         //console.log("DemoPage.ngOnInit() this.keysStored: " + this.keysStored);

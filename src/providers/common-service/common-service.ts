@@ -144,8 +144,8 @@ export enum PaymentMethod {
 // AppPlatform (appplatform)
 export enum AppPlatform {
     STELLAR,
-    RIPPLE,
-    UPHOLD
+    UPHOLD,
+    RIPPLE
 }
 
 export enum AppMode {
@@ -199,6 +199,7 @@ export const PAYMETHOD = 'payMethod';
 export class CommonService {
     isMobile: boolean = false;
     url_dcube: string = AppConstants.URL_DEV_DCUBE;
+    url_scom: string = AppConstants.URL_DEV_SCOM;
     local: Storage = null;
     _data: any = null;
     cfgdata: any = null;
@@ -264,25 +265,30 @@ export class CommonService {
     }
 
     reconfigDcubeUrl() {
-        console.log('reconfigDcubeUrl() this.appMode: ', this.appMode);
+        //console.log('reconfigDcubeUrl() this.appMode: ', this.appMode);
         this.url_dcube = AppConstants.URL_DEV_DCUBE;
+        this.url_scom = AppConstants.URL_DEV_SCOM;
         switch (this.appMode) {
             case AppMode[AppMode.PROD]:
                 // production mode
-                this.url_dcube = AppConstants.URL_LIVE_DCUBE;
+            this.url_dcube = AppConstants.URL_LIVE_DCUBE;
+            this.url_scom = AppConstants.URL_LIVE_SCOM;
                 break;
             case AppMode[AppMode.DEMO]:
                 // demonstration/learning mode
                 this.url_dcube = AppConstants.URL_DEMO_DCUBE;
+                this.url_scom = AppConstants.URL_DEMO_SCOM;
                 break;
             case AppMode[AppMode.TEST]:
                 // demonstration/learning mode
                 this.url_dcube = AppConstants.URL_TEST_DCUBE;
+                this.url_scom = AppConstants.URL_TEST_SCOM;
                 break;
             default:
                 // development mode
                 if (this.platform.is('mobile')) {
                     this.url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
+                    this.url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
                 }
         }
     }

@@ -13,7 +13,7 @@ declare var StellarSdk: any;
   for more info on providers and Angular 2 DI.
 */
 @Injectable()
-export class StellarCommon {
+export class StellarCommonService {
 
     constructor(public http: Http) {
     }

@@ -8,7 +8,7 @@ import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-tra
 import { MyApp } from './app.component';
 import { AppConfig } from '../providers/app-config/app-config';
 import { CommonService } from '../providers/common-service/common-service';
-import { StellarCommon } from '../providers/stellar-common/stellar-common';
+import { StellarCommonService } from '../providers/stellar-common-service/stellar-common-service';
 import { StellarRemoteService } from '../providers/stellar-remote-service/stellar-remote-service';
 
 import { KeySettingsService } from '../providers/key-settings-service/key-settings-service';
@@ -43,6 +43,10 @@ import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-ac
 import { AccountClientFormPage } from '../pages/account-client-form/account-client-form';
 import { ClientVerificationForm } from '../pages/client-verification-form/client-verification-form';
 
+// Pages that communicate with SCOM micro service
+import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
+
+
 /*
   Author: Stephen Agyepong
 */
@@ -69,7 +73,8 @@ export function createTranslateLoader(http: Http) {
       ReceivePage,
       SendPage,
       TransactionsPage,
-      WalletPage
+      WalletPage,
+      QuickSmsFormPage
   ],
   imports: [
       IonicModule.forRoot(MyApp),
@@ -97,13 +102,14 @@ export function createTranslateLoader(http: Http) {
       ReceivePage,
       SendPage,
       TransactionsPage,
-      WalletPage
+      WalletPage,
+      QuickSmsFormPage
   ],
   providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler },
       Storage,
       AppConfig,
       CommonService,
-      StellarCommon,
+      StellarCommonService,
       StellarRemoteService,
       KeySettingsService,
       StellarKeySettingsService,

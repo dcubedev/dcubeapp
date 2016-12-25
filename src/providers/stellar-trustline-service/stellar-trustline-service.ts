@@ -3,7 +3,7 @@ import 'rxjs/add/operator/map';
 
 import { CommonService } from '../common-service/common-service';
 import { StellarRemoteService } from '../../providers/stellar-remote-service/stellar-remote-service';
-import { StellarCommon } from "../../providers/stellar-common/stellar-common";
+import { StellarCommonService } from "../../providers/stellar-common-service/stellar-common-service";
 
 declare var StellarSdk: any;
 
@@ -15,7 +15,7 @@ export class StellarTrustlineService {
 
     constructor(private comSrvc: CommonService,
         private srsSrvc: StellarRemoteService,
-        private scsSrvc: StellarCommon) {
+        private scsSrvc: StellarCommonService) {
     }
 
     setAuthorization(issuingAccount, issuingKeys) {

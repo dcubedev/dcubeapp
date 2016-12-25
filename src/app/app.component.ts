@@ -23,6 +23,9 @@ import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-ac
 import { AccountClientFormPage } from '../pages/account-client-form/account-client-form';
 import { ClientVerificationForm } from '../pages/client-verification-form/client-verification-form';
 
+// Pages that communicate with SCOM micro service
+import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
+
 /*
   Author: Stephen Agyepong
 */
@@ -59,7 +62,8 @@ export class MyApp {
       { title: 'Client Form', component: AccountClientFormPage, enabled: true },
       { title: 'Account Client Forms', component: AccountAcctkeyFormPage, enabled: true },
       { title: 'System Demonstration', component: DemoPage, enabled: true },
-      { title: 'Client Verification Form', component: ClientVerificationForm, enabled: true }
+      { title: 'Client Verification Form', component: ClientVerificationForm, enabled: true },
+      { title: 'Quick SMS', component: QuickSmsFormPage, enabled: true }
   ];
 
   // items that go on the setup menu (right more menu)
