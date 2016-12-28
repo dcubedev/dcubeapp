@@ -66,7 +66,7 @@ export class MyApp {
       { title: 'Quick SMS', component: QuickSmsFormPage, enabled: true }
   ];
 
-  // items that go on the setup menu (right more menu)
+  // items that go on the setup menu (right more/setup menu)
   setuppages: IPageObj[] = [
       { title: 'Wallet', component: WalletPage, enabled: true },
       { title: 'Application Mode', component: AppmodePage, enabled: true },

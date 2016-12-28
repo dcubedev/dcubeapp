@@ -6,6 +6,7 @@ import { Storage } from '@ionic/storage';
 import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
 
 import { MyApp } from './app.component';
+import { Appheader } from '../pages/appheader/appheader';
 import { AppConfig } from '../providers/app-config/app-config';
 import { CommonService } from '../providers/common-service/common-service';
 import { StellarCommonService } from '../providers/stellar-common-service/stellar-common-service';
@@ -57,7 +58,8 @@ export function createTranslateLoader(http: Http) {
 
 @NgModule({
   declarations: [
-    MyApp,
+      MyApp,
+      Appheader,
       AboutPage,
       AccountAcctkeyFormPage,
       AccountClientFormPage,
@@ -86,7 +88,8 @@ export function createTranslateLoader(http: Http) {
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
+      MyApp,
+      Appheader,
       AboutPage,
       AccountAcctkeyFormPage,
       AccountClientFormPage,
