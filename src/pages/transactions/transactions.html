@@ -18,7 +18,7 @@
     </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content scroll="true" padding>
     <ion-list *ngFor="let item of account.transactions">
         <div class="row item narrow" style="color:#20E000" *ngIf="!item.debit" (click)="createContact(item)">
             <div class="my-ellipsis no-padding">
