@@ -1,0 +1,82 @@
+<!--
+  Generated template for the QuickSmsFormPage page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+    <ion-navbar>
+        <ion-title>Quick SMS Using PrimeNG</ion-title>
+        <button ion-button menuToggle start>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-buttons ion-button end>
+            <button (click)="toggleRightMenu()">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-content scroll="true" padding>
+    <ion-title>Send SMS to an individual or all your contacts</ion-title>
+    <h1>PrimeNG Showcase</h1>
+
+    <p-dataTable [(value)]="persons" selectionMode="single" [(selection)]="selectedPerson" (onRowSelect)="onRowSelect($event)" rows="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" [globalFilter]="gb" [responsive]="true">
+        <header>Person list</header>
+        <p-column field="cardId" header="Card ID" [filter]="true" filterMatchMode="contains" [sortable]="true"></p-column>
+        <p-column field="name" header="Name" [filter]="true" filterMatchMode="contains" [sortable]="true"></p-column>
+        <p-column field="surname" header="Surname" [filter]="true" filterMatchMode="contains" [sortable]="true"></p-column>
+        <p-column field="country" header="Country" [filter]="true" filterMatchMode="contains" [sortable]="true"></p-column>
+
+        <footer>
+            <div class="ui-helper-clearfix" style="width:100%">
+                <button type="button" pButton icon="fa-plus" style="float:left" (click)="showDialogToAdd()" label="Add"></button>
+                <button type="button" pButton icon="fa-pencil-square-o" style="float:left" (click)="showDialogToEdit()" [disabled]="selectedPerson == null" label="Edit"></button>
+                <button type="button" pButton icon="fa-close" style="float:left" (click)="delete()" [disabled]="selectedPerson == null" label="Delete"></button>
+            </div>
+        </footer>
+    </p-dataTable>
+
+    <p-dialog header="Person details" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true">
+        <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="displayablePerson">
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="cardId">Card ID</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="cardId" [(ngModel)]="displayablePerson.cardId" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="name">Name</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="name" [(ngModel)]="displayablePerson.name" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="surname">Surname</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="surname" [(ngModel)]="displayablePerson.surname" /></div>
+            </div>
+            <div class="ui-grid-row">
+                <div class="ui-grid-col-4"><label for="country">Country</label></div>
+                <div class="ui-grid-col-8"><input pInputText id="country" [(ngModel)]="displayablePerson.country" /></div>
+            </div>
+        </div>
+        <footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <button type="button" pButton icon="fa-check" (click)="save()" label="Save"></button>
+            </div>
+        </footer>
+    </p-dialog>
+
+    <p-toolbar>
+        <div class="ui-toolbar-group-left">
+            <button pButton type="button" label="New" icon="fa-plus"></button>
+            <button pButton type="button" label="Open" icon="fa-folder-open"></button>
+
+            <i class="fa fa-bars"></i>
+        </div>
+
+        <div class="ui-toolbar-group-right">
+            <button pButton type="button" icon="fa-search"></button>
+            <i class="fa fa-bars"></i>
+            <button pButton type="button" icon="fa-refresh"></button>
+            <button pButton type="button" icon="fa-trash"></button>
+        </div>
+    </p-toolbar>
+
+</ion-content>

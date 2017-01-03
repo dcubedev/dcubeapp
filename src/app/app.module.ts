@@ -1,9 +1,15 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { Http } from '@angular/http';
+import { RouterModule } from '@angular/router';
+import 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
 
 import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
+import {InputTextModule, DataTableModule, ButtonModule, DialogModule} from "primeng/primeng";
+import {ToolbarModule} from 'primeng/primeng';
+//import {SplitButtonModule} from 'primeng/primeng';
+import 'primeng/primeng';
 
 import { MyApp } from './app.component';
 import { Appheader } from '../pages/appheader/appheader';
@@ -46,7 +52,7 @@ import { ClientVerificationForm } from '../pages/client-verification-form/client
 
 // Pages that communicate with SCOM micro service
 import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
-
+import { QuickSmsPage } from '../pages/sms-person/sms-person';
 
 /*
   Author: Stephen Agyepong
@@ -76,7 +82,8 @@ export function createTranslateLoader(http: Http) {
       SendPage,
       TransactionsPage,
       WalletPage,
-      QuickSmsFormPage
+      QuickSmsFormPage,
+      QuickSmsPage
   ],
   imports: [
       IonicModule.forRoot(MyApp),
@@ -84,7 +91,9 @@ export function createTranslateLoader(http: Http) {
           provide: TranslateLoader,
           useFactory: (createTranslateLoader),
           deps: [Http]
-      })
+      }),
+      InputTextModule, DataTableModule, ButtonModule, DialogModule,
+      ToolbarModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -106,9 +115,11 @@ export function createTranslateLoader(http: Http) {
       SendPage,
       TransactionsPage,
       WalletPage,
-      QuickSmsFormPage
+      QuickSmsFormPage,
+      QuickSmsPage
   ],
   providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler },
+      RouterModule,
       Storage,
       AppConfig,
       CommonService,

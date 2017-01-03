@@ -4,7 +4,8 @@
   "homepage": "https://dcubedev.com/",
   "private": true,
   "config": {
-    "ionic_copy": "src/assets/scripts/copy.config.js"
+    "ionic_copy": "src/assets/scripts/copy.config.js",
+    "ionic_sass": "src/assets/scripts/sass.config.js"
   },
   "scripts": {
     "ionic:build": "ionic-app-scripts build",
@@ -20,12 +21,14 @@
     "@angular/platform-browser": "2.2.1",
     "@angular/platform-browser-dynamic": "2.2.1",
     "@angular/platform-server": "2.2.1",
+    "@angular/router": "^3.2.1",
     "@ionic/storage": "1.1.6",
     "eventsource": "^0.2.1",
     "ionic-angular": "2.0.0-rc.4",
     "ionic-native": "2.2.11",
     "ionicons": "3.0.0",
     "ng2-translate": "^4.2.0",
+    "primeng": "^1.1.2",
     "rxjs": "5.0.0-beta.12",
     "stellar-sdk": "^0.6.2",
     "zone.js": "0.6.26"
@@ -42,6 +45,6 @@
     "cordova-plugin-splashscreen",
     "ionic-plugin-keyboard"
   ],
-  "cordovaPlatforms": [ ],
+  "cordovaPlatforms": [],
   "description": "DcubeApp: fintech app build with Ionic2/AngulaJS2/Cordova"
 }

@@ -14,8 +14,16 @@ module.exports = {
     src: ['{{ROOT}}/node_modules/ionicons/dist/fonts/**/*', '{{ROOT}}/node_modules/ionic-angular/fonts/**/*'],
     dest: '{{WWW}}/assets/fonts'
   },
+  copyPrimeNG: {
+      src: ['{{ROOT}}/node_modules/primeng/resources/primeng.min.css', '{{ROOT}}/node_modules/primeng/resources/themes/omega/theme.css'],
+      dest: '{{WWW}}/assets/primeng/css'
+  },
+  copyPrimeThemeImages: {
+      src: ['{{ROOT}}/node_modules/primeng/resources/themes/omega/images/**/*'],
+      dest: '{{WWW}}/assets/primeng/css/images'
+  },
   copyStellar: {
-      src: ['node_modules/stellar-sdk/dist/stellar-sdk.js'],
+      src: ['{{ROOT}}/node_modules/stellar-sdk/dist/stellar-sdk.js'],
       dest: '{{BUILD}}'
   },
   copyPolyfills: {

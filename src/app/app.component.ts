@@ -25,6 +25,7 @@ import { ClientVerificationForm } from '../pages/client-verification-form/client
 
 // Pages that communicate with SCOM micro service
 import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
+import { QuickSmsPage } from '../pages/sms-person/sms-person';
 
 /*
   Author: Stephen Agyepong
@@ -63,9 +64,10 @@ export class MyApp {
       { title: 'Account Client Forms', component: AccountAcctkeyFormPage, enabled: true },
       { title: 'System Demonstration', component: DemoPage, enabled: true },
       { title: 'Client Verification Form', component: ClientVerificationForm, enabled: true },
-      { title: 'Quick SMS', component: QuickSmsFormPage, enabled: true }
+      { title: 'Quick SMS', component: QuickSmsFormPage, enabled: true },
+      { title: 'Quick SMS PrimeNG', component: QuickSmsPage, enabled: true }
   ];
-
+  
   // items that go on the setup menu (right more/setup menu)
   setuppages: IPageObj[] = [
       { title: 'Wallet', component: WalletPage, enabled: true },
