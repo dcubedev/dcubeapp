@@ -37,7 +37,7 @@
         </footer>
     </p-dataTable>
 
-    <p-dialog header="Person details" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true">
+    <p-dialog header="Person details" [(visible)]="displayDialog" >
         <div class="ui-grid ui-grid-responsive ui-fluid" *ngIf="displayablePerson">
             <div class="ui-grid-row">
                 <div class="ui-grid-col-4"><label for="cardId">Card ID</label></div>
@@ -78,5 +78,64 @@
             <button pButton type="button" icon="fa-trash"></button>
         </div>
     </p-toolbar>
+
+    <p-dialog header="Godfather I" [(visible)]="display" responsive="true" resizable="true" width="300">
+        <p>
+            The story begins as Don Vito Corleone, the head of a New York Mafia family, oversees his daughter's wedding.
+            His beloved son Michael has just come home from the war, but does not intend to become part of his father's business.
+            Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family,
+            kind and benevolent to those who give respect,
+            but given to ruthless violence whenever anything stands against the good of the family.
+        </p>
+        <footer>
+            <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+                <button type="button" pButton icon="fa-close" (click)="display=false" label="No"></button>
+                <button type="button" pButton icon="fa-check" (click)="display=false" label="Yes"></button>
+            </div>
+        </footer>
+    </p-dialog>
+
+    <button type="text" (click)="showDialog()" pButton icon="fa-external-link-square" label="Show"></button>
+
+
+    <div class="ui-g">
+        <div class="ui-g-12 ui-md-4">
+            <h3>Basic</h3>
+            <p-calendar [(ngModel)]="date1"></p-calendar> {{date1|date}}
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Spanish</h3>
+            <p-calendar [(ngModel)]="date2" [locale]="es" dateFormat="dd/mm/yy"></p-calendar> {{date2|date}}
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Icon</h3>
+            <p-calendar [(ngModel)]="date3" [showIcon]="true"></p-calendar> <span style="margin-left:35px">{{date3|date}}</span>
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Restrict</h3>
+            <p-calendar [(ngModel)]="date4" [minDate]="minDate" [maxDate]="maxDate" [readonlyInput]="true"></p-calendar> {{date4|date}}
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Navigators</h3>
+            <p-calendar [(ngModel)]="date5" [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2030"></p-calendar> {{date5|date}}
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Time</h3>
+            <p-calendar [(ngModel)]="date6" [showTime]="true"></p-calendar> {{date6}}
+        </div>
+
+        <div class="ui-g-12 ui-md-4">
+            <h3>Time Only </h3>
+            <p-calendar [(ngModel)]="date7" [timeOnly]="true"></p-calendar>
+        </div>
+    </div>
+
+    <h3>Inline {{date8|date}}</h3>
+    <p-calendar [(ngModel)]="date8" [inline]="true"></p-calendar> 
 
 </ion-content>

@@ -9,6 +9,8 @@ import { AccountService } from '../../providers/account-service/account-service'
 import { TrustService } from '../../providers/trust-service/trust-service';
 import { TradingService } from '../../providers/trading-service/trading-service';
 
+import { AccountAcctkeyFormPage } from '../account-acctkey-form/account-acctkey-form';
+
 
 /*
   Author: Stephen Agyepong
@@ -94,6 +96,10 @@ export class DemoPage {
 
     toggleRightMenu() {
         this.menuCtrl.toggle('right');
+    }
+
+    gotoAccountAcctkeyForm() {
+        this.navCtrl.push(AccountAcctkeyFormPage);
     }
 
     genKeypair() {

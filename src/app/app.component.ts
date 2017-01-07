@@ -15,6 +15,7 @@ import { PaymethodPage } from '../pages/paymethod/paymethod';
 import { PlatformPage } from '../pages/platform/platform';
 import { ReceivePage } from '../pages/receive/receive';
 import { SendPage } from '../pages/send/send';
+import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/transactions/transactions';
 import { WalletPage } from '../pages/wallet/wallet';
 
@@ -46,7 +47,7 @@ interface IPageObj {
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage: any = WalletPage;
+  rootPage: any = TabsPage;
 
   // items that go on the main menu (left menu)
   footerpages: IPageObj[] = [
@@ -59,7 +60,7 @@ export class MyApp {
 
   // items that go on the main menu (right menu)
   mainpages: IPageObj[] = [
-      { title: 'Wallet', component: WalletPage, enabled: true },
+      { title: 'Home', component: TabsPage, enabled: true },
       { title: 'Client Form', component: AccountClientFormPage, enabled: true },
       { title: 'Account Client Forms', component: AccountAcctkeyFormPage, enabled: true },
       { title: 'System Demonstration', component: DemoPage, enabled: true },
@@ -70,7 +71,6 @@ export class MyApp {
   
   // items that go on the setup menu (right more/setup menu)
   setuppages: IPageObj[] = [
-      { title: 'Wallet', component: WalletPage, enabled: true },
       { title: 'Application Mode', component: AppmodePage, enabled: true },
       { title: 'Currency', component: CurrencyPage, enabled: true },
       { title: 'Language', component: LanguagePage, enabled: true },

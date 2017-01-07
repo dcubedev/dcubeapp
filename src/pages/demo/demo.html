@@ -81,6 +81,10 @@
             <ion-textarea [(ngModel)]="outArea" name="outTextArea" rows="6" placeholder="output will go here..."></ion-textarea>
         </ion-item>
         <div class="button-bar">
+            <button ion-button class="button button-block" (click)="gotoAccountAcctkeyForm()">
+                <ion-icon name="share"></ion-icon>
+                Go to account-acctkey-form
+            </button>
             <button ion-button class="button button-block" (click)="genKeyAndFundAccount()">
                 <ion-icon name="share"></ion-icon>
                 Generate Keypair and fund account

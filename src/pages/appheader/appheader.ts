@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
 /*
-  Generated class for the AppheaderPage page.
+  Generated class for the Appheader page.
 
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.

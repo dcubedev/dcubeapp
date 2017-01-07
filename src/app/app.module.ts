@@ -8,6 +8,7 @@ import { Storage } from '@ionic/storage';
 import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
 import {InputTextModule, DataTableModule, ButtonModule, DialogModule} from "primeng/primeng";
 import {ToolbarModule} from 'primeng/primeng';
+import {CalendarModule} from 'primeng/primeng';
 //import {SplitButtonModule} from 'primeng/primeng';
 import 'primeng/primeng';
 
@@ -42,6 +43,7 @@ import { PaymethodPage } from '../pages/paymethod/paymethod';
 import { PlatformPage } from '../pages/platform/platform';
 import { ReceivePage } from '../pages/receive/receive';
 import { SendPage } from '../pages/send/send';
+import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/transactions/transactions';
 import { WalletPage } from '../pages/wallet/wallet';
 
@@ -80,6 +82,7 @@ export function createTranslateLoader(http: Http) {
       PlatformPage,
       ReceivePage,
       SendPage,
+      TabsPage,
       TransactionsPage,
       WalletPage,
       QuickSmsFormPage,
@@ -93,7 +96,8 @@ export function createTranslateLoader(http: Http) {
           deps: [Http]
       }),
       InputTextModule, DataTableModule, ButtonModule, DialogModule,
-      ToolbarModule
+      ToolbarModule,
+      CalendarModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -113,6 +117,7 @@ export function createTranslateLoader(http: Http) {
       PlatformPage,
       ReceivePage,
       SendPage,
+      TabsPage,
       TransactionsPage,
       WalletPage,
       QuickSmsFormPage,
