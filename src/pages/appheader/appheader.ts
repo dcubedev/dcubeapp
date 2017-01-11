@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Input } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
 /*
@@ -8,20 +9,21 @@ import { NavController, MenuController } from 'ionic-angular';
   Ionic pages and navigation.
 */
 @Component({
-  selector: 'app-header',
-  templateUrl: 'appheader.html',
+    selector: 'app-header',
+    templateUrl: 'appheader.html',
 })
 export class Appheader {
+    @Input() ptitle: string;
+ 
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController) {
+    }
 
-  constructor(private navCtrl: NavController, public menuCtrl: MenuController) {
-  }
+    toggleLeftMenu() {
+        this.menuCtrl.toggle('left');
+    }
 
-  toggleLeftMenu() {
-      this.menuCtrl.toggle('left');
-  }
-
-  toggleRightMenu() {
-      this.menuCtrl.toggle('right');
-  }
+    toggleRightMenu() {
+        this.menuCtrl.toggle('right');
+    }
 
 }
