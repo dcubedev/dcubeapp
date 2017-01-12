@@ -9,7 +9,6 @@ import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-tra
 import {InputTextModule, DataTableModule, ButtonModule, DialogModule} from "primeng/primeng";
 import {ToolbarModule} from 'primeng/primeng';
 import {CalendarModule} from 'primeng/primeng';
-//import {SplitButtonModule} from 'primeng/primeng';
 import 'primeng/primeng';
 
 import { MyApp } from './app.component';

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 
 import { NavParams } from 'ionic-angular';
 
+import { CommonService } from '../../providers/common-service/common-service';
+
 import { ContactsPage } from '../contacts/contacts';
 import { ReceivePage } from '../receive/receive';
 import { SendPage } from '../send/send';
@@ -10,7 +12,7 @@ import { WalletPage } from '../wallet/wallet';
 
 
 @Component({
-  templateUrl: 'tabs.html'
+    templateUrl: 'tabs.html'
 })
 export class TabsPage {
     // set the root pages for each tab
@@ -19,11 +21,12 @@ export class TabsPage {
     tab2Root: any = WalletPage;
     tab3Root: any = SendPage;
     tab4Root: any = TransactionsPage;
-    
-  mySelectedIndex: number;
 
-  constructor(navParams: NavParams) {
-    this.mySelectedIndex = navParams.data.tabIndex || 0;
-  }
+    mySelectedIndex: number;
+
+    constructor(navParams: NavParams,
+        private commonSvrc: CommonService) {
+        this.mySelectedIndex = navParams.data.tabIndex || 0;
+    }
 
 }

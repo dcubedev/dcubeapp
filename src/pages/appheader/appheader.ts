@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Input } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
+import { CommonService } from '../../providers/common-service/common-service';
+
 /*
   Generated class for the Appheader page.
 
@@ -14,8 +16,13 @@ import { NavController, MenuController } from 'ionic-angular';
 })
 export class Appheader {
     @Input() ptitle: string;
- 
-    constructor(private navCtrl: NavController, public menuCtrl: MenuController) {
+
+    getPtitle() {
+        return this.commonSvrc.translateString(this.ptitle);
+    }
+
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        private commonSvrc: CommonService) {
     }
 
     toggleLeftMenu() {

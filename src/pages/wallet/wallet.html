@@ -5,7 +5,7 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-    <app-header ptitle="Wallet"></app-header>
+    <app-header ptitle="tabs.home"></app-header>
 </ion-header>
 
 <ion-content padding>
@@ -18,21 +18,21 @@
     <div class="button-bar">
         <button ion-button class="button button-block">
             <ion-icon name="archive"></ion-icon>
-            {{ "import" | translate }}
+            {{ "common.import" | translate }}
         </button>
         <button ion-button class="button button-block">
             <ion-icon name="share"></ion-icon>
-            {{ "export" | translate }}
+            {{ "common.export" | translate }}
         </button>
     </div>
     <div class="text-center" style="padding-bottom:10px">
         <button ion-button class="button button-block">
             <ion-icon name="ios-unlock"></ion-icon>
-            {{ "revealsecret" | translate }}
+            {{ "common.revealsecret" | translate }}
         </button>
     </div>
     <div class="item item-divider">
-        {{ "announcements" | translate }}
+        {{ "common.announcements" | translate }}
     </div>
     <div class="item item-body">
         Stellar Foundation has decided to launch a new consensus network called Stellar-Core.

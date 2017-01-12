@@ -1,13 +1,13 @@
 <ion-menu side="left" [content]="content">
     <ion-header>
         <ion-toolbar>
-            <ion-title>Main Menu</ion-title>
+            <ion-title>{{getTranslate("common.mainmenu")}}</ion-title>
         </ion-toolbar>
     </ion-header>
     <ion-content>
         <ion-list>
             <button menuClose ion-item *ngFor="let p of mainpages" (click)="openPage(p)">
-                {{p.title}}
+                {{getTranslate(p.title)}}
             </button>
         </ion-list>
     </ion-content>
@@ -16,13 +16,13 @@
 <ion-menu side="right" [content]="content">
     <ion-header>
         <ion-toolbar>
-            <ion-title>Setup/Config Menu</ion-title>
+            <ion-title>{{getTranslate("common.setupmenu")}}</ion-title>
         </ion-toolbar>
     </ion-header>
     <ion-content>
         <ion-list>
             <button menuClose ion-item *ngFor="let p of setuppages" (click)="openPage(p)">
-                {{p.title}}
+                {{getTranslate(p.title)}}
             </button>
         </ion-list>
     </ion-content>

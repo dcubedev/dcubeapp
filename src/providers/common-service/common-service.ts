@@ -3,10 +3,10 @@ import { EventEmitter } from '@angular/core';
 import { Http, RequestOptionsArgs } from '@angular/http';
 
 import { Platform } from 'ionic-angular';
+import { TranslateService } from 'ng2-translate';
 
 // ionic 2 imports
 import { Storage } from '@ionic/storage';
-import {TranslateService} from 'ng2-translate';
 
 // dcubedev imports
 import * as AppConstants from '../app-constants/app-constants';
@@ -220,9 +220,6 @@ export class CommonService {
             this.isMobile = true;
         }
         this.reconfigDcubeUrl();
-        
-        // this language will be used as a fallback when a translation isn't found in the current language
-        translateService.setDefaultLang(this.appLang);
 
         // see https://www.w3.org/International/questions/qa-html-language-declarations
         //console.log('CommonService.constructor() this.platform.lang: ', this.platform.lang());
@@ -271,8 +268,8 @@ export class CommonService {
         switch (this.appMode) {
             case AppMode[AppMode.PROD]:
                 // production mode
-            this.url_dcube = AppConstants.URL_LIVE_DCUBE;
-            this.url_scom = AppConstants.URL_LIVE_SCOM;
+                this.url_dcube = AppConstants.URL_LIVE_DCUBE;
+                this.url_scom = AppConstants.URL_LIVE_SCOM;
                 break;
             case AppMode[AppMode.DEMO]:
                 // demonstration/learning mode
@@ -368,14 +365,20 @@ export class CommonService {
     }
 
     translateString(key: string): string {
-        this.translateService.get(key).subscribe(
-            value => {
-                // value is our translated string
-                return value;
-            }
-        )
+        return this.translateService.instant(key);
+    }
 
-        return key;
+    translateStringSubscribe(key: string): string {
+        console.log('CommonService::translateString() key: ', key);
+
+        this.translateService.get(key).subscribe(value => {
+            // value is our translated string
+            console.log('CommonService::translateString() value: ', value);
+            return value;
+        })
+
+        console.log('CommonService::translateString() value: ', "");
+        return "";
     }
 
     getAppCurrency() {

@@ -1,7 +1,7 @@
 <ion-tabs selectedIndex="2">
-    <ion-tab [root]="tab0Root" tabTitle="contacts" tabIcon="contacts">{{ "contacts" | translate }}</ion-tab>
-    <ion-tab [root]="tab1Root" tabTitle="receive" tabIcon="arrow-round-back"></ion-tab>
-    <ion-tab [root]="tab2Root" tabTitle="wallet" tabIcon="home">{{ "wallet" | translate }}</ion-tab>
-    <ion-tab [root]="tab3Root" tabTitle="send" tabIcon="send">{{ "send" | translate }}</ion-tab>
-    <ion-tab [root]="tab4Root" tabTitle="trx" tabIcon="archive">{{ "trx" | translate }}</ion-tab>
+    <ion-tab [root]="tab0Root" tabTitle="{{ 'tabs.contacts' | translate }}" tabIcon="contacts"></ion-tab>
+    <ion-tab [root]="tab1Root" tabTitle="{{ 'tabs.receive' | translate }}" tabIcon="arrow-round-back"></ion-tab>
+    <ion-tab [root]="tab2Root" tabTitle="{{ 'tabs.home' | translate }}" tabIcon="home"></ion-tab>
+    <ion-tab [root]="tab3Root" tabTitle="{{ 'tabs.send' | translate }}" tabIcon="send"></ion-tab>
+    <ion-tab [root]="tab4Root" tabTitle="{{ 'tabs.trx' | translate }}" tabIcon="archive"></ion-tab>
 </ion-tabs>
