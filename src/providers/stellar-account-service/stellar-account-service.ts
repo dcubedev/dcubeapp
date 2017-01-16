@@ -68,7 +68,6 @@ export class StellarAccountService {
     }
 
     healthCheck() {
-        console.log('SAS healthCheck: this.srsSrvc.isConnected(): ' + this.srsSrvc.isConnected());
         if (!this.srsSrvc.isConnected()) {
             this.srsSrvc.initServer();
             this.connectionChanged = true;

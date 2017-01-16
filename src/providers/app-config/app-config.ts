@@ -30,7 +30,7 @@ export class AppConfig {
                     console.error('config loading error: ' + JSON.stringify(onerr))
                     reject(onerr);
                 },
-                () => { console.log('config loading completed') } );
+                () => { console.log('app-config loading completed') } );
         });
     }
 

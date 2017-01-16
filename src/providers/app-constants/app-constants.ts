@@ -9,17 +9,17 @@ export const NEW_TRANSACT = 'newTransaction';
 export const NEW_PAYMENT = 'newPayment';
 export const MEMO_ACCT = 'account';
 
-export const URL_DEV_DCUBE = 'http://localhost:8080/dcube-fintech-dev-0.0.1-SNAPSHOT/';
-export const URL_DEV_MOBILE_DCUBE = 'http://dcubedev.com/dcube-fintech-dev-0.0.1-SNAPSHOT/';
-export const URL_DEMO_DCUBE = 'http://demo.dcubedev.com/dcube-fintech-dev-0.0.1-SNAPSHOT/';
-export const URL_TEST_DCUBE = 'http://test.dcubedev.com/dcube-fintech-dev-0.0.1-SNAPSHOT/';
-export const URL_LIVE_DCUBE = 'https://dcubedev.com/dcube-fintech-dev-0.0.1-SNAPSHOT/';
+export const URL_DEV_DCUBE = 'http://localhost:8080/dcube-service/';
+export const URL_DEV_MOBILE_DCUBE = 'http://dcubedev.com/dcube-service/';
+export const URL_DEMO_DCUBE = 'http://demo.dcubedev.com/dcube-service/';
+export const URL_TEST_DCUBE = 'http://test.dcubedev.com/dcube-service/';
+export const URL_LIVE_DCUBE = 'https://dcubedev.com/dcube-service/';
 
-export const URL_DEV_SCOM = 'http://localhost:8080/scom-center-dev-0.0.1/sms/';
-export const URL_DEV_MOBILE_SCOM = 'http://dcubedev.com/scom-center-dev-0.0.1/sms/';
-export const URL_DEMO_SCOM = 'http://demo.dcubedev.com/scom-center-dev-0.0.1/sms/';
-export const URL_TEST_SCOM = 'http://test.dcubedev.com/scom-center-dev-0.0.1/sms/';
-export const URL_LIVE_SCOM = 'http://dcubedev.com/scom-center-dev-0.0.1/sms/';
+export const URL_DEV_SCOM = 'http://localhost:8080/scom-center/sms/';
+export const URL_DEV_MOBILE_SCOM = 'http://dcubedev.com/scom-center/sms/';
+export const URL_DEMO_SCOM = 'http://demo.dcubedev.com/scom-center/sms/';
+export const URL_TEST_SCOM = 'http://test.dcubedev.com/scom-center/sms/';
+export const URL_LIVE_SCOM = 'http://dcubedev.com/scom-center/sms/';
 
 /*
   Author: Stephen Agyepong

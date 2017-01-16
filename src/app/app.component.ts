@@ -105,7 +105,6 @@ export class MyApp {
             Splashscreen.hide();
 
             let curlang: string = this.commonSvrc.appLang.toLocaleLowerCase();
-            console.log('MyApp.initializeApp() this.commonSvrc.appLang: ', curlang);
 
             // see https://www.w3.org/International/questions/qa-html-language-declarations
             this.platform.setLang(curlang, true);

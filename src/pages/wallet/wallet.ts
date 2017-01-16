@@ -46,7 +46,6 @@ export class WalletPage implements OnInit{
         if (undefined !== self.keysStored && null !== self.keysStored && undefined !== self.keysStored.address && null !== self.keysStored.address && self.keysStored.address.length > 0
             && ((null !== self.accountBalances && self.accountBalances.length < 1) ||
             (null === self.accountBalances))) {
-            console.log("WalletPage.onKeyEvent() call getAccountBalances()");
             self.getAccountBalances();
         }
     }
