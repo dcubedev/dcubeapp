@@ -15,11 +15,11 @@ export const URL_DEMO_DCUBE = 'http://demo.dcubedev.com/dcube-service/';
 export const URL_TEST_DCUBE = 'http://test.dcubedev.com/dcube-service/';
 export const URL_LIVE_DCUBE = 'https://dcubedev.com/dcube-service/';
 
-export const URL_DEV_SCOM = 'http://localhost:8080/scom-center/sms/';
-export const URL_DEV_MOBILE_SCOM = 'http://dcubedev.com/scom-center/sms/';
-export const URL_DEMO_SCOM = 'http://demo.dcubedev.com/scom-center/sms/';
-export const URL_TEST_SCOM = 'http://test.dcubedev.com/scom-center/sms/';
-export const URL_LIVE_SCOM = 'http://dcubedev.com/scom-center/sms/';
+export const URL_DEV_SCOM = 'http://localhost:8080/scom-center/';
+export const URL_DEV_MOBILE_SCOM = 'http://dcubedev.com/scom-center/';
+export const URL_DEMO_SCOM = 'http://demo.dcubedev.com/scom-center/';
+export const URL_TEST_SCOM = 'http://test.dcubedev.com/scom-center/';
+export const URL_LIVE_SCOM = 'http://dcubedev.com/scom-center/';
 
 /*
   Author: Stephen Agyepong

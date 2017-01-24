@@ -54,6 +54,10 @@ export class AccountService{
         return this.sas.getAccountBalances();
     }
 
+    getAccountBalanceForKeyWithAddr(keyaddr) {
+        return this.sas.getAccountBalanceForKeyWithAddr(keyaddr);
+    }
+
     getAccountBalancesUseStellarBalances(addr_p) {
         let self = this;
         let promise = new Promise(function (resolve, reject) {

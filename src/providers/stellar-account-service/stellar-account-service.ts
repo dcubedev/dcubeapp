@@ -5,6 +5,7 @@ import { EventEmitter } from '@angular/core';
 
 import * as AppConstants from '../app-constants/app-constants';
 import { CommonService } from '../common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 import * as CommonConstants from '../common-service/common-service';
 import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
 import * as StellarKeySettingsConstants from '../stellar-key-settings-service/stellar-key-settings-service';
@@ -34,6 +35,7 @@ export class StellarAccountService {
     pagingToken = 0;
 
     constructor(private http: Http, private comSrvc: CommonService,
+        private remoteSvrc: RemoteService,
         private keysettings: StellarKeySettingsService,
         private srsSrvc: StellarRemoteService,
         private scsSrvc: StellarCommonService) {
@@ -182,12 +184,17 @@ export class StellarAccountService {
 
     getAccountBalanceForKey() {
         // get initial account balances
-        let self = this;
         let keyaddr = this.getKeyAddress();
+        this.getAccountBalanceForKeyWithAddr(keyaddr);
+    }
 
-        self.resetAccount(keyaddr);
+    getAccountBalanceForKeyWithAddr(keyaddr) {
+        // get initial account balances
+        let self = this;
 
-        if (undefined !== self.account.address && self.account.address.length > 0) {
+        this.resetAccount(keyaddr);
+
+        if (undefined !== this.account.address && this.account.address.length > 0) {
             self.srsSrvc.getServer().accounts()
                 .accountId(self.account.address)
                 .call()
@@ -498,16 +505,16 @@ export class StellarAccountService {
         server.friendbot(addrp)
             .call()
             .then(data => {
-                console.log("fundAccountWithFriendbot() data: " + data);
+                console.log("fundAccountWithFriendbot() data: " + JSON.stringify(data));
             }, err => {
-                console.log("fundAccountWithFriendbot() err: " + err);
+                console.log("fundAccountWithFriendbot() err: " + JSON.stringify(err));
             })
     }
 
     fundAccountWithDcubeFriendbot(addrp) {
         let url_p = StellarConstants.URL_FRIENDBOT + '?json=true&addr=' + addrp;
 
-        this.comSrvc.getHttp(url_p).then(data => {
+        this.remoteSvrc.getHttp(url_p).then(data => {
             console.log("fundAccountWithFriendbot() data: " + data);
         }, err => {
             console.log("fundAccountWithFriendbot() err: " + err);
@@ -534,7 +541,7 @@ export class StellarAccountService {
 
             console.log("makePaymentUsingBridgeWithHttp() sending POST _url: " + _url);
             console.log("makePaymentUsingBridgeWithHttp() sending POST _body: " + _body);
-            self.comSrvc.postHttp(_url, _body, reqOptions).then(data => {
+            self.remoteSvrc.postHttp(_url, _body, reqOptions).then(data => {
                 console.log("makePaymentUsingBridgeWithHttp() data: " + JSON.stringify(data));
                 resolve(data);
             }, err => {

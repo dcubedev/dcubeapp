@@ -10,12 +10,18 @@
     "clientverify": "Client Verification Form",
     "quicksms": "Quick SMS",
     "quicksmspng": "Quick SMS Using PrimeNG",
+    "wallet": "Wallet",
 
     "appmode": "Application Mode",
     "currency": "Currency",
     "language": "Current Language",
     "platform": "Platform",
     "pymtmethod": "Payment Method",
+    "grptype": "Group Types",
+    "creategrp": "Create Group",
+    "managegrp": "Manage Group",
+    "dfbs": "Feedback System",
+    "drds": "Recommendation System",
     "devhelp": "Ionic Developer Help"
   },
   "common": {

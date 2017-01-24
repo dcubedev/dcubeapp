@@ -4,6 +4,7 @@ import { Http } from '@angular/http';
 
 import { CommonService } from '../common-service/common-service';
 import * as CommonConstants from '../common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 
 declare var StellarSdk: any;
 
@@ -75,7 +76,8 @@ export class StellarKeySettingsService {
     keysStored: CommonConstants.IWalletKey = null;
     public keyEvents$: EventEmitter<any>;
 
-    constructor(private http: Http, private commonSvrc: CommonService) {
+    constructor(private http: Http, private commonSvrc: CommonService,
+        private remoteSvrc: RemoteService) {
         this.keyEvents$ = new EventEmitter();
     }
 
@@ -145,7 +147,8 @@ export class StellarKeySettingsService {
         let url_p = this.commonSvrc.url_dcube + "dcube/getAllCurrencyAuthkeys?appmode=" + appmode;
 
         if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
+            console.log("loadKeysFromDatabase() url_p: " + url_p);
+            this.remoteSvrc.getHttp(url_p).then(data => {
                 self.dbKeys = data;
 
                 self.DCUBE_DEMO_KEYS = self.dbKeys['DCUBE_GHS_CLIENT_KEYS'];

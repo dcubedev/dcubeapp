@@ -15,6 +15,7 @@ import { MyApp } from './app.component';
 import { Appheader } from '../pages/appheader/appheader';
 import { AppConfig } from '../providers/app-config/app-config';
 import { CommonService } from '../providers/common-service/common-service';
+import { RemoteService } from '../providers/remote-service/remote-service';
 import { StellarCommonService } from '../providers/stellar-common-service/stellar-common-service';
 import { StellarRemoteService } from '../providers/stellar-remote-service/stellar-remote-service';
 
@@ -45,6 +46,13 @@ import { SendPage } from '../pages/send/send';
 import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/transactions/transactions';
 import { WalletPage } from '../pages/wallet/wallet';
+import { HomePage } from '../pages/home/home';
+
+import { GroupTypesPage } from '../pages/grouptypes/grouptypes';
+import { CreateGroupPage } from '../pages/create-group/create-group';
+import { FeedbackSystemPage } from '../pages/dfbs/dfbs';
+import { RecommendationSystemPage } from '../pages/drds/drds';
+import { ManageGroupsPage } from '../pages/manage-group/manage-group';
 
 // Pages that communicate with Dcube web services
 import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-acctkey-form';
@@ -73,13 +81,19 @@ export function createTranslateLoader(http: Http) {
       AppmodePage,
       ClientVerificationForm,
       ContactsPage,
+      CreateGroupPage,
       CurrencyPage,
       DemoPage,
-      LanguagePage,
       DevHelpPage,
+      FeedbackSystemPage,
+      GroupTypesPage,
+      HomePage,
+      LanguagePage,
+      ManageGroupsPage,
       PaymethodPage,
       PlatformPage,
       ReceivePage,
+      RecommendationSystemPage,
       SendPage,
       TabsPage,
       TransactionsPage,
@@ -108,13 +122,19 @@ export function createTranslateLoader(http: Http) {
       AppmodePage,
       ClientVerificationForm,
       ContactsPage,
+      CreateGroupPage,
       CurrencyPage,
       DemoPage,
-      LanguagePage,
       DevHelpPage,
+      FeedbackSystemPage,
+      GroupTypesPage,
+      HomePage,
+      LanguagePage,
+      ManageGroupsPage,
       PaymethodPage,
       PlatformPage,
       ReceivePage,
+      RecommendationSystemPage,
       SendPage,
       TabsPage,
       TransactionsPage,
@@ -127,6 +147,7 @@ export function createTranslateLoader(http: Http) {
       Storage,
       AppConfig,
       CommonService,
+      RemoteService,
       StellarCommonService,
       StellarRemoteService,
       KeySettingsService,

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 
 import { CommonService } from '../common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
 import { StellarRemoteService } from '../../providers/stellar-remote-service/stellar-remote-service';
 
@@ -17,6 +18,7 @@ declare var StellarSdk: any;
 export class StellarTradingService {
 
     constructor(private comSrvc: CommonService,
+        private remoteSvrc: RemoteService,
         private keysettings: StellarKeySettingsService,
         private srsSrvc: StellarRemoteService) {
     }
@@ -26,7 +28,7 @@ export class StellarTradingService {
         let request_p = _url + '?q=' + e_address + '&type=' + e_type;
         console.log("sendFederationRequest() sending GET: " + request_p);
    
-        this.comSrvc.getHttp(request_p).then(data => {
+        this.remoteSvrc.getHttp(request_p).then(data => {
             console.log("sendFederationRequest() data: " + JSON.stringify(data));
         }, err => {
             console.log("sendFederationRequest() err: " + JSON.stringify(err));

@@ -4,6 +4,7 @@ import { MenuController, NavController } from 'ionic-angular';
 import { RequestMethod, Headers, RequestOptionsArgs } from '@angular/http';
 
 import { CommonService } from '../../providers/common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 
 /*
   Author: Stephen Agyepong
@@ -22,11 +23,13 @@ export class AccountAcctkeyFormPage {
     constructor(private navCtrl: NavController,
         private menuCtrl: MenuController,
         private formBuilder: FormBuilder,
-        private commonSvrc: CommonService) {
-
+        private commonSvrc: CommonService,
+        private remoteSvrc: RemoteService) {
+        
         this.acctAcctkeyForm = this.formBuilder.group({
             acctkeyId: [''],
             accountId: [''],
+            platformId: [this.commonSvrc.appplatform],
             startingBalance: [''],
             balanceDate: [''],
             username: ['']
@@ -34,11 +37,13 @@ export class AccountAcctkeyFormPage {
         this.clientAcctkeyForm = this.formBuilder.group({
             acctkeyId: [''],
             clientId: [''],
+            platformId: [this.commonSvrc.appplatform],
             username: ['']
         });
         this.acctClientForm = this.formBuilder.group({
             accountId: [''],
             clientId: [''],
+            platformId: [this.commonSvrc.appplatform],
             username: ['']
         });
     }
@@ -55,7 +60,8 @@ export class AccountAcctkeyFormPage {
         let self = this;
         let acctkeyId = this.clientAcctkeyForm.value['acctkeyId'];
         let clientId: string = this.clientAcctkeyForm.value['clientId'];
-
+        let platformId: string = this.clientAcctkeyForm.value['platformId'];
+        
         let url_p = null;
 
         if (acctkeyId != undefined &&
@@ -63,19 +69,19 @@ export class AccountAcctkeyFormPage {
             acctkeyId.length > 10) {
             // "GA6TQPQRV5T6PBINT6UWCTLFFDLU5YCLQR2ZZH5WUZUX3GNTWQ5MEEKB"
             acctkeyId = acctkeyId.trim();
-            url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkeyByKey?acctkeyid=" + acctkeyId;
+            url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkeyByKey?platform=" + platformId + "&acctkeyid=" + acctkeyId;
         } else {
             if (clientId != undefined &&
                 clientId != null &&
                 clientId.length > 10) {
                 // "d90b3b58-006e-434c-ac40-dcfcce0267b4"
                 clientId = clientId.trim();
-                url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkey?acctid=" + clientId;
+                url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkey?platform=" + platformId + "&acctid=" + clientId;
             }
         }
 
         if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
+            this.remoteSvrc.getHttp(url_p).then(data => {
                 //console.log("getClientAcctkeyData() data: " + JSON.stringify(data));
                 //console.log("getClientAcctkeyData() data['acctkeyId']: " + data['acctkeyId']);
 
@@ -90,6 +96,7 @@ export class AccountAcctkeyFormPage {
         let self = this;
         let accountId = this.acctClientForm.value['accountId'];
         let clientId: string = this.acctClientForm.value['clientId'];
+        let platformId: string = this.clientAcctkeyForm.value['platformId'];
 
         let url_p = null;
 
@@ -98,19 +105,19 @@ export class AccountAcctkeyFormPage {
             clientId.length > 10) {
             // "GA6TQPQRV5T6PBINT6UWCTLFFDLU5YCLQR2ZZH5WUZUX3GNTWQ5MEEKB"
             clientId = clientId.trim();
-            url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkeyByKey?acctkeyid=" + clientId;
+            url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkeyByKey?platform=" + platformId + "&acctkeyid=" + clientId;
         } else {
             if (accountId != undefined &&
                 accountId != null &&
                 accountId.length > 10) {
                 // "d90b3b58-006e-434c-ac40-dcfcce0267b4"
                 accountId = accountId.trim();
-                url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkey?acctid=" + accountId;
+                url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkey?platform=" + platformId + "&acctid=" + accountId;
             }
         }
 
         if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
+            this.remoteSvrc.getHttp(url_p).then(data => {
                 //console.log("getAccountClientData() data: " + JSON.stringify(data));
                 //console.log("getAccountClientData() data['acctkeyId']: " + data['acctkeyId']);
 
@@ -143,7 +150,7 @@ export class AccountAcctkeyFormPage {
             };
 
             console.log("getComplianceServerInfo() GET url_p: " + url_p);
-            self.commonSvrc.getHttp(url_p, reqOptions).then(data => {
+            self.remoteSvrc.getHttp(url_p, reqOptions).then(data => {
                 console.log("getComplianceServerInfo() data: " + JSON.stringify(data));
                 //this.outArea = data['message'];
                 //this.outArea = data['pending'];
@@ -159,6 +166,7 @@ export class AccountAcctkeyFormPage {
         let self = this;
         let acctkeyId = this.acctAcctkeyForm.value['acctkeyId'];
         let accountId = this.acctAcctkeyForm.value['accountId'];
+        let platformId: string = this.clientAcctkeyForm.value['platformId'];
 
         let url_p = null;
 
@@ -167,20 +175,20 @@ export class AccountAcctkeyFormPage {
             acctkeyId.length > 10) {
             // "GA6TQPQRV5T6PBINT6UWCTLFFDLU5YCLQR2ZZH5WUZUX3GNTWQ5MEEKB"
             acctkeyId = acctkeyId.trim();
-            url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkeyByKey?acctkeyid=" + acctkeyId;
+            url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkeyByKey?platform=" + platformId + "&acctkeyid=" + acctkeyId;
         } else {
             if (accountId != undefined &&
                 accountId != null &&
                 accountId.length > 10) {
                 // "d90b3b58-006e-434c-ac40-dcfcce0267b4"
                 accountId = accountId.trim();
-                url_p = this.commonSvrc.url_dcube + "stellar/getAccountAcctkey?acctid=" + accountId;
+                url_p = this.commonSvrc.url_dcube + "platform/getAccountAcctkey?platform=" + platformId + "&acctid=" + accountId;
             }
         }
 
         console.log("getAccountAcctkeyData() url_p: " + url_p);
         if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
+            this.remoteSvrc.getHttp(url_p).then(data => {
                 //console.log("getAccountAcctkeyData() data: " + JSON.stringify(data));
                 //console.log("getAccountAcctkeyData() data['acctkeyId']: " + data['acctkeyId']);
 

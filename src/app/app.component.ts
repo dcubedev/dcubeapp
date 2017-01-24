@@ -23,6 +23,12 @@ import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/transactions/transactions';
 import { WalletPage } from '../pages/wallet/wallet';
 
+import { GroupTypesPage } from '../pages/grouptypes/grouptypes';
+import { CreateGroupPage } from '../pages/create-group/create-group';
+import { FeedbackSystemPage } from '../pages/dfbs/dfbs';
+import { RecommendationSystemPage } from '../pages/drds/drds';
+import { ManageGroupsPage } from '../pages/manage-group/manage-group';
+
 // Pages that communicate with Dcube web services
 import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-acctkey-form';
 import { AccountClientFormPage } from '../pages/account-client-form/account-client-form';
@@ -65,6 +71,7 @@ export class MyApp {
     // items that go on the main menu (right menu)
     mainpages: IPageObj[] = [
         { title: 'tabs.home', component: TabsPage, enabled: true },
+        { title: 'pages.wallet', component: WalletPage, enabled: true },
         { title: 'pages.clientform', component: AccountClientFormPage, enabled: true },
         { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: true },
         { title: 'pages.demo', component: DemoPage, enabled: true },
@@ -81,6 +88,11 @@ export class MyApp {
         { title: 'pages.platform', component: PlatformPage, enabled: true },
         { title: 'pages.pymtmethod', component: PaymethodPage, enabled: true },
         { title: 'pages.devhelp', component: DevHelpPage, enabled: true },
+        { title: 'pages.grptype', component: GroupTypesPage, enabled: true },
+        { title: 'pages.creategrp', component: CreateGroupPage, enabled: true },
+        { title: 'pages.managegrp', component: ManageGroupsPage, enabled: true },
+        { title: 'pages.drds', component: RecommendationSystemPage, enabled: true },
+        { title: 'pages.dfbs', component: FeedbackSystemPage, enabled: true },
         { title: 'common.about', component: AboutPage, enabled: true }
     ];
 

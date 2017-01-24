@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { MenuController, NavController } from 'ionic-angular';
 
 import { CommonService } from '../../providers/common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 
 /*
   Author: Stephen Agyepong
@@ -20,10 +21,12 @@ export class ClientVerificationForm {
     constructor(public navCtrl: NavController,
         private menuCtrl: MenuController,
         private formBuilder: FormBuilder,
-        private commonSvrc: CommonService) {
+        private commonSvrc: CommonService,
+        private remoteSvrc: RemoteService) {
         
         this.clientVerifyForm = this.formBuilder.group({
             clientename: [''],
+            platformId: [this.commonSvrc.appplatform],
             name: this.formBuilder.group({
                 lname: [''],
                 fname: [''],
@@ -62,7 +65,7 @@ export class ClientVerificationForm {
         }
 
         if (url_p != null) {
-            this.commonSvrc.getHttp(url_p).then(data => {
+            this.remoteSvrc.getHttp(url_p).then(data => {
                 (self.clientVerifyForm.controls['clientename'] as FormControl).setValue(data['clientename']);
 
                 (<FormControl>(<FormGroup>self.clientVerifyForm.controls['name']).controls['lname']).setValue(data['name']['lname']);
@@ -111,6 +114,7 @@ export class ClientVerificationForm {
         let body_p = {};
 
         let clientEname = self.clientVerifyForm.controls['clientename'].value;
+        //let platformId: string = this.clientVerifyForm.value['platformId'];
 
         let lname = (<FormControl>(<FormGroup>self.clientVerifyForm.controls['name']).controls['lname']).value;
         let fname = (<FormControl>(<FormGroup>self.clientVerifyForm.controls['name']).controls['fname']).value;
@@ -184,7 +188,7 @@ export class ClientVerificationForm {
             };
 
             console.log("verifyClientSanctionStatus() sending POST body_p: " + body_p);
-            self.commonSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
+            self.remoteSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
                 console.log("verifyClientSanctionStatus() data: " + JSON.stringify(data));
                 //this.outArea = data['message'];
                 //this.outArea = data['pending'];
@@ -274,7 +278,7 @@ export class ClientVerificationForm {
             };
 
             console.log("canShareClientInfo() sending POST body_p: " + body_p);
-            self.commonSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
+            self.remoteSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
                 console.log("canShareClientInfo() data: " + JSON.stringify(data));
                 this.outArea = JSON.stringify(data);
             }, err => {

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { EventEmitter } from '@angular/core';
-import { Http, RequestOptionsArgs } from '@angular/http';
 
 import { Platform } from 'ionic-angular';
 import { TranslateService } from 'ng2-translate';
@@ -156,6 +155,8 @@ export enum AppMode {
 }
 
 export enum AppCurrency {
+    ZSK,
+    DDD,
     BTC,
     EUR,
     FUNT,
@@ -201,7 +202,6 @@ export class CommonService {
     url_dcube: string = AppConstants.URL_DEV_DCUBE;
     url_scom: string = AppConstants.URL_DEV_SCOM;
     local: Storage = null;
-    _data: any = null;
     cfgdata: any = null;
     appplatform: string = AppPlatform[AppPlatform.STELLAR];
     appMode: string = AppMode[AppMode.DEV];
@@ -210,8 +210,7 @@ export class CommonService {
     payMethod: string = PaymentMethod[PaymentMethod.WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT];
     public commonEvents$: EventEmitter<any>;
 
-    constructor(public http: Http,
-        private platform: Platform,
+    constructor(private platform: Platform,
         public storage: Storage,
         public translateService: TranslateService,
         public appcfg: AppConfig) {
@@ -496,48 +495,6 @@ export class CommonService {
             receiver_ename: 'usd_base*dcube.com',
             req_type: 'name'
         };
-    }
-
-    getHttp(url_p: string, options?: RequestOptionsArgs) {
-        return new Promise((resolve, reject) => {
-            let self = this;
-            this.http.get(url_p, options)
-                .subscribe(_data => {
-                    self._data = _data;
-                    //console.log('getHttp() this._data: ' + JSON.stringify(this._data));
-                    //console.log('getHttp() _data.status: ' + JSON.stringify(_data.status));
-                    //console.log('getHttp() _data.headers: ' + JSON.stringify(_data.headers));
-                    //console.log('getHttp() _data.json(): ' + JSON.stringify(_data.json()));
-                    resolve(_data.json());
-                },
-                onerr => {
-                    console.error('getHttp() error: ' + JSON.stringify(onerr));
-                    reject(onerr);
-                },
-                () => {
-                    //console.log('getHttp() completed');
-                });
-        });
-    }
-
-    postHttp(url_p: string, body_p: any, options?: RequestOptionsArgs) {
-        return new Promise((resolve, reject) => {
-            let self = this;
-            this.http.post(url_p, body_p, options)
-                .subscribe(_data => {
-                    self._data = _data;
-                    console.log('postHttp() _data.status: ' + JSON.stringify(_data.status));
-                    console.log('postHttp() _data.headers: ' + JSON.stringify(_data.headers));
-                    console.log('postHttp() this._data: ' + JSON.stringify(this._data));
-                    console.log('postHttp() _data.json(): ' + JSON.stringify(_data.json()));
-                    resolve(_data.json());
-                },
-                onerr => {
-                    console.error('postHttp() error: ' + JSON.stringify(onerr));
-                    reject(onerr);
-                },
-                () => { console.log('postHttp() completed') });
-        });
     }
 
 }

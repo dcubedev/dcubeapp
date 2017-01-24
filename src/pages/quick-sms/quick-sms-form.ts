@@ -4,6 +4,7 @@ import { MenuController, NavController } from 'ionic-angular';
 import { RequestMethod, Headers, RequestOptionsArgs } from '@angular/http';
 
 import { CommonService } from '../../providers/common-service/common-service';
+import { RemoteService } from '../../providers/remote-service/remote-service';
 
 /*
   Author: Stephen Agyepong
@@ -20,7 +21,8 @@ export class QuickSmsFormPage {
     constructor(private navCtrl: NavController,
         private menuCtrl: MenuController,
         private formBuilder: FormBuilder,
-        private commonSvrc: CommonService) {
+        private commonSvrc: CommonService,
+        private remoteSvrc: RemoteService) {
 
         this.appmode = commonSvrc.appMode;
         this.msgSizeArea = "0";
@@ -44,7 +46,7 @@ export class QuickSmsFormPage {
 
     sendSMS() {
         let self = this;
-        let url_p = this.commonSvrc.url_scom + "send";
+        let url_p = this.commonSvrc.url_scom + "sms/send";
         let body_p = null;
 
         if (url_p != null) {
@@ -84,7 +86,7 @@ export class QuickSmsFormPage {
 
             console.log("sendSMS() url_p: " + url_p);
             console.log("sendSMS() body_p: " + body_p);
-            this.commonSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
+            this.remoteSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
                 console.log("sendSMS() data: " + JSON.stringify(data));
                 //console.log("sendSMS() data: " + data);
             }, err => {
@@ -96,7 +98,7 @@ export class QuickSmsFormPage {
 
     sendEmail() {
         let self = this;
-        let url_p = this.commonSvrc.url_scom + "send";
+        let url_p = this.commonSvrc.url_scom + "sms/send";
         let body_p = null;
 
         if (url_p != null) {
@@ -126,7 +128,7 @@ export class QuickSmsFormPage {
 
             console.log("sendSMS() url_p: " + url_p);
             console.log("sendSMS() body_p: " + body_p);
-            this.commonSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
+            this.remoteSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
                 console.log("sendSMS() data: " + JSON.stringify(data));
                 //console.log("sendSMS() data: " + data);
             }, err => {
@@ -140,6 +142,69 @@ export class QuickSmsFormPage {
         console.log("smsForm.dirty: " + this.smsForm.dirty);
         console.log("smsForm.valid: " + this.smsForm.valid);
         console.log(this.smsForm.value);
+    }
+
+    insertScomAppData() {
+        let url_p = this.commonSvrc.url_scom + "application";
+        let body_p = null;
+
+        if (url_p != null) {
+            let contentType = 'application/json';
+            let headers = new Headers();
+            headers.append('Content-Type', contentType);
+            //headers.append('Content-Type', 'application/text');
+            //headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            //headers.append('Origin', 'http://localhost:8080');
+            var reqOptions: RequestOptionsArgs = {
+                url: null,
+                method: RequestMethod.Post,
+                search: null,
+                headers: headers,
+                body: null
+            };
+
+            body_p = '{"appCode":"001","appName":"Test Application1","status":"a"}';
+
+            console.log("insertScomAppData() url_p: " + url_p);
+            console.log("insertScomAppData() body_p: " + body_p);
+            this.remoteSvrc.postHttp(url_p, body_p, reqOptions).then(data => {
+                console.log("insertScomAppData() data: " + JSON.stringify(data));
+                //console.log("insertScomAppData() data: " + data);
+            }, err => {
+                console.log("insertScomAppData() err: " + JSON.stringify(err));
+                //console.log("insertScomAppData() err: " + err);
+            })
+        }
+    }
+
+    getScomAppData() {
+        let url_p = this.commonSvrc.url_scom + "application/001";
+
+        if (url_p != null) {
+            let contentType = 'application/json';
+            let headers = new Headers();
+            headers.append('Content-Type', contentType);
+            //headers.append('Content-Type', 'application/text');
+            //headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            //headers.append('Origin', 'http://localhost:8080');
+            var reqOptions: RequestOptionsArgs = {
+                url: null,
+                method: RequestMethod.Post,
+                search: null,
+                headers: headers,
+                body: null
+            };
+
+            console.log("getScomAppData() url_p: " + url_p);
+
+            this.remoteSvrc.getHttp(url_p, reqOptions).then(data => {
+                console.log("getScomAppData() data: " + JSON.stringify(data));
+                //console.log("getScomAppData() data: " + data);
+            }, err => {
+                console.log("getScomAppData() err: " + JSON.stringify(err));
+                //console.log("getScomAppData() err: " + err);
+            })
+        }
     }
 
 }

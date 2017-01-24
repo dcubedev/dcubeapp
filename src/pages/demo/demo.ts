@@ -58,7 +58,7 @@ export class DemoPage {
     onAccountEvent(self, acctevt: any) {
         //console.log("DemoPage.onAccountEvent() acctevt: " + acctevt);
         //console.log("DemoPage.onAccountEvent() acctevt.memo: " + acctevt.memo);
-        //console.log("DemoPage.onAccountEvent() acctevt.status: " + acctevt.status);
+        console.log("DemoPage.onAccountEvent() acctevt.status: " + JSON.stringify(acctevt.status));
         //console.log("DemoPage.onAccountEvent() self.acctSvrc.getAccount(): " + self.acctSvrc.getAccount());
         //console.log("Entering DemoPage.onAccountEvent() ... self.acctSvrc: " + self.acctSvrc);
         if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
@@ -120,7 +120,13 @@ export class DemoPage {
     }
 
     getAccountBalances() {
-        this.acctSvrc.getAccountBalances();
+        let addr = this.keysStored.address;
+
+        if (null !== addr && undefined !== addr && addr.length > 0 ) {
+            this.acctSvrc.getAccountBalanceForKeyWithAddr(addr);
+        } else {
+            this.acctSvrc.getAccountBalances();
+        }
     }
 
     getAccountBalancesUseStellarBalances() {
