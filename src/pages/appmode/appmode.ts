@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
+import { TranslateService } from 'ng2-translate';
+
 import * as CommonConstants from '../../providers/common-service/common-service';
 import { CommonService } from '../../providers/common-service/common-service';
 
@@ -16,7 +18,9 @@ import { CommonService } from '../../providers/common-service/common-service';
 export class AppmodePage {
     appmode: string = CommonConstants.AppMode[CommonConstants.AppMode.DEV];
 
-    constructor(private comSrvc: CommonService, private navCtrl: NavController, public menuCtrl: MenuController) {
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        public translateService: TranslateService,
+        private comSrvc: CommonService) {
     }
 
     toggleLeftMenu() {
@@ -34,6 +38,10 @@ export class AppmodePage {
             //console.log('AppmodePage this.appmode: ' + this.appmode);
             this.comSrvc.setAppMode(this.appmode);
         }
+    }
+
+    getTranslate(key: string) {
+        return this.translateService.instant(key);
     }
 
 }

@@ -137,7 +137,8 @@ export enum PaymentMethod {
     BETWEEN_PLATFORMS_DIRECT,
     WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT,
     WITHIN_PLATFORM_ANCHOR_MULTI_ACCOUNT,
-    BETWEEN_PLATFORMS_ANCHOR
+    BETWEEN_PLATFORMS_ANCHOR_ONE_ACCOUNT,
+    BETWEEN_PLATFORMS_ANCHOR_MULTI_ACCOUNT
 }
 
 // AppPlatform (appplatform)
@@ -251,6 +252,9 @@ export class CommonService {
                 this.local.set(APPPLATFORM, this.appplatform);  // Stellar
                 this.local.set('payMethod', this.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
 
+                this.setAppLanguage(this.appLang);
+                this.setAppPlatform(this.appplatform);
+                this.setPayMethod(this.payMethod);
                 this.reconfigDcubeUrl();
                 this.commonEvents$.emit({
                     memo: APPCURR,
@@ -350,6 +354,7 @@ export class CommonService {
         this.local.set(APPLANG, curlang);  // en, fr
 
         // the lang to use, if the lang isn't available, it will use the current loader to get them
+        //console.log('CommonService.setAppLanguage() curlang: ', curlang);
         this.translateService.use(curlang);
 
         //see https://www.w3.org/International/questions/qa-html-language-declarations

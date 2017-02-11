@@ -10,12 +10,8 @@
 
 <ion-content padding>
     <ion-list radio-group [(ngModel)]="lang" (ionChange)="langChanged($event)">
-        <ion-list-header>
-            Languages
-        </ion-list-header>
-
         <ion-item *ngFor="let item of supportedLanguages">
-            <ion-label>{{item.label}}</ion-label>
+            <ion-label>{{getTranslate(item.label)}}</ion-label>
             <ion-radio checked={{item.checked}} value={{item.value}}></ion-radio>
         </ion-item>
     </ion-list>

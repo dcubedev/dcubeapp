@@ -12,11 +12,11 @@
     "quicksmspng": "Quick SMS Using PrimeNG",
     "wallet": "Wallet",
 
-    "appmode": "Application Mode",
-    "currency": "Currency",
-    "language": "Current Language",
-    "platform": "Platform",
-    "pymtmethod": "Payment Method",
+    "appmode": "Application Modes Supported",
+    "currency": "Currencies Accepted",
+    "language": "Preferred Language",
+    "platform": "Digital Currency Platforms",
+    "pymtmethod": "Payment Methods",
     "grptype": "Group Types",
     "creategrp": "Create Group",
     "managegrp": "Manage Group",
@@ -58,6 +58,56 @@
     "send": "Send",
     "trx": "Trx",
     "translation": "Translation"
+  },
+  "appmode": {
+    "dev": "Development",
+    "test": "Testing/QA",
+    "demo": "Demonstration",
+    "prod": "Production"
+  },
+  "currency": {
+    "btc": "Bitcoin",
+    "eur": "Euro",
+    "funt": "FunTracker",
+    "gbp": "British Pound",
+    "ghs": "Ghanaian Cedi",
+    "ngn": "Nigerian Naira",
+    "ugx": "Ugandan Shilling",
+    "usd": "US Dollar",
+    "xlm": "Stellar Lumen",
+    "xof": "West African CFA",
+    "zar": "South African Rand"
+  },
+  "lang": {
+    "ak": "Akan",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "sw": "Swahili",
+    "yo": "Yoruba",
+    "zu": "Zulu"
+  },
+  "platform": {
+    "stellar": "Stellar",
+    "ripple": "Ripple",
+    "uphold": "Uphold"
+  },
+  "paymethod": {
+    "within_platform_direct": "Direct payment within platform",
+    "within_platform_anchor_one_account": "Payment through anchor using one account",
+    "within_platform_anchor_multi_account": "Payment through anchor each client has own account",
+    "between_platforms_direct": "Direct payment between platforms",
+    "between_platforms_anchor_one_account": "Payment between anchors on different platforms using one account",
+    "between_platforms_anchor_multi_account": "Payment between anchors on different platforms each client has own account"
+  },
+  "grptypes": {
+    "asca": "Accumulating Savings and Credit Associations",
+    "rosca": "Rotating Savings and Credit Associations",
+    "consumer": "Consumer Cooperative",
+    "producer": "Producer Cooperative",
+    "worker": "Worker Cooperative",
+    "purchasing": "Purchasing Cooperative",
+    "hybrid": "Hybrid Cooperative"
   },
   "misc": {
     "title": "Contacts",

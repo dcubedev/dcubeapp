@@ -10,27 +10,23 @@
 
 <ion-content padding>
     <ion-list radio-group [(ngModel)]="appmode" (ionChange)="appModeChanged($event)">
-        <ion-list-header>
-            Application modes supported
-        </ion-list-header>
-
         <ion-item>
-            <ion-label>Development</ion-label>
+            <ion-label>{{getTranslate("appmode.dev")}}</ion-label>
             <ion-radio checked="true" value="DEV"></ion-radio>
         </ion-item>
 
         <ion-item>
-            <ion-label>Testing/QA</ion-label>
+            <ion-label>{{getTranslate("appmode.test")}}</ion-label>
             <ion-radio value="TEST"></ion-radio>
         </ion-item>
 
         <ion-item>
-            <ion-label>Demonstration</ion-label>
+            <ion-label>{{getTranslate("appmode.demo")}}</ion-label>
             <ion-radio value="DEMO"></ion-radio>
         </ion-item>
 
         <ion-item>
-            <ion-label>Production</ion-label>
+            <ion-label>{{getTranslate("appmode.prod")}}</ion-label>
             <ion-radio value="PROD"></ion-radio>
         </ion-item>
     </ion-list>

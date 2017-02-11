@@ -10,12 +10,8 @@
 
 <ion-content padding>
     <ion-list radio-group [(ngModel)]="curr" (ionChange)="currencyChanged($event)">
-        <ion-list-header>
-            Currencies accepted
-        </ion-list-header>
-
         <ion-item *ngFor="let item of supportedCurrencies">
-            <ion-label>{{item.label}}</ion-label>
+            <ion-label>{{getTranslate(item.label)}}</ion-label>
             <ion-radio checked={{item.checked}} value={{item.value}}></ion-radio>
         </ion-item>
     </ion-list>

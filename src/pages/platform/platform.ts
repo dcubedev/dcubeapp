@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
+import { TranslateService } from 'ng2-translate';
+
 import * as CommonConstants from '../../providers/common-service/common-service';
 import { CommonService } from '../../providers/common-service/common-service';
 
@@ -16,15 +18,17 @@ import { CommonService } from '../../providers/common-service/common-service';
 export class PlatformPage {
  
     supportedPlatforms: CommonConstants.IRadioGroupItem[] = [
-        { label: 'Stellar', checked: 'true', value: 'STELLAR' },
-        { label: 'Ripple', checked: 'false', value: 'RIPPLE' },
-        { label: 'Uphold', checked: 'false', value: 'UPHOLD' }
+        { label: 'platform.stellar', checked: 'true', value: 'STELLAR' },
+        { label: 'platform.ripple', checked: 'false', value: 'RIPPLE' },
+        { label: 'platform.uphold', checked: 'false', value: 'UPHOLD' }
     ];
 
     // set default digital currency platform
     appplatform: string = CommonConstants.AppPlatform[CommonConstants.AppPlatform.STELLAR];
 
-    constructor(private comSrvc: CommonService, private navCtrl: NavController, public menuCtrl: MenuController) {
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        public translateService: TranslateService,
+        private comSrvc: CommonService) {
     }
 
     toggleLeftMenu() {
@@ -42,6 +46,10 @@ export class PlatformPage {
             //console.log('appplatform: ', this.appplatform);
             this.comSrvc.setAppPlatform(this.appplatform);
         }
+    }
+
+    getTranslate(key: string) {
+        return this.translateService.instant(key);
     }
 
 }

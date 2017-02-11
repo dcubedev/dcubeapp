@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
+import { TranslateService } from 'ng2-translate';
+
 import * as CommonConstants from '../../providers/common-service/common-service';
 import { CommonService } from '../../providers/common-service/common-service';
 
@@ -15,18 +17,20 @@ import { CommonService } from '../../providers/common-service/common-service';
 })
 export class GroupTypesPage {
     groupTypes: CommonConstants.IRadioGroupItem[] = [
-        { label: 'Accumulating Savings and Credit Associations', checked: 'true', value: 'ASCA' },
-        { label: 'Rotating Savings and Credit Associations', checked: 'false', value: 'ROSCA' },
-        { label: 'Consumer Cooperative', checked: 'false', value: 'Consumer' },
-        { label: 'Producer Cooperative', checked: 'false', value: 'Producer' },
-        { label: 'Worker Cooperative', checked: 'false', value: 'Worker' },
-        { label: 'Purchasing Cooperative', checked: 'false', value: 'Purchasing' },
-        { label: 'Hybrid Cooperative', checked: 'false', value: 'Hybrid' }
+        { label: 'grptypes.asca', checked: 'true', value: 'ASCA' },
+        { label: 'grptypes.rosca', checked: 'false', value: 'ROSCA' },
+        { label: 'grptypes.consumer', checked: 'false', value: 'Consumer' },
+        { label: 'grptypes.producer', checked: 'false', value: 'Producer' },
+        { label: 'grptypes.worker', checked: 'false', value: 'Worker' },
+        { label: 'grptypes.purchasing', checked: 'false', value: 'Purchasing' },
+        { label: 'grptypes.hybrid', checked: 'false', value: 'Hybrid' }
     ];
 
     grouptypes: string = 'ASCA';
 
-    constructor(private comSrvc: CommonService, private navCtrl: NavController, public menuCtrl: MenuController) {
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        public translateService: TranslateService,
+        private comSrvc: CommonService) {
     }
 
     toggleLeftMenu() {
@@ -44,6 +48,10 @@ export class GroupTypesPage {
             //console.log('groupTypesChanged this.grouptypes: ' + this.grouptypes);
             //this.comSrvc.setAppMode(this.grouptypes);
         }
+    }
+
+    getTranslate(key: string) {
+        return this.translateService.instant(key);
     }
 
 }

@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
+import { TranslateService } from 'ng2-translate';
+
 import * as CommonConstants from '../../providers/common-service/common-service';
 import { CommonService } from '../../providers/common-service/common-service';
 
@@ -14,17 +16,17 @@ import { CommonService } from '../../providers/common-service/common-service';
 })
 export class CurrencyPage { 
     supportedCurrencies: CommonConstants.IRadioGroupItem[] = [
-        { label: 'Bitcoin', checked: 'false', value: 'BTC' },
-        { label: 'Euro', checked: 'false', value: 'EUR' },
-        { label: 'FunTracker', checked: 'false', value: 'FUNT' },
-        { label: 'British Pound', checked: 'false', value: 'GBP' },
-        { label: 'Ghanaian Cedi', checked: 'false', value: 'GHS' },
-        { label: 'Nigerian Naira', checked: 'false', value: 'NGN' },
-        { label: 'Ugandan Shilling', checked: 'false', value: 'UGX' },
-        { label: 'US Dollar', checked: 'true', value: 'USD' },
-        { label: 'Stellar Lumen', checked: 'false', value: 'XLM' },
-        { label: 'West African CFA', checked: 'false', value: 'XOF' },
-        { label: 'South African Rand', checked: 'false', value: 'ZAR' }
+        { label: 'currency.btc', checked: 'false', value: 'BTC' },
+        { label: 'currency.eur', checked: 'false', value: 'EUR' },
+        { label: 'currency.funt', checked: 'false', value: 'FUNT' },
+        { label: 'currency.gbp', checked: 'false', value: 'GBP' },
+        { label: 'currency.ghs', checked: 'false', value: 'GHS' },
+        { label: 'currency.ngn', checked: 'false', value: 'NGN' },
+        { label: 'currency.ugx', checked: 'false', value: 'UGX' },
+        { label: 'currency.usd', checked: 'true', value: 'USD' },
+        { label: 'currency.xlm', checked: 'false', value: 'XLM' },
+        { label: 'currency.xof', checked: 'false', value: 'XOF' },
+        { label: 'currency.zar', checked: 'false', value: 'ZAR' }
     ];
 
     // XOF	Communauté Financière Africaine (BCEAO) Franc
@@ -32,7 +34,9 @@ export class CurrencyPage {
     //curr: string = CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM];
     curr: string = CommonConstants.AppCurrency[CommonConstants.AppCurrency.USD];
 
-    constructor(private comSrvc: CommonService, private navCtrl: NavController, public menuCtrl: MenuController) {
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        public translateService: TranslateService,
+        private comSrvc: CommonService) {
     }
 
     toggleLeftMenu() {
@@ -50,6 +54,10 @@ export class CurrencyPage {
             //console.log('currency: ', this.curr);
             this.comSrvc.setAppCurrency(this.curr);
         }
+    }
+
+    getTranslate(key: string) {
+        return this.translateService.instant(key);
     }
 
 }

@@ -9,13 +9,9 @@
 </ion-header>
 
 <ion-content padding>
-    <ion-list-header>
-        Payment Method Setup
-    </ion-list-header>
-   
     <ion-list radio-group [(ngModel)]="paymethod" (ionChange)="paymethodChanged($event)">
         <ion-item *ngFor="let item of paymentMethods">
-            <ion-label>{{item.label}}</ion-label>
+            <ion-label>{{getTranslate(item.label)}}</ion-label>
             <ion-radio checked={{item.checked}} value={{item.value}}></ion-radio>
         </ion-item>
     </ion-list>
