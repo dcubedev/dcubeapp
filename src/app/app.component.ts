@@ -93,7 +93,7 @@ export class MyApp {
         { title: 'pages.managegrp', component: ManageGroupsPage, enabled: true },
         { title: 'pages.drds', component: RecommendationSystemPage, enabled: true },
         { title: 'pages.dfbs', component: FeedbackSystemPage, enabled: true },
-        { title: 'common.about', component: AboutPage, enabled: true }
+        { title: 'pages.about', component: AboutPage, enabled: true }
     ];
 
     menuCtrl: MenuController;

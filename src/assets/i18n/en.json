@@ -12,6 +12,7 @@
     "quicksmspng": "Quick SMS Using PrimeNG",
     "wallet": "Wallet",
 
+    "about": "About",
     "appmode": "Application Modes Supported",
     "currency": "Currencies Accepted",
     "language": "Preferred Language",
@@ -27,7 +28,6 @@
   "common": {
     "mainmenu": "Main Menu",
     "setupmenu": "Setup/Config Menu",
-    "about": "About",
     "import": "Import",
     "export": "Export",
     "announcements": "Announcements",
@@ -57,7 +57,7 @@
     "home": "Home",
     "send": "Send",
     "trx": "Trx",
-    "translation": "Translation"
+    "transactions": "Transactions"
   },
   "appmode": {
     "dev": "Development",
