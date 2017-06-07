@@ -91,13 +91,17 @@
                 <ion-icon name="archive"></ion-icon>
                 Change Trustline
             </button>
-            <button ion-button class="button button-block" (click)="changeTrustlineAndPay()">
+            <button ion-button class="button button-block" (click)="checkTrustline()">
                 <ion-icon name="archive"></ion-icon>
-                Change Trustline and Pay
+                Check Trustline
             </button>
             <button ion-button class="button button-block" (click)="getAccountBalances()">
                 <ion-icon name="archive"></ion-icon>
                 Get ALL account balances
+            </button>
+            <button ion-button class="button button-block" (click)="sendPayment()">
+                <ion-icon name="archive"></ion-icon>
+                Send Payment
             </button>
             <button ion-button class="button button-block" (click)="makePaymentUsingBridge()">
                 <ion-icon name="archive"></ion-icon>
@@ -111,9 +115,9 @@
                 <ion-icon name="archive"></ion-icon>
                 Request Payment
             </button>
-            <button ion-button class="button button-block" (click)="sendPayment()">
+            <button ion-button class="button button-block" (click)="changeTrustlineAndPay()">
                 <ion-icon name="archive"></ion-icon>
-                Send Payment
+                Change Trustline and Pay
             </button>
             <button ion-button class="button button-block" (click)="getPaymentInfo()">
                 <ion-icon name="archive"></ion-icon>

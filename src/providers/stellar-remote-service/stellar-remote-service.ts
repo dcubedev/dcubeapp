@@ -74,6 +74,7 @@ export class StellarRemoteService {
             }
             self.network = 'testNetwork';
             self.hostname = StellarConstants.URL_TEST_NETWORK;
+            StellarSdk.Network.useTestNetwork();
             self.server = new StellarSdk.Server(self.hostname, { secure: true, port: 443, allowHttp: true });
         }
     }

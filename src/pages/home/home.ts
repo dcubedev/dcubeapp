@@ -36,11 +36,20 @@ export class HomePage implements OnInit{
 
         this.getAccountBalances();
         this.commonSvrc.initAccount(this);
+        this.commonSvrc.onCommonEvent(this, this.oncommonEvents);
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
     }
-     
+
+    oncommonEvents(self, commonevt: any) {
+        if ((undefined !== commonevt.status) &&
+            (CommonConstants.SOURCEOFKEYS_CHANGED == commonevt.memo) ) {
+            self.acctSvrc.getAccountBalances(commonevt.status);
+        }
+    }
+
     onKeyEvent(self, acctevt: any) {
         self.keysStored = acctevt.status;
+        //console.log("home::onKeyEvent() acctevt.memo: " + acctevt.memo);
 
         // if we have a valid key address and account balance is not set
         if (undefined !== self.keysStored && null !== self.keysStored && undefined !== self.keysStored.address && null !== self.keysStored.address && self.keysStored.address.length > 0
@@ -51,6 +60,7 @@ export class HomePage implements OnInit{
     }
 
     onAccountEvent(self, acctevt: any) {
+        //console.log("home::onAccountEvent() acctevt.memo: " + acctevt.memo);
         if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
             self.account = self.acctSvrc.getAccount();
         }
@@ -66,7 +76,7 @@ export class HomePage implements OnInit{
 
     getAccountBalancesUseStellarBalances() {
         let self = this;
-        console.log("getAccountBalances() this.keysStored.address: " + this.keysStored.address);
+        //console.log("getAccountBalances() this.keysStored.address: " + this.keysStored.address);
         if (null !== this.keysStored.address && "" !== this.keysStored.address) {
             this.acctSvrc.getAccountBalancesUseStellarBalances(this.keysStored.address).then(acctBalances => {
                 console.log("getAccountBalances() acctBalances: " + JSON.stringify(acctBalances));

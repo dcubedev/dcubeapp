@@ -24,12 +24,12 @@ export class TrustService {
         this.stsSrvc.checkTrust(assetCode, assetIssuer, clientAccountId);
     }
 
-    changeTrust(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt) {
-        this.stsSrvc.changeTrust(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt);
+    changeTrust(issuingAddr, signerSeed, asset_code, trustLimitAmt) {
+        this.stsSrvc.changeTrust(issuingAddr, signerSeed, asset_code, trustLimitAmt);
     }
 
-    changeTrustAndPay(issuingAddr, issuingSeed: string, receivingSeed: string, asset_code, trustLimitAmt, pymtAmt: string) {
-        this.stsSrvc.changeTrustAndPay(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt, pymtAmt);
+    changeTrustAndPay(issuingAddr, issuingSeed: string, signerSeed: string, asset_code, trustLimitAmt, pymtAmt: string) {
+        this.stsSrvc.changeTrustAndPay(issuingAddr, issuingSeed, signerSeed, asset_code, trustLimitAmt, pymtAmt);
     }
 
 }

@@ -184,12 +184,14 @@ export const APPMODE_CHANGED = 'appmodeChanged';
 export const APPLANG_CHANGED = 'appLangChanged';
 export const APPPLATFORM_CHANGED = 'appplatformChanged';
 export const PAYMETHOD_CHANGED = 'paymethodChanged';
+export const SOURCEOFKEYS_CHANGED = 'SourceOfKeysChanged';
 
 export const APPCURR = 'appCurr';
 export const APPMODE = 'appMode';
 export const APPLANG = 'appLang';
 export const APPPLATFORM = 'appplatform';
 export const PAYMETHOD = 'payMethod';
+export const SOURCEOFKEYS = 'SourceOfKeys';
 
 /*
   Generated class for the CommonService provider.
@@ -199,13 +201,14 @@ export const PAYMETHOD = 'payMethod';
 */
 @Injectable()
 export class CommonService {
+    SourceOfKeys: string;
     isMobile: boolean = false;
-    url_dcube: string = AppConstants.URL_DEV_DCUBE;
-    url_scom: string = AppConstants.URL_DEV_SCOM;
+    url_dcube: string = AppConstants.URL_DEMO_DCUBE;
+    url_scom: string = AppConstants.URL_DEMO_SCOM;
     local: Storage = null;
     cfgdata: any = null;
     appplatform: string = AppPlatform[AppPlatform.STELLAR];
-    appMode: string = AppMode[AppMode.DEV];
+    appMode: string = AppMode[AppMode.DEMO];
     appLang: string = AppLanguage[AppLanguage.EN];
     appCurr: string = AppCurrency[AppCurrency.XLM];
     payMethod: string = PaymentMethod[PaymentMethod.WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT];
@@ -216,6 +219,7 @@ export class CommonService {
         public translateService: TranslateService,
         public appcfg: AppConfig) {
 
+        let self = this;
         if (this.platform.is('mobile')) {
             this.isMobile = true;
         }
@@ -234,7 +238,9 @@ export class CommonService {
             this.local.set(APPCURR, this.appCurr);  // XLM, GHS, USD
             this.local.set(APPPLATFORM, this.appplatform);  // Stellar
             this.local.set(PAYMETHOD, this.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
+            this.local.set(SOURCEOFKEYS, this.SourceOfKeys);
             //console.log('CommonService.constructor() this.appCurr: ', this.appCurr);
+            //console.log('CommonService.constructor() this.SourceOfKeys: ', this.SourceOfKeys);
 
             // override with configuration data
             this.appcfg.load().then(cfgdata => {
@@ -244,40 +250,45 @@ export class CommonService {
                 this.appCurr = this.cfgdata.AppCurrency;
                 this.appplatform = this.cfgdata.AppPlatform;
                 this.payMethod = this.cfgdata.PaymentMethod;
+                this.SourceOfKeys = this.cfgdata.SourceOfKeys;
+                //console.log('CommonService.constructor(cfgdata received) this.cfgdata.SourceOfKeys: ', this.cfgdata.SourceOfKeys);
                 //console.log('CommonService.constructor(cfgdata received) this.appCurr: ', this.appCurr);
 
-                this.local.set(APPMODE, this.appMode);  // dev, demo, prod
-                this.local.set(APPLANG, this.appLang);  // en, fr
-                this.local.set(APPCURR, this.appCurr);  // XLM, GHS, USD
-                this.local.set(APPPLATFORM, this.appplatform);  // Stellar
-                this.local.set('payMethod', this.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
+                self.local.set(APPMODE, self.appMode);  // dev, demo, prod
+                self.local.set(APPLANG, self.appLang);  // en, fr
+                self.local.set(APPCURR, self.appCurr);  // XLM, GHS, USD
+                self.local.set(APPPLATFORM, self.appplatform);  // Stellar
+                self.local.set(PAYMETHOD, self.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
+                self.local.set(SOURCEOFKEYS, self.SourceOfKeys);
 
-                this.setAppLanguage(this.appLang);
-                this.setAppPlatform(this.appplatform);
-                this.setPayMethod(this.payMethod);
-                this.reconfigDcubeUrl();
-                this.commonEvents$.emit({
-                    memo: APPCURR,
-                    status: APPCURR_CHANGED
-                });
+                self.setSourceOfKeys(self.SourceOfKeys);
+                self.setAppLanguage(self.appLang);
+                self.setAppPlatform(self.appplatform);
+                self.setPayMethod(self.payMethod);
+                self.reconfigDcubeUrl();
             })
         }
     }
 
+    onCommonEvent(callbackObj, evtFunc) {
+        this.commonEvents$.subscribe(commonevt => {
+            evtFunc(callbackObj, commonevt);
+        });
+    }
+
     reconfigDcubeUrl() {
-        //console.log('reconfigDcubeUrl() this.appMode: ', this.appMode);
-        this.url_dcube = AppConstants.URL_DEV_DCUBE;
-        this.url_scom = AppConstants.URL_DEV_SCOM;
+        this.url_dcube = AppConstants.URL_DEMO_DCUBE;
+        this.url_scom = AppConstants.URL_DEMO_SCOM;
         switch (this.appMode) {
             case AppMode[AppMode.PROD]:
                 // production mode
                 this.url_dcube = AppConstants.URL_LIVE_DCUBE;
                 this.url_scom = AppConstants.URL_LIVE_SCOM;
                 break;
-            case AppMode[AppMode.DEMO]:
-                // demonstration/learning mode
-                this.url_dcube = AppConstants.URL_DEMO_DCUBE;
-                this.url_scom = AppConstants.URL_DEMO_SCOM;
+            case AppMode[AppMode.DEV]:
+                // development mode
+                this.url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
+                this.url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
                 break;
             case AppMode[AppMode.TEST]:
                 // demonstration/learning mode
@@ -285,23 +296,74 @@ export class CommonService {
                 this.url_scom = AppConstants.URL_TEST_SCOM;
                 break;
             default:
-                // development mode
                 if (this.platform.is('mobile')) {
-                    this.url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
-                    this.url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
+                    // demonstration/learning mode
+                    this.url_dcube = AppConstants.URL_DEMO_DCUBE;
+                    this.url_scom = AppConstants.URL_DEMO_SCOM;
                 }
         }
+
+        //console.log('reconfigDcubeUrl() this.url_dcube: ', this.url_dcube);
+        //console.log('reconfigDcubeUrl() this.url_scom: ', this.url_scom);
+    }
+
+    getDcubeUrl(appMode) {
+        let url_dcube = AppConstants.URL_DEMO_DCUBE;
+        switch (appMode) {
+            case AppMode[AppMode.PROD]:
+                // production mode
+                url_dcube = AppConstants.URL_LIVE_DCUBE;
+                break;
+            case AppMode[AppMode.DEV]:
+                // development mode
+                url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
+                break;
+            case AppMode[AppMode.TEST]:
+                // demonstration/learning mode
+                url_dcube = AppConstants.URL_TEST_DCUBE;
+                break;
+            default:  
+                if (this.platform.is('mobile')) {
+                    // demonstration/learning mode
+                    url_dcube = AppConstants.URL_DEMO_DCUBE;
+                }
+        }
+
+        return url_dcube;
+    }
+
+    getScomcenterUrl(appMode) {
+        let url_scom = AppConstants.URL_DEMO_SCOM;
+        switch (appMode) {
+            case AppMode[AppMode.PROD]:
+                // production mode
+                url_scom = AppConstants.URL_LIVE_SCOM;
+                break;
+            case AppMode[AppMode.DEV]:
+                // development mode
+                url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
+                break;
+            case AppMode[AppMode.TEST]:
+                // demonstration/learning mode
+                url_scom = AppConstants.URL_TEST_SCOM;
+                break;
+            default:    
+                if (this.platform.is('mobile')) {
+                   // demonstration/learning mode
+                   url_scom = AppConstants.URL_DEMO_SCOM;
+                }
+        }
+
+        return url_scom;
     }
 
     getAppMode() {
         let self = this;
         this.local.get(APPMODE).then((value: any) => {
             self.appMode = value;
-            //console.log('getAppMode() value: ', value);
             return this.appMode;
         });
 
-        //console.log('getAppMode() this.appMode: ', this.appMode);
         return this.appMode;  // dev, demo, prod
     }
 
@@ -368,23 +430,6 @@ export class CommonService {
         });
     }
 
-    translateString(key: string): string {
-        return this.translateService.instant(key);
-    }
-
-    translateStringSubscribe(key: string): string {
-        console.log('CommonService::translateString() key: ', key);
-
-        this.translateService.get(key).subscribe(value => {
-            // value is our translated string
-            console.log('CommonService::translateString() value: ', value);
-            return value;
-        })
-
-        console.log('CommonService::translateString() value: ', "");
-        return "";
-    }
-
     getAppCurrency() {
         let self = this;
         this.local.get(APPCURR).then((value: any) => {
@@ -427,6 +472,45 @@ export class CommonService {
         });
     }
 
+    getSourceOfKeys() {
+        let self = this;
+        this.local.get(SOURCEOFKEYS).then((value: any) => {
+            self.SourceOfKeys = value;
+            //console.log('getSourceOfKeys() value: ', value);
+            return this.SourceOfKeys;
+        });
+
+        //console.log('getSourceOfKeys() this.SourceOfKeys: ', this.SourceOfKeys);
+        return this.SourceOfKeys;  // loadKeysFromDatabase, 
+    }
+
+    setSourceOfKeys(source: string) {
+        this.SourceOfKeys = source;
+        this.local.set(SOURCEOFKEYS, source);  // dev, demo, prod
+
+        this.commonEvents$.emit({
+            memo: SOURCEOFKEYS_CHANGED,
+            status: source
+        });
+    }
+
+    translateString(key: string): string {
+        return this.translateService.instant(key);
+    }
+
+    translateStringSubscribe(key: string): string {
+        console.log('CommonService::translateString() key: ', key);
+
+        this.translateService.get(key).subscribe(value => {
+            // value is our translated string
+            console.log('CommonService::translateString() value: ', value);
+            return value;
+        })
+
+        console.log('CommonService::translateString() value: ', "");
+        return "";
+    }
+
     initAccountTransaction(self, asset_type: string, amount: number) {
         self.account = {
             effectId: '',
@@ -445,7 +529,7 @@ export class CommonService {
 
     initAccount(self) {
         self.account = {
-            address: null,
+            address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
             balance: 0,
             reserve: 0,
@@ -454,50 +538,50 @@ export class CommonService {
                 effectId: null,
                 asset_code: this.appCurr,
                 asset_type: null,
-                amount: 0,
+                amount: 1,
                 debit: null,
                 memo: 'usd_client',
                 memoType: 'text',
-                extra_memo: 'usd_client',
-                sender_ename: 'usd_issuer*dcube.com',
-                receiver_ename: 'usd_base*dcube.com',
+                extra_memo: 'testing compliance',
+                sender_ename: 'usd_client*dcubedev.com',
+                receiver_ename: 'usd_base*dcubedev.com',
                 req_type: 'name',
                 creationDate: '',
                 creationTimestamp: '',
                 remoteContact: ''
             }],
             otherCurrencies: [],
-            destaddress: 'GCS3V3RII7LOCAKMZV4MBBZJFO6HQSN7DJPQGQQKLKIBBRPOXN6FTTIN',
-            destsecret: 'SDIUALDWTBDUU42AJ7TM3PUELOWIYGRIYYDVXLFW5MIJHPG23VIYLEAZ',
-            pymtamt: 0,
-            trustLimitAmt: 100,
+            destaddress: 'GANKXD6D7UH7HUUMZGFZWK6NDS6TYB5GO6NIWSN36B3JPCSCE7QV3Y5N',
+            destsecret: 'SDW4CSSNUXVGCT5CNG3AHJ24MRVQDHCP2WI5NTTYKX2BIPEFOEII4FD4',
+            pymtamt: 1,
+            trustLimitAmt: 1000,
             memo: 'usd_client',
             memo_type: 'text',
-            extra_memo: 'usd_client',
-            sender_ename: 'usd_issuer*dcube.com',
-            receiver_ename: 'usd_base*dcube.com',
+            extra_memo: 'testing compliance',
+            sender_ename: 'usd_client*dcubedev.com',
+            receiver_ename: 'usd_base*dcubedev.com',
             req_type: 'name'
         };
     }
 
     initAccountTransactions(self, transactions) {
         self.account = {
-            address: null,
+            address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
             balance: 0,
             reserve: 0,
             sequence: 0,
             transactions: [transactions],
             otherCurrencies: [],
-            destaddress: 'GCS3V3RII7LOCAKMZV4MBBZJFO6HQSN7DJPQGQQKLKIBBRPOXN6FTTIN',
-            destsecret: 'SDIUALDWTBDUU42AJ7TM3PUELOWIYGRIYYDVXLFW5MIJHPG23VIYLEAZ',
-            pymtamt: 0,
-            trustLimitAmt: 100,
+            destaddress: 'GANKXD6D7UH7HUUMZGFZWK6NDS6TYB5GO6NIWSN36B3JPCSCE7QV3Y5N',
+            destsecret: 'SDW4CSSNUXVGCT5CNG3AHJ24MRVQDHCP2WI5NTTYKX2BIPEFOEII4FD4',
+            pymtamt: 1,
+            trustLimitAmt: 1000,
             memo: 'usd_client',
             memo_type: 'text',
-            extra_memo: 'usd_client',
-            sender_ename: 'usd_issuer*dcube.com',
-            receiver_ename: 'usd_base*dcube.com',
+            extra_memo: 'testing compliance',
+            sender_ename: 'usd_client*dcubedev.com',
+            receiver_ename: 'usd_base*dcubedev.com',
             req_type: 'name'
         };
     }

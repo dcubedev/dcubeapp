@@ -24,9 +24,9 @@ export class AccountService{
     }
 
     onAccountEvent(callbackObj, acctevtFunc) {
-        //console.log("AccountService.onAccountEvent() acctevtFunc: " + acctevtFunc);
+        //console.log("AccountService::onAccountEvent() acctevtFunc: " + acctevtFunc);
         this.sas.acctEvent$.subscribe(acctevt => {
-            //console.log("AccountService.onAccountEvent(subscribed) acctevt: " + acctevt);
+            //console.log("AccountService::onAccountEvent(subscribed) acctevt: " + acctevt);
             acctevtFunc(callbackObj, acctevt);
         });
     }
@@ -50,8 +50,9 @@ export class AccountService{
         this.sas.getPaymentInfo(accountId);
     }
 
-    getAccountBalances() {
-        return this.sas.getAccountBalances();
+    getAccountBalances(source?: string) {
+        //console.log("AccountService::getAccountBalances() source: " + source);
+        return this.sas.getAccountBalances(source);
     }
 
     getAccountBalanceForKeyWithAddr(keyaddr) {

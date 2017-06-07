@@ -8,7 +8,8 @@ import { RemoteService } from '../../providers/remote-service/remote-service';
 
 declare var StellarSdk: any;
 
-export const INFLATION_DESTINATION = 'GBL7AE2HGRNQSPWV56ZFLILXNT52QWSMOQGDBBXYOP7XKMQTCKVMX2ZL';
+// Stephen's account
+export const INFLATION_DESTINATION = 'GCONLWO3FOGT4KTHEVZ3EAPOJ6NUOUTWBH47CBZNDFKNQDQAHKMNPURT';
 
 
 /*
@@ -80,38 +81,42 @@ export class StellarKeySettingsService {
         private remoteSvrc: RemoteService) {
         this.keyEvents$ = new EventEmitter();
     }
-
+    
     getDefaultKeys(): CommonConstants.IWalletKey {
-        this.keysStored = {
+        return this.getDefaultKeysSource(this);
+    }
+
+    getDefaultKeysSource(self): CommonConstants.IWalletKey {
+        self.keysStored = {
             address: "",
             secret: ""
         };
 
         // on a mobile device
-        if (this.commonSvrc.isMobile) {
+        //if (self.commonSvrc.isMobile) {
             // do nothing we already have the desired values
-        } else {
-        }
+        //} else {
+        //}
 
-        switch (this.commonSvrc.appMode) {
+        switch (self.commonSvrc.appMode) {
             case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
                 // production mode
-                this.keysStored = this.DCUBE_PROD_KEYS;
+                self.keysStored = self.DCUBE_PROD_KEYS;
                 break;
-            case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
-                // demonstration/learning mode
-                this.keysStored = this.DCUBE_DEMO_KEYS;
+            case CommonConstants.AppMode[CommonConstants.AppMode.DEV]:
+                // development mode
+                self.keysStored = self.DCUBE_DEV_KEYS;
                 break;
             case CommonConstants.AppMode[CommonConstants.AppMode.TEST]:
                 // testing mode
-                this.keysStored = this.DCUBE_TEST_KEYS;
+                self.keysStored = self.DCUBE_TEST_KEYS;
                 break;
             default:
-                // development mode
-                this.keysStored = this.DCUBE_DEV_KEYS;
+                // demonstration/learning mode
+                self.keysStored = self.DCUBE_DEMO_KEYS;  
         }
         
-        return this.keysStored;
+        return self.keysStored;
     }
 
     getBaseKeys(): CommonConstants.IWalletKey {
@@ -120,9 +125,9 @@ export class StellarKeySettingsService {
             address: ""
         };
         switch (this.commonSvrc.appMode) {
-            case CommonConstants.AppMode[CommonConstants.AppMode.DEMO]:
-                // demonstration/learning mode
-                keys = this.DCUBE_DEMO_BASE_ACCT_KEYS;
+            case CommonConstants.AppMode[CommonConstants.AppMode.DEV]:
+                // development mode
+                keys = this.DCUBE_DEV_BASE_ACCT_KEYS;
                 break;
             case CommonConstants.AppMode[CommonConstants.AppMode.PROD]:
                 // production mode
@@ -133,8 +138,8 @@ export class StellarKeySettingsService {
                 keys = this.DCUBE_TEST_BASE_ACCT_KEYS;
                 break;
             default:
-                // development mode
-                keys = this.DCUBE_DEV_BASE_ACCT_KEYS;
+                // demonstration/learning mode
+                keys = this.DCUBE_DEMO_BASE_ACCT_KEYS;
         }
 
         return keys;
@@ -143,62 +148,77 @@ export class StellarKeySettingsService {
     loadKeysFromDatabase() {
         let self = this;
         let appmode = this.commonSvrc.appMode;
-
-        let url_p = this.commonSvrc.url_dcube + "dcube/getAllCurrencyAuthkeys?appmode=" + appmode;
+        console.log("StellarKeySettingsService::loadKeysFromDatabase() appmode: " + appmode);
+   
+        let url_p = this.commonSvrc.getDcubeUrl(appmode) + "platform/getAllCurrencyAuthkeys?platform=STELLAR&appmode=" + appmode;
 
         if (url_p != null) {
-            console.log("loadKeysFromDatabase() url_p: " + url_p);
+            console.log("StellarKeySettingsService::loadKeysFromDatabase() url_p: " + url_p);
             this.remoteSvrc.getHttp(url_p).then(data => {
                 self.dbKeys = data;
+                console.log("StellarKeySettingsService::loadKeysFromDatabase(from remoteSvrc) self.dbKeys['DCUBE_USD_BASE_KEYS']: " + self.dbKeys['DCUBE_USD_BASE_KEYS']);
 
-                self.DCUBE_DEMO_KEYS = self.dbKeys['DCUBE_GHS_CLIENT_KEYS'];
+                self.DCUBE_DEMO_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
                 self.DCUBE_DEV_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
-                self.DCUBE_PROD_KEYS = self.dbKeys['DCUBE_USD_ISSUING_KEYS'];
-                self.DCUBE_TEST_KEYS = self.dbKeys['DCUBE_USD_CLIENT_KEYS'];
+                self.DCUBE_TEST_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                //self.DCUBE_PROD_KEYS = self.dbKeys['DCUBE_USD_ISSUING_KEYS'];
+                self.DCUBE_PROD_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
 
                 self.DCUBE_DEMO_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
                 self.DCUBE_DEV_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
-                self.DCUBE_PROD_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
                 self.DCUBE_TEST_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
+                //self.DCUBE_PROD_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_ISSUING_KEYS'];
+                self.DCUBE_PROD_BASE_ACCT_KEYS = self.dbKeys['DCUBE_USD_BASE_KEYS'];
 
-                self.initKeys();
+                //safe keys for later
+                self.saveKeysStore(self.getDefaultKeysSource(self));
                 self.keyEvents$.emit({
                     memo: 'KEYS_LOADED_FROM_DB',
                     status: self.getDefaultKeys()
                 });
             }, err => {
-                console.log("loadKeysFromDatabase() err: " + JSON.stringify(err));
+                console.log("StellarKeySettingsService::loadKeysFromDatabase() err: " + JSON.stringify(err));
             })
         }
     }
 
-    loadKeysStore(): CommonConstants.IWalletKey {
-        let indx: string = this.commonSvrc.appMode;
-        if (undefined !== this.keysStored && null !== this.keysStored &&
-            undefined !== this.keysStored.address && null !== this.keysStored.address) {
+    loadKeysStore(source?: string): CommonConstants.IWalletKey {
+        //console.log('StellarKeySettingsService::loadKeysStore() source: ' + source);
+        if ((undefined !== source || null !== source) &&
+            ('loadKeysFromDatabase' === source) )    {
+            // if source is given then load from the specified source
+            this.loadKeysFromDatabase();
         } else {
-            this.keysStored = {
-                address: "",
-                secret: "",
-                mode: "undefined"
-            };
-        }
-
-        // if we have keys stored, use them otherwise use default keys
-        if (undefined !== window && null !== window &&
-            undefined !== window.localStorage && null !== window.localStorage &&
-            undefined !== window.localStorage[indx] && null !== window.localStorage[indx] &&
-            window.localStorage[indx].length > 0) {
-            let winstore: CommonConstants.IWalletKey = <CommonConstants.IWalletKey>JSON.parse(window.localStorage[indx]);
-
-            if (undefined !== winstore && null !== winstore &&
-                undefined != winstore.address && winstore.address.length > 0) {
-                this.keysStored = winstore;
+            let indx: string = this.commonSvrc.appMode;
+            if (undefined !== this.keysStored && null !== this.keysStored &&
+                undefined !== this.keysStored.address && null !== this.keysStored.address) {
             } else {
+                this.keysStored = {
+                    address: "",
+                    secret: "",
+                    mode: "undefined"
+                };
+            }
+
+            // if we have keys stored, use them otherwise use default keys
+            if (undefined !== window && null !== window &&
+                undefined !== window.localStorage && null !== window.localStorage &&
+                undefined !== window.localStorage[indx] && null !== window.localStorage[indx] &&
+                window.localStorage[indx].length > 0) {
+                let winstore: CommonConstants.IWalletKey = <CommonConstants.IWalletKey>JSON.parse(window.localStorage[indx]);
+
+                if (undefined !== winstore && null !== winstore &&
+                    undefined != winstore.address && winstore.address.length > 0) {
+                    this.keysStored = winstore;
+                    //console.log('StellarKeySettingsService::loadKeysStore() loading from: winstore');
+                } else {
+                    //console.log('StellarKeySettingsService::loadKeysStore() loading from: loadKeysFromDatabase');
+                    this.loadKeysFromDatabase();
+                }
+            } else {
+                //console.log('StellarKeySettingsService::loadKeysStore() loading from: loadKeysFromDatabase');
                 this.loadKeysFromDatabase();
             }
-        } else {
-            this.loadKeysFromDatabase();
         }
 
         return this.keysStored;
@@ -213,7 +233,7 @@ export class StellarKeySettingsService {
         if (undefined !== this.keysStored && null !== this.keysStored &&
             undefined !== this.keysStored.address && null !== this.keysStored.address &&
             this.keysStored.address.length > 0) {
-            console.log('saveKeyInStore() this.keysStored.address.length: ' + this.keysStored.address.length);
+            //console.log('StellarKeySettingsService::saveKeyInStore() this.keysStored.address.length: ' + this.keysStored.address.length);
             window.localStorage[indx] = JSON.stringify(this.keysStored);
         }
     }
@@ -227,7 +247,7 @@ export class StellarKeySettingsService {
             if (undefined !== this.keysStored && null !== this.keysStored &&
                 undefined !== this.keysStored.address && null !== this.keysStored.address &&
                 this.keysStored.address.length > 0) {
-                console.log('saveKeysStore() this.keysStored.address.length: ' + this.keysStored.address.length);
+                //console.log('StellarKeySettingsService::saveKeysStore() this.keysStored.address.length: ' + this.keysStored.address.length);
                 window.localStorage[indx] = JSON.stringify(this.keysStored);
             }
         } else {
@@ -244,7 +264,7 @@ export class StellarKeySettingsService {
     }
 
     getStellarKeyPair(secretkey) {
-        return StellarSdk.Keypair.fromSeed(secretkey);
+        return StellarSdk.Keypair.fromSecret(secretkey);
     }
 
     genStellarKeypair() {
@@ -253,18 +273,18 @@ export class StellarKeySettingsService {
             address: ""
         };
         let keyPair = StellarSdk.Keypair.random();
-        console.log('genStellarKeypair keyPair: ' + keyPair);
+        //console.log('StellarKeySettingsService::genStellarKeypair keyPair: ' + keyPair);
 
         if (keyPair) {
             keys = {
-                secret: keyPair.seed(),
-                address: keyPair.accountId(),
+                secret: keyPair.secret(),
+                address: keyPair.publicKey(),
                 mode: 'created'
             };
-            console.log('genStellarKeypair Account ID: ' + keys.address);
-            console.log(keys.address);
-            console.log('genStellarKeypair Secret Key: ' + keys.secret);
-            console.log(keys.secret);
+            //console.log('StellarKeySettingsService::genStellarKeypair Account ID: ' + keys.address);
+            //console.log(keys.address);
+            //console.log('StellarKeySettingsService::genStellarKeypair Secret Key: ' + keys.secret);
+            //console.log(keys.secret);
         }
 
         return keys;

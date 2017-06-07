@@ -58,7 +58,7 @@ export class DemoPage {
     onAccountEvent(self, acctevt: any) {
         //console.log("DemoPage.onAccountEvent() acctevt: " + acctevt);
         //console.log("DemoPage.onAccountEvent() acctevt.memo: " + acctevt.memo);
-        console.log("DemoPage.onAccountEvent() acctevt.status: " + JSON.stringify(acctevt.status));
+        //console.log("DemoPage.onAccountEvent() acctevt.status: " + JSON.stringify(acctevt.status));
         //console.log("DemoPage.onAccountEvent() self.acctSvrc.getAccount(): " + self.acctSvrc.getAccount());
         //console.log("Entering DemoPage.onAccountEvent() ... self.acctSvrc: " + self.acctSvrc);
         if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
@@ -187,21 +187,27 @@ export class DemoPage {
 
     changeTrustline() {
         let issuingAddr = this.keysStored.address;
-        let issuingSeed = this.keysStored.secret;
-        let receivingSeed = this.account.destsecret;
+        let signerSeed = this.account.destsecret;
         let asset_code = this.account.asset_code;
         let trustLimitAmt: string = "" + this.account.trustLimitAmt;
-        this.trustSvrc.changeTrust(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt);
+        this.trustSvrc.changeTrust(issuingAddr, signerSeed, asset_code, trustLimitAmt);
+    }
+
+    checkTrustline() {
+        let assetIssuer = this.keysStored.address;
+        let assetCode = this.account.asset_code;
+        let clientAccountId = this.account.destaddress;
+        this.trustSvrc.checkTrust(assetCode, assetIssuer, clientAccountId);
     }
 
     changeTrustlineAndPay() {
         let issuingAddr = this.keysStored.address;
         let issuingSeed: string = this.keysStored.secret;
-        let receivingSeed: string = <string>this.account.destsecret;
+        let signerSeed: string = <string>this.account.destsecret;
         let asset_code = this.account.asset_code;
         let pymtamt: string = "" + this.account.pymtamt;
         let trustLimitAmt: string = "" + this.account.trustLimitAmt;
-        this.trustSvrc.changeTrustAndPay(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt, pymtamt);
+        this.trustSvrc.changeTrustAndPay(issuingAddr, issuingSeed, signerSeed, asset_code, trustLimitAmt, pymtamt);
     }
 
     sendFederationRequest() {

@@ -77,7 +77,8 @@ export class StellarAccountService {
 
         if (this.srsSrvc.isConnected()) {
             // Now get account balances
-            this.attachToKeys();
+            console.log('StellarAccountService::healthCheck() SourceOfKeys: ' + this.comSrvc.SourceOfKeys);
+            this.attachToKeys(this.comSrvc.SourceOfKeys);
             this.keysChanged = false;
             this.connectionChanged = false;
         }
@@ -102,8 +103,9 @@ export class StellarAccountService {
             .catch(console.log('setInflationDestination error'));
     }
 
-    getAccountBalances() {
-        this.getAccountBalanceForKey();
+    getAccountBalances(source?: string) {
+        //console.log('StellarAccountService::getAccountBalances() source: ' + source);
+        this.getAccountBalanceForKey(source);
     }
 
     getAccountBalancesCallback() {
@@ -167,24 +169,28 @@ export class StellarAccountService {
         return promise;
     }
 
-    getKeyAddress() {
+    getKeyAddress(source?: string) {
+        //console.log("StellarAccountService::getKeyAddress() source: " + source);
         let keyaddr = null;
-        if (undefined !== this.account && null !== this.account && undefined !== this.account.address && null !== this.account.address) {
+        if ((undefined === source || null === source) &&
+            undefined !== this.account && null !== this.account &&
+            undefined !== this.account.address && null !== this.account.address) {
             if (this.account.address.length > 0) {
                 keyaddr = this.account.address;
             } else {
-                keyaddr = this.keysettings.loadKeysStore().address;
+                keyaddr = this.keysettings.loadKeysStore(source).address;
             }
         } else {
-            keyaddr = this.keysettings.loadKeysStore().address;
+            keyaddr = this.keysettings.loadKeysStore(source).address;
         }
 
         return keyaddr;
     }
 
-    getAccountBalanceForKey() {
+    getAccountBalanceForKey(source?: string) {
+        //console.log("StellarAccountService::getAccountBalanceForKey() source: " + source);
         // get initial account balances
-        let keyaddr = this.getKeyAddress();
+        let keyaddr = this.getKeyAddress(source);
         this.getAccountBalanceForKeyWithAddr(keyaddr);
     }
 
@@ -216,10 +222,10 @@ export class StellarAccountService {
                     self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
                 })
                 .catch(StellarSdk.NotFoundError, function (err) {
-                    console.log("attachToKeys account not found");
+                    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() account not found");
                 })
                 .catch(function (err) {
-                    console.log("attachToKeys() err: " + (err.stack || err));
+                    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() err: " + (err.stack || err));
                 })
 
             self.srsSrvc.getServer().effects()
@@ -228,7 +234,8 @@ export class StellarAccountService {
                 .order('desc')
                 .call()
                 .then(function (effectResults) {
-                    //console.log("getAccountBalanceForKey() effectResponse: " + JSON.stringify(effectResults));
+                    self.clearBalance();
+                    //console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() effectResponse: " + JSON.stringify(effectResults));
                     let length = effectResults.records ? effectResults.records.length : 0;
                     for (let index = length - 1; index >= 0; index--) {
                         let currentEffect = effectResults.records[index];
@@ -241,22 +248,23 @@ export class StellarAccountService {
                     });
                 })
                 .catch(function (err) {
-                    //self.attachToPaymentsStream('now');
-                    console.log("getAccountBalanceForKey err: " + err)
+                    //self.getAccountBalanceForKeyWithAddr('now');
+                    console.log("getAccountBalanceForKeyWithAddr() err: " + err)
                 });
         }
     }
 
-    attachToKeys() {
+    attachToKeys(source?: string) {
+        console.log("attachToKeys() source: " + source);
         // get initial account balances
         let self = this;
-        let keyaddr = this.getKeyAddress();
+        let keyaddr = this.getKeyAddress(source);
         this.resetAccount(keyaddr);
         self.srsSrvc.getServer().accounts()
             .accountId(self.account.address)
             .call()
             .then(function (acc) {
-                //console.log("acctResponse: " + JSON.stringify(acc));
+                //console.log("StellarAccountService::attachToKeys() acctResponse: " + JSON.stringify(acc));
                 let reserveChunks = 1 + acc.signers.length; // minimum reserve
                 for (let i = 0; i < acc.balances.length; i++) {
                     let bal = acc.balances[i];
@@ -279,7 +287,7 @@ export class StellarAccountService {
                 console.log("attachToKeys account not found");
             })
             .catch(function (err) {
-                console.log("attachToKeys() err: " + (err.stack || err));
+                console.log("StellarAccountService::attachToKeys() err: " + (err.stack || err));
             })
 
         self.srsSrvc.getServer().effects()
@@ -288,7 +296,7 @@ export class StellarAccountService {
             .order('desc')
             .call()
             .then(function (effectResults) {
-                //console.log("effectResponse: " + JSON.stringify(effectResults));
+                //console.log("StellarAccountService::attachToKeys() effectResponse: " + JSON.stringify(effectResults));
                 let length = effectResults.records ? effectResults.records.length : 0;
                 for (let index = length - 1; index >= 0; index--) {
                     let currentEffect = effectResults.records[index];
@@ -311,6 +319,13 @@ export class StellarAccountService {
                 self.attachToPaymentsStream('now');
                 console.log("attachToKeys err: " + err)
             });
+    }
+
+    clearBalance() {
+        // clear account balances
+        this.account.balance = 0;
+        this.account.transactions.splice(0, this.account.transactions.length);
+        this.account.otherCurrencies.splice(0, this.account.otherCurrencies.length);
     }
 
     addToBalance(curr, amount: number) {
@@ -487,15 +502,15 @@ export class StellarAccountService {
             .build();
 
         // sign the transaction
-        transaction.sign(StellarSdk.Keypair.fromSeed(secret));
+        transaction.sign(StellarSdk.Keypair.fromSecret(secret));
 
         // transaction is now ready to be sent to the network or saved somewhere
         // Ok, send it off to Stellar!
         self.srsSrvc.getServer().submitTransaction(transaction)
             .then(data => {
-                console.log("createAndFundAccountAny() data: " + data);
+                console.log("StellarAccountService::createAndFundAccountAny() data: " + data);
             }, err => {
-                console.log("createAndFundAccountAny() err: " + err);
+                console.log("StellarAccountService::createAndFundAccountAny() err: " + err);
             })
     }
 
@@ -505,9 +520,9 @@ export class StellarAccountService {
         server.friendbot(addrp)
             .call()
             .then(data => {
-                console.log("fundAccountWithFriendbot() data: " + JSON.stringify(data));
+                console.log("StellarAccountService::fundAccountWithFriendbot() data: " + JSON.stringify(data));
             }, err => {
-                console.log("fundAccountWithFriendbot() err: " + JSON.stringify(err));
+                console.log("StellarAccountService::fundAccountWithFriendbot() err: " + JSON.stringify(err));
             })
     }
 
@@ -515,9 +530,9 @@ export class StellarAccountService {
         let url_p = StellarConstants.URL_FRIENDBOT + '?json=true&addr=' + addrp;
 
         this.remoteSvrc.getHttp(url_p).then(data => {
-            console.log("fundAccountWithFriendbot() data: " + data);
+            console.log("StellarAccountService::fundAccountWithFriendbot() data: " + data);
         }, err => {
-            console.log("fundAccountWithFriendbot() err: " + err);
+            console.log("StellarAccountService::fundAccountWithFriendbot() err: " + err);
         })
     }
 
@@ -539,13 +554,13 @@ export class StellarAccountService {
                 body: null
             };
 
-            console.log("makePaymentUsingBridgeWithHttp() sending POST _url: " + _url);
-            console.log("makePaymentUsingBridgeWithHttp() sending POST _body: " + _body);
+            console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _url: " + _url);
+            console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _body: " + _body);
             self.remoteSvrc.postHttp(_url, _body, reqOptions).then(data => {
-                console.log("makePaymentUsingBridgeWithHttp() data: " + JSON.stringify(data));
+                console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() data: " + JSON.stringify(data));
                 resolve(data);
             }, err => {
-                console.log("makePaymentUsingBridgeWithHttp() err: " + JSON.stringify(err));
+                console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() err: " + JSON.stringify(err));
                 reject(err);
             })
         });
@@ -578,7 +593,7 @@ export class StellarAccountService {
                 status: body_urlenc
             });
         }, err => {
-            console.log("makePaymentWithCompliance() err: " + JSON.stringify(err));
+            console.log("StellarAccountService::makePaymentWithCompliance() err: " + JSON.stringify(err));
         })
 
     }
@@ -607,14 +622,14 @@ export class StellarAccountService {
                 status: body_urlenc
             });
         }, err => {
-            console.log("makePaymentUsingBridge() err: " + JSON.stringify(err));
+            console.log("StellarAccountService::makePaymentUsingBridge() err: " + JSON.stringify(err));
         })
 
     }
 
     makePayment(srcAddrKey, srcSeedkey, destkey, asset_code, amount: string, memo: string) {
         let server = this.srsSrvc.getServer();
-        let sourceKeys = StellarSdk.Keypair.fromSeed(srcSeedkey);
+        let sourceKeys = StellarSdk.Keypair.fromSecret(srcSeedkey);
 
         let self = this;
         // First, check to make sure that the destination account exists.
@@ -627,9 +642,9 @@ export class StellarAccountService {
             .catch(StellarSdk.NotFoundError, function (error) {
                 throw new Error('makePayment() The destination account does not exist!');
             })
-            // If there was no error, load up-to-date information on your account.
+            // If there was no error, load up-to-date information on source account.
             .then(function () {
-                return server.loadAccount(sourceKeys.accountId());
+                return server.loadAccount(sourceKeys.publicKey());
             })
             .then(function (sourceAccount) {
                 // Start building the transaction.
@@ -652,14 +667,14 @@ export class StellarAccountService {
                 return server.submitTransaction(transaction);
             })
             .then(function (result) {
-                console.log('makePayment() Success! Results:', result);
+                console.log('StellarAccountService::makePayment() Success! Results:', result);
                 self.acctEvent$.emit({
                     memo: amount,
                     status: AppConstants.NEW_PAYMENT
                 });
             })
             .catch(function (error) {
-                console.error('makePayment() Something went wrong!', error);
+                console.error('StellarAccountService::makePayment() Something went wrong!', error);
             });
     }
 
@@ -676,7 +691,7 @@ export class StellarAccountService {
         // If some payments have already been handled, start the results from the
         // last seen payment. (See below in `handlePayment` where it gets saved.)
         let lastToken = this.loadLastPagingToken();
-        console.log("receivePayment lastToken: " + lastToken);
+        console.log("StellarAccountService::getPaymentInfo() receivePayment lastToken: " + lastToken);
         if (lastToken) {
             payments.cursor(lastToken);
         }
@@ -704,11 +719,11 @@ export class StellarAccountService {
                     asset = payment.asset_code + ':' + payment.asset_issuer;
                 }
 
-                console.log(payment.amount + ' ' + asset + ' from ' + payment.from);
+                console.log("StellarAccountService::getPaymentInfo() " + payment.amount + ' ' + asset + ' from ' + payment.from);
             },
 
             onerror: function (error) {
-                console.error('Error in payment stream: ' + JSON.stringify(error));
+                console.error('StellarAccountService::getPaymentInfo() Error in payment stream: ' + JSON.stringify(error));
             }
         });
     }
@@ -716,13 +731,13 @@ export class StellarAccountService {
     savePagingToken(token) {
         // In most cases, you should save this to a local database or file so that
         // you can load it next time you stream new payments.
-        console.log("savePagingToken token: " + token);
+        console.log("StellarAccountService::savePagingToken() token: " + token);
         this.pagingToken = token;
     }
 
     loadLastPagingToken() {
         // Get the last paging token from a local database or file
-        console.log("loadLastPagingToken called");
+        console.log("StellarAccountService::loadLastPagingToken called");
         return this.pagingToken;
     }
 
@@ -732,8 +747,8 @@ export class StellarAccountService {
             let server = self.srsSrvc.getServer();
             // returns {"_accountId":"","sequence":""}
             server.loadAccount(addr_p).then((account) => {
-                console.log('Balances for account: ' + addr_p);
-                console.log('Account info: ' + JSON.stringify(account));
+                console.log('StellarAccountService::loadAccount() Balances for account: ' + addr_p);
+                console.log('StellarAccountService::loadAccount() Account info: ' + JSON.stringify(account));
                 resolve(account);
             });
         });

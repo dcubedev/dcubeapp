@@ -164,7 +164,7 @@ export class StellarAnchorService {
                     // Sign the transaction
                     .build();
 
-                transaction.sign(StellarSdk.Keypair.fromSeed(self.config.baseAccountSeed));
+                transaction.sign(StellarSdk.Keypair.fromSecret(self.config.baseAccountSeed));
 
                 // POST https://horizon-testnet.stellar.org/transactions
                 return server.submitTransaction(transaction)

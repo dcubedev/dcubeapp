@@ -51,19 +51,21 @@ export class StellarTrustlineService {
         });
     }
 
-    changeTrust(issuingAddr, issuingSeed, receivingSeed, asset_code, trustLimitAmt) {
+    changeTrust(issuingAddr, signerSeed, asset_code, trustLimitAmt) {
         let server = this.srsSrvc.getServer();
 
         // Keys for accounts to issue and receive the new asset
-        //var issuingKeys = StellarSdk.Keypair.fromSeed(issuingSeed);
-        let receivingKeys = StellarSdk.Keypair.fromSeed(receivingSeed);
+        //var issuingKeys = StellarSdk.Keypair.fromSecret(issuingSeed);
+        let signerKeys = StellarSdk.Keypair.fromSecret(signerSeed);
+        console.log('StellarTrustlineService::changeTrust() signerKeys: ' + signerKeys );
 
         // First, the receiving account must trust the asset
         let issuedAsset = this.scsSrvc.getAssetObject(asset_code, issuingAddr);
+        console.log('StellarTrustlineService::changeTrust() issuedAsset: ' + issuedAsset);
         
-        server.loadAccount(receivingKeys.accountId())
+        server.loadAccount(signerKeys.publicKey())
             .then(function (receiver) {
-                var transaction = new StellarSdk.TransactionBuilder(receiver)
+                let transaction = new StellarSdk.TransactionBuilder(receiver)
                     // The `changeTrust` operation creates (or alters) a trustline
                     // The `limit` parameter below is optional
                     .addOperation(StellarSdk.Operation.changeTrust({
@@ -71,7 +73,7 @@ export class StellarTrustlineService {
                         limit: trustLimitAmt
                     }))
                     .build();
-                transaction.sign(receivingKeys);
+                transaction.sign(signerKeys);
                 return server.submitTransaction(transaction);
             })
     }
@@ -80,8 +82,8 @@ export class StellarTrustlineService {
         let server = this.srsSrvc.getServer();
 
         // Keys for accounts to issue and receive the new asset
-        let issuingKeys = StellarSdk.Keypair.fromSeed(issuingSeed);
-        let receivingKeys = StellarSdk.Keypair.fromSeed(receivingSeed);
+        let issuingKeys = StellarSdk.Keypair.fromSecret(issuingSeed);
+        let receivingKeys = StellarSdk.Keypair.fromSecret(receivingSeed);
 
         // First, the receiving account must trust the asset
         let issuedAsset = this.scsSrvc.getAssetObject(asset_code, issuingAddr);

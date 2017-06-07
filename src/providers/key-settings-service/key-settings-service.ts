@@ -21,8 +21,8 @@ export class KeySettingsService {
         });
     }
 
-    loadKeysStore(): CommonConstants.IWalletKey {
-        return this.stellarKeySvrc.loadKeysStore();
+    loadKeysStore(source?: string): CommonConstants.IWalletKey {
+        return this.stellarKeySvrc.loadKeysStore(source);
     }
 
     genKeypair() {
