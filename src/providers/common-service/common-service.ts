@@ -203,12 +203,12 @@ export const SOURCEOFKEYS = 'SourceOfKeys';
 export class CommonService {
     SourceOfKeys: string;
     isMobile: boolean = false;
-    url_dcube: string = AppConstants.URL_DEMO_DCUBE;
-    url_scom: string = AppConstants.URL_DEMO_SCOM;
+    url_dcube: string = AppConstants.URL_DEV_DCUBE;
+    url_scom: string = AppConstants.URL_DEV_SCOM;
     local: Storage = null;
     cfgdata: any = null;
     appplatform: string = AppPlatform[AppPlatform.STELLAR];
-    appMode: string = AppMode[AppMode.DEMO];
+    appMode: string = AppMode[AppMode.DEV];
     appLang: string = AppLanguage[AppLanguage.EN];
     appCurr: string = AppCurrency[AppCurrency.XLM];
     payMethod: string = PaymentMethod[PaymentMethod.WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT];
@@ -231,6 +231,7 @@ export class CommonService {
         //console.log('CommonService.constructor() this.platform.lang: ', this.platform.lang());
 
         this.commonEvents$ = new EventEmitter();
+        console.log('CommonService.constructor() this.local: ', this.local);
         if (null === this.local) {
             this.local = storage;
             this.local.set(APPMODE, this.appMode);  // dev, demo, prod
@@ -239,33 +240,28 @@ export class CommonService {
             this.local.set(APPPLATFORM, this.appplatform);  // Stellar
             this.local.set(PAYMETHOD, this.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
             this.local.set(SOURCEOFKEYS, this.SourceOfKeys);
-            //console.log('CommonService.constructor() this.appCurr: ', this.appCurr);
-            //console.log('CommonService.constructor() this.SourceOfKeys: ', this.SourceOfKeys);
-
+            
             // override with configuration data
             this.appcfg.load().then(cfgdata => {
-                this.cfgdata = cfgdata;
-                this.appMode = this.cfgdata.AppMode;
-                this.appLang = this.cfgdata.AppLanguage;
-                this.appCurr = this.cfgdata.AppCurrency;
-                this.appplatform = this.cfgdata.AppPlatform;
-                this.payMethod = this.cfgdata.PaymentMethod;
-                this.SourceOfKeys = this.cfgdata.SourceOfKeys;
-                //console.log('CommonService.constructor(cfgdata received) this.cfgdata.SourceOfKeys: ', this.cfgdata.SourceOfKeys);
-                //console.log('CommonService.constructor(cfgdata received) this.appCurr: ', this.appCurr);
+                self.cfgdata = cfgdata;
+           
+                self.local.set(APPMODE, cfgdata['AppMode']);  // dev, demo, prod
+                self.local.set(APPLANG, cfgdata['AppLanguage']);  // en, fr
+                self.local.set(APPCURR, cfgdata['AppCurrency']);  // XLM, GHS, USD
+                self.local.set(APPPLATFORM, cfgdata['AppPlatform']);  // Stellar
+                self.local.set(PAYMETHOD, cfgdata['PaymentMethod']);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
+                self.local.set(SOURCEOFKEYS, cfgdata['SourceOfKeys']);
 
-                self.local.set(APPMODE, self.appMode);  // dev, demo, prod
-                self.local.set(APPLANG, self.appLang);  // en, fr
-                self.local.set(APPCURR, self.appCurr);  // XLM, GHS, USD
-                self.local.set(APPPLATFORM, self.appplatform);  // Stellar
-                self.local.set(PAYMETHOD, self.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
-                self.local.set(SOURCEOFKEYS, self.SourceOfKeys);
+                self.setAppModeSelf(self, cfgdata['AppMode']);
+                self.setAppLanguageSelf(self, cfgdata['AppLanguage']);
+                self.setAppCurrencySelf(self, cfgdata['AppCurrency']);
+                self.setAppPlatformSelf(self, cfgdata['AppPlatform']);
+                self.setPayMethodSelf(self, cfgdata['PaymentMethod']);
+                self.setSourceOfKeysSelf(self, cfgdata['SourceOfKeys']);
 
-                self.setSourceOfKeys(self.SourceOfKeys);
-                self.setAppLanguage(self.appLang);
-                self.setAppPlatform(self.appplatform);
-                self.setPayMethod(self.payMethod);
-                self.reconfigDcubeUrl();
+                self.platform.setLang(cfgdata['AppLanguage'].toLocaleLowerCase(), true);
+
+                self.reconfigDcubeUrlSelf(self);
             })
         }
     }
@@ -287,8 +283,8 @@ export class CommonService {
                 break;
             case AppMode[AppMode.DEV]:
                 // development mode
-                this.url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
-                this.url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
+                this.url_dcube = AppConstants.URL_DEV_DCUBE;
+                this.url_scom = AppConstants.URL_DEV_SCOM;
                 break;
             case AppMode[AppMode.TEST]:
                 // demonstration/learning mode
@@ -306,6 +302,37 @@ export class CommonService {
         //console.log('reconfigDcubeUrl() this.url_dcube: ', this.url_dcube);
         //console.log('reconfigDcubeUrl() this.url_scom: ', this.url_scom);
     }
+    reconfigDcubeUrlSelf(self) {
+        self.url_dcube = AppConstants.URL_DEMO_DCUBE;
+        self.url_scom = AppConstants.URL_DEMO_SCOM;
+        console.log('reconfigDcubeUrlSelf() self.appMode: ', self.appMode);
+        switch (self.appMode) {
+            case AppMode[AppMode.PROD]:
+                // production mode
+                self.url_dcube = AppConstants.URL_LIVE_DCUBE;
+                self.url_scom = AppConstants.URL_LIVE_SCOM;
+                break;
+            case AppMode[AppMode.DEV]:
+                // development mode
+                self.url_dcube = AppConstants.URL_DEV_DCUBE;
+                self.url_scom = AppConstants.URL_DEV_SCOM;
+                break;
+            case AppMode[AppMode.TEST]:
+                // demonstration/learning mode
+                self.url_dcube = AppConstants.URL_TEST_DCUBE;
+                self.url_scom = AppConstants.URL_TEST_SCOM;
+                break;
+            default:
+                if (self.platform.is('mobile')) {
+                    // demonstration/learning mode
+                    self.url_dcube = AppConstants.URL_DEMO_DCUBE;
+                    self.url_scom = AppConstants.URL_DEMO_SCOM;
+                }
+        }
+
+        console.log('reconfigDcubeUrlSelf() self.url_dcube: ', self.url_dcube);
+        console.log('reconfigDcubeUrlSelf() self.url_scom: ', self.url_scom);
+    }
 
     getDcubeUrl(appMode) {
         let url_dcube = AppConstants.URL_DEMO_DCUBE;
@@ -316,7 +343,7 @@ export class CommonService {
                 break;
             case AppMode[AppMode.DEV]:
                 // development mode
-                url_dcube = AppConstants.URL_DEV_MOBILE_DCUBE;
+                url_dcube = AppConstants.URL_DEV_DCUBE;
                 break;
             case AppMode[AppMode.TEST]:
                 // demonstration/learning mode
@@ -341,7 +368,7 @@ export class CommonService {
                 break;
             case AppMode[AppMode.DEV]:
                 // development mode
-                url_scom = AppConstants.URL_DEV_MOBILE_SCOM;
+                url_scom = AppConstants.URL_DEV_SCOM;
                 break;
             case AppMode[AppMode.TEST]:
                 // demonstration/learning mode
@@ -376,6 +403,15 @@ export class CommonService {
             status: APPMODE_CHANGED
         });
     }
+    setAppModeSelf(self, mode: string) {
+        self.appMode = mode;
+        self.local.set(APPMODE, mode);  // dev, demo, prod
+        self.reconfigDcubeUrl();
+        self.commonEvents$.emit({
+            memo: APPMODE,
+            status: APPMODE_CHANGED
+        });
+    }
 
     getAppPlatform() {
         let self = this;
@@ -390,6 +426,15 @@ export class CommonService {
     }
 
     setAppPlatform(app: string) {
+        this.appplatform = app;
+        this.local.set(APPPLATFORM, app);  // Stellar
+
+        this.commonEvents$.emit({
+            memo: APPPLATFORM,
+            status: APPPLATFORM_CHANGED
+        });
+    }
+    setAppPlatformSelf(self, app: string) {
         this.appplatform = app;
         this.local.set(APPPLATFORM, app);  // Stellar
 
@@ -429,6 +474,24 @@ export class CommonService {
             status: APPLANG_CHANGED
         });
     }
+    setAppLanguageSelf(self, curlang: string) {
+        self.appLang = curlang;
+        self.local.set(APPLANG, curlang);  // en, fr
+
+        // the lang to use, if the lang isn't available, it will use the current loader to get them
+        //console.log('CommonService.setAppLanguage() curlang: ', curlang);
+        self.translateService.use(curlang);
+
+        //see https://www.w3.org/International/questions/qa-html-language-declarations
+        //console.log('CommonService.setAppLanguage() this.platform.lang: ', this.platform.lang());
+        self.platform.setLang(curlang.toLocaleLowerCase(), true);
+        //console.log('CommonService.setAppLanguage() this.platform.lang: ', this.platform.lang());
+
+        self.commonEvents$.emit({
+            memo: APPLANG,
+            status: APPLANG_CHANGED
+        });
+    }
 
     getAppCurrency() {
         let self = this;
@@ -446,6 +509,14 @@ export class CommonService {
         this.appCurr = curr;
         this.local.set(APPCURR, curr);  // XLM, USD, GHS
         this.commonEvents$.emit({
+            memo: APPCURR,
+            status: APPCURR_CHANGED
+        });
+    }
+    setAppCurrencySelf(self, curr: string) {
+        self.appCurr = curr;
+        self.local.set(APPCURR, curr);  // XLM, USD, GHS
+        self.commonEvents$.emit({
             memo: APPCURR,
             status: APPCURR_CHANGED
         });
@@ -471,6 +542,14 @@ export class CommonService {
             status: PAYMETHOD_CHANGED
         });
     }
+    setPayMethodSelf(self, payMethod: string) {
+        self.payMethod = payMethod;
+        self.local.set(PAYMETHOD, payMethod);  // 
+        self.commonEvents$.emit({
+            memo: PAYMETHOD,
+            status: PAYMETHOD_CHANGED
+        });
+    }
 
     getSourceOfKeys() {
         let self = this;
@@ -489,6 +568,15 @@ export class CommonService {
         this.local.set(SOURCEOFKEYS, source);  // dev, demo, prod
 
         this.commonEvents$.emit({
+            memo: SOURCEOFKEYS_CHANGED,
+            status: source
+        });
+    }
+    setSourceOfKeysSelf(self, source: string) {
+        self.SourceOfKeys = source;
+        self.local.set(SOURCEOFKEYS, source);  // dev, demo, prod
+
+        self.commonEvents$.emit({
             memo: SOURCEOFKEYS_CHANGED,
             status: source
         });

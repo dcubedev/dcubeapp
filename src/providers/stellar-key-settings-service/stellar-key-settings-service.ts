@@ -150,7 +150,7 @@ export class StellarKeySettingsService {
         let appmode = this.commonSvrc.appMode;
         console.log("StellarKeySettingsService::loadKeysFromDatabase() appmode: " + appmode);
    
-        let url_p = this.commonSvrc.getDcubeUrl(appmode) + "platform/getAllCurrencyAuthkeys?platform=STELLAR&appmode=" + appmode;
+        let url_p = this.commonSvrc.getDcubeUrl(appmode) + "rest/platform/getAllCurrencyAuthkeys?platform=STELLAR&appmode=" + appmode;
 
         if (url_p != null) {
             console.log("StellarKeySettingsService::loadKeysFromDatabase() url_p: " + url_p);

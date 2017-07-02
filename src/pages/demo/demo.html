@@ -71,6 +71,19 @@
             <ion-textarea [(ngModel)]="outArea" name="outTextArea" rows="6" placeholder="output will go here..."></ion-textarea>
         </ion-item>
         <div class="button-bar">
+            <button ion-button class="button button-block" (click)="getOrderBookTrades()">
+                <ion-icon name="archive"></ion-icon>
+                Get OrderBook Trades
+            </button>
+            <button ion-button class="button button-block" (click)="sendFederationRequest()">
+                <ion-icon name="archive"></ion-icon>
+                Send a Federation request
+            </button>
+            <button ion-button class="button button-block" (click)="getBuySellTradeInfo()">
+                <ion-icon name="archive"></ion-icon>
+                Get Buy/Sell Trade Info
+            </button>
+
             <button ion-button class="button button-block" (click)="gotoAccountAcctkeyForm()">
                 <ion-icon name="share"></ion-icon>
                 Go to account-acctkey-form
@@ -123,14 +136,7 @@
                 <ion-icon name="archive"></ion-icon>
                 Get Payment Information
             </button>
-            <button ion-button class="button button-block" (click)="sendFederationRequest()">
-                <ion-icon name="archive"></ion-icon>
-                Send a Federation request
-            </button>
-            <button ion-button class="button button-block" (click)="getBuySellTradeInfo()">
-                <ion-icon name="archive"></ion-icon>
-                Get Buy/Sell Trade Info
-            </button>
+            
         </div>
     </ion-grid>
 </ion-content>

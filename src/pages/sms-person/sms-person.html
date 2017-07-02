@@ -9,7 +9,7 @@
 </ion-header>
 
 <ion-content scroll="true" padding>
-    <ion-title>Send SMS to an individual or all your contacts</ion-title>
+    <p-tabMenu [model]="tab_items"></p-tabMenu>
     <h1>PrimeNG Showcase</h1>
 
     <p-dataTable [(value)]="persons" selectionMode="single" [(selection)]="selectedPerson" (onRowSelect)="onRowSelect($event)" rows="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" [globalFilter]="gb" [responsive]="true">

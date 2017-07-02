@@ -9,6 +9,7 @@ import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-tra
 import {InputTextModule, DataTableModule, ButtonModule, DialogModule} from "primeng/primeng";
 import {ToolbarModule} from 'primeng/primeng';
 import {CalendarModule} from 'primeng/primeng';
+import {TabMenuModule, MenuModule} from 'primeng/primeng';
 import 'primeng/primeng';
 
 import { MyApp } from './app.component';
@@ -108,9 +109,12 @@ export function createTranslateLoader(http: Http) {
           useFactory: (createTranslateLoader),
           deps: [Http]
       }),
+      RouterModule.forRoot([]),
       InputTextModule, DataTableModule, ButtonModule, DialogModule,
       ToolbarModule,
-      CalendarModule
+      CalendarModule,
+      TabMenuModule,
+      MenuModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [

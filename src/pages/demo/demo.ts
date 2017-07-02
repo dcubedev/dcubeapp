@@ -214,6 +214,10 @@ export class DemoPage {
         this.tradingSvrc.sendFederationRequest(this.account.receiver_ename, this.account.req_type);
     }
 
+    getOrderBookTrades() {
+        this.tradingSvrc.getOrderBookTrades();
+    }
+
     getBuySellTradeInfo() {
         let sellCurr = CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM];
         let buyCurr = CommonConstants.AppCurrency[CommonConstants.AppCurrency.USD];

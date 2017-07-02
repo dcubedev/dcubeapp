@@ -87,6 +87,10 @@ export class StellarRemoteService {
         return this.server;
     }
 
+    getServerURL(): string {
+        return this.hostname;
+    }
+
     getBridgeServerURL(): string {
         return this.bridgeServerURL;
     }

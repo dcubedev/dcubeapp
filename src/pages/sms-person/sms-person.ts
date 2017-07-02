@@ -35,6 +35,7 @@ export class QuickSmsPage implements OnInit {
 
     msgs: Message[] = [];
     items: MenuItem[];
+    tab_items: MenuItem[];
 
     newPerson: boolean;
     smsForm: FormGroup;
@@ -107,6 +108,14 @@ export class QuickSmsPage implements OnInit {
             { field: 'name', header: 'Name' },
             { field: 'surname', header: 'Surname' },
             { field: 'country', header: 'Country' }
+        ];
+
+        this.tab_items = [
+            { label: 'Stats', icon: 'fa-bar-chart' },
+            { label: 'Calendar', icon: 'fa-calendar' },
+            { label: 'Documentation', icon: 'fa-book' },
+            { label: 'Support', icon: 'fa-support' },
+            { label: 'Social', icon: 'fa-twitter' }
         ];
 
         this.items = [

@@ -5,6 +5,7 @@ import { CommonService } from '../common-service/common-service';
 import { RemoteService } from '../../providers/remote-service/remote-service';
 import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
 import { StellarRemoteService } from '../../providers/stellar-remote-service/stellar-remote-service';
+import * as StellarConstants from "../../providers/stellar-constants/stellar-constants";
 
 declare var StellarSdk: any;
 
@@ -22,10 +23,25 @@ export class StellarTradingService {
         private keysettings: StellarKeySettingsService,
         private srsSrvc: StellarRemoteService) {
     }
-    
+
+    getHttp(serverURL, reQuery) {
+        //let _url = this.srsSrvc.getServerURL();
+        let request_p = serverURL + reQuery;
+        console.log("getHttp() reQuery: " + reQuery);
+        console.log("getHttp() request_p: " + request_p);
+
+        this.remoteSvrc.getHttp(request_p).then(data => {
+            console.log("getHttp() data: " + JSON.stringify(data));
+        }, err => {
+            console.log("getHttp() err: " + JSON.stringify(err));
+        })
+    }
+
     sendFederationRequest(e_address, e_type) {
+        //let _url = StellarConstants.URL_DEV_FEDERATION;
         let _url = this.srsSrvc.getFederationServerURL();
-        let request_p = _url + '?q=' + e_address + '&type=' + e_type;
+        let reQuery = '?q=' + e_address + '&type=' + e_type;
+        let request_p = _url + reQuery;
         console.log("sendFederationRequest() sending GET: " + request_p);
    
         this.remoteSvrc.getHttp(request_p).then(data => {
@@ -47,5 +63,23 @@ export class StellarTradingService {
             .catch((err) => { console.log(err); })
     }
 
+    orderBookTrades() {
+        // https://horizon-testnet.stellar.org/order_book/trades
+        let _url = StellarConstants.URL_LIVE_NETWORK;
+        //let _url = this.srsSrvc.getServerURL();
+        //let reQuery = '/order_book/trades';
+        //let reQuery = '/order_book?selling_asset_type={selling_asset_type}&selling_asset_code={selling_asset_code}';
+        let reQuery = '/order_book?selling_asset_type={native}';
+        let request_p = _url + reQuery;
+        console.log("orderBookTrades() reQuery: " + reQuery);
+        console.log("orderBookTrades() request_p: " + request_p);
+
+        this.remoteSvrc.getHttp(request_p).then(data => {
+            console.log("orderBookTrades() data: " + JSON.stringify(data));
+        }, err => {
+            console.log("orderBookTrades() err: " + JSON.stringify(err));
+        })
+
+    }
 }
 
