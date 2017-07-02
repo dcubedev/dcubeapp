@@ -4,11 +4,11 @@ import 'rxjs/add/operator/map';
 import { CommonService } from '../common-service/common-service';
 import * as CommonConstants from '../common-service/common-service';
 
-import { StellarCommonService } from '../stellar-common-service/stellar-common-service';
+import { StellarCommonService } from '../stellar/stellar-common-service';
 //import * as StellarConstants from "../stellar-constants/stellar-constants";
-import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
+import { StellarKeySettingsService } from '../stellar/stellar-key-settings-service';
 //import * as StellarKeySettingsConstants from '../stellar-key-settings-service/stellar-key-settings-service';
-import { StellarRemoteService } from '../stellar-remote-service/stellar-remote-service';
+import { StellarRemoteService } from '../stellar/stellar-remote-service';
 
 declare var StellarSdk: any;
 

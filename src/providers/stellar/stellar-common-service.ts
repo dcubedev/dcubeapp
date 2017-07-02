@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-import * as StellarConstants from "../stellar-constants/stellar-constants";
+import * as StellarConstants from "../stellar/stellar-constants";
 
 declare var StellarSdk: any;
 

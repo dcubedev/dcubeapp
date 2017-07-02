@@ -3,7 +3,7 @@ import { Http } from '@angular/http';
 
 import * as CommonConstants from '../common-service/common-service';
 
-import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
+import { StellarKeySettingsService } from '../stellar/stellar-key-settings-service';
 
 
 /*

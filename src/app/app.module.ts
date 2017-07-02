@@ -17,20 +17,20 @@ import { Appheader } from '../pages/appheader/appheader';
 import { AppConfig } from '../providers/app-config/app-config';
 import { CommonService } from '../providers/common-service/common-service';
 import { RemoteService } from '../providers/remote-service/remote-service';
-import { StellarCommonService } from '../providers/stellar-common-service/stellar-common-service';
-import { StellarRemoteService } from '../providers/stellar-remote-service/stellar-remote-service';
+import { StellarCommonService } from '../providers/stellar/stellar-common-service';
+import { StellarRemoteService } from '../providers/stellar/stellar-remote-service';
 
 import { KeySettingsService } from '../providers/key-settings-service/key-settings-service';
-import { StellarKeySettingsService } from '../providers/stellar-key-settings-service/stellar-key-settings-service';
+import { StellarKeySettingsService } from '../providers/stellar/stellar-key-settings-service';
 
 import { AccountService } from '../providers/account-service/account-service';
-import { StellarAccountService } from '../providers/stellar-account-service/stellar-account-service';
+import { StellarAccountService } from '../providers/stellar/stellar-account-service';
 
 import { TrustService } from '../providers/trust-service/trust-service';
-import { StellarTrustlineService } from '../providers/stellar-trustline-service/stellar-trustline-service';
+import { StellarTrustlineService } from '../providers/stellar/stellar-trustline-service';
 
 import { TradingService } from '../providers/trading-service/trading-service';
-import { StellarTradingService } from '../providers/stellar-trading-service/stellar-trading-service';
+import { StellarTradingService } from '../providers/stellar/stellar-trading-service';
 
 // Pages that communicate with digital currency platforms (Stellar, etc)
 import { AboutPage } from '../pages/about/about';

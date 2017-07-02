@@ -5,7 +5,7 @@ import { Http } from '@angular/http';
 
 import { CommonService } from '../common-service/common-service';
 import * as CommonConstants from '../common-service/common-service';
-import * as StellarConstants from "../../providers/stellar-constants/stellar-constants";
+import * as StellarConstants from "../../providers/stellar/stellar-constants";
 
 declare var StellarSdk: any;
 

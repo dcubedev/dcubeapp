@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 
 import { CommonService } from '../common-service/common-service';
-import { StellarRemoteService } from '../../providers/stellar-remote-service/stellar-remote-service';
-import { StellarCommonService } from "../../providers/stellar-common-service/stellar-common-service";
+import { StellarRemoteService } from '../../providers/stellar/stellar-remote-service';
+import { StellarCommonService } from "../../providers/stellar/stellar-common-service";
 
 declare var StellarSdk: any;
 

@@ -3,7 +3,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 import * as CommonConstants from '../common-service/common-service';
-import { StellarAccountService } from '../../providers/stellar-account-service/stellar-account-service';
+import { StellarAccountService } from '../../providers/stellar/stellar-account-service';
 
 
 /*

@@ -7,12 +7,12 @@ import * as AppConstants from '../app-constants/app-constants';
 import { CommonService } from '../common-service/common-service';
 import { RemoteService } from '../../providers/remote-service/remote-service';
 import * as CommonConstants from '../common-service/common-service';
-import { StellarKeySettingsService } from '../stellar-key-settings-service/stellar-key-settings-service';
-import * as StellarKeySettingsConstants from '../stellar-key-settings-service/stellar-key-settings-service';
-import { StellarRemoteService } from '../stellar-remote-service/stellar-remote-service';
+import { StellarKeySettingsService } from '../stellar/stellar-key-settings-service';
+import * as StellarKeySettingsConstants from '../stellar/stellar-key-settings-service';
+import { StellarRemoteService } from '../stellar/stellar-remote-service';
 
-import * as StellarConstants from "../stellar-constants/stellar-constants";
-import { StellarCommonService } from "../stellar-common-service/stellar-common-service";
+import * as StellarConstants from "../stellar/stellar-constants";
+import { StellarCommonService } from "../stellar/stellar-common-service";
 
 declare var StellarSdk: any;
 

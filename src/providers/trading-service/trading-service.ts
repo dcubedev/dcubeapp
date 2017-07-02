@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { StellarTradingService } from '../../providers/stellar-trading-service/stellar-trading-service';
+import { StellarTradingService } from '../../providers/stellar/stellar-trading-service';
 
 /*
   Author: Stephen Agyepong
