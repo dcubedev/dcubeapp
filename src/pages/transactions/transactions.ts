@@ -43,15 +43,11 @@ export class TransactionsPage {
             //console.log("TransactionsPage.onAccountEvent() self.account: " + self.account);
             //console.log("TransactionsPage.onAccountEvent() self.account.balance: " + self.account.balance);
         }
-
-        //console.log("TransactionsPage.onAccountEvent() acctevt: " + acctevt);
-        //console.log("TransactionsPage.onAccountEvent() acctevt.memo: " + acctevt.memo);
-        //console.log("TransactionsPage.onAccountEvent() acctevt.status: " + acctevt.status);
     }
 
     resetTransaction() {
-        return [this.commonSvrc.initAccountTransaction(this, 'XLM', 0),
-                this.commonSvrc.initAccountTransaction(this, 'GHS', -10)
+        return [this.commonSvrc.initTransaction(this, 'XLM', 0),
+                this.commonSvrc.initTransaction(this, 'GHS', -10)
                ];
     }
 

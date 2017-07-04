@@ -9,21 +9,19 @@ import { AccountService } from '../../providers/account-service/account-service'
 import { TrustService } from '../../providers/trust-service/trust-service';
 import { TradingService } from '../../providers/trading-service/trading-service';
 
-import { AccountAcctkeyFormPage } from '../account-acctkey-form/account-acctkey-form';
-
-
 /*
   Author: Stephen Agyepong
 
-    This component demonstrates the features and capabilities of the application
+    This component demonstrates the features and capabilities of the stellar offers and trades
 */
 @Component({
-    templateUrl: 'demo.html'
+    templateUrl: 'trade-offers.html'
 })
-export class DemoPage {
+export class OffersAndTradesPage {
     account: CommonConstants.IAccount;
     accountBalances: CommonConstants.IAccountBalance[];
     keysStored: CommonConstants.IWalletKey;
+    transaction: CommonConstants.ITransaction;
     outArea: string = "";
 
     constructor(private navCtrl: NavController, private menuCtrl: MenuController,
@@ -39,30 +37,26 @@ export class DemoPage {
         };
 
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
-        //console.log("Entering DemoPage.constructor() ...");
+        //console.log("Entering OffersAndTradesPage.constructor() ...");
     }
 
     ngOnInit() {
         this.commonSvrc.initAccount(this);
-        //console.log("DemoPage.ngOnInit() this.account: " + this.account);
-        //console.log("DemoPage.ngOnInit() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
+        this.commonSvrc.initTransaction(this, 'USD', 1);
+        //console.log("OffersAndTradesPage.ngOnInit() this.account: " + this.account);
+        //console.log("OffersAndTradesPage.ngOnInit() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
-        //console.log("DemoPage.ngOnInit() this.keysStored: " + this.keysStored);
-        //console.log("DemoPage.ngOnInit() this.keysStored.address: " + this.keysStored.address);
+        //console.log("OffersAndTradesPage.ngOnInit() this.keysStored: " + this.keysStored);
+        //console.log("OffersAndTradesPage.ngOnInit() this.keysStored.address: " + this.keysStored.address);
         this.getAccountBalances();
         this.commonSvrc.commonEvents$.subscribe(commonevt => this.onCommonEvent(commonevt));
     }
 
     onAccountEvent(self, acctevt: any) {
-        //console.log("DemoPage.onAccountEvent() acctevt: " + acctevt);
-        //console.log("DemoPage.onAccountEvent() acctevt.memo: " + acctevt.memo);
-        //console.log("DemoPage.onAccountEvent() acctevt.status: " + JSON.stringify(acctevt.status));
-        //console.log("DemoPage.onAccountEvent() self.acctSvrc.getAccount(): " + self.acctSvrc.getAccount());
-        //console.log("Entering DemoPage.onAccountEvent() ... self.acctSvrc: " + self.acctSvrc);
         if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
             //self.account = self.acctSvrc.getAccount();
-            //console.log("DemoPage.onAccountEvent() self.account: " + self.account);
-            //console.log("DemoPage.onAccountEvent() self.account.balance: " + self.account.balance);
+            //console.log("OffersAndTradesPage.onAccountEvent() self.account: " + self.account);
+            //console.log("OffersAndTradesPage.onAccountEvent() self.account.balance: " + self.account.balance);
         }
 
         if (AppConstants.ACCT_INFO_LOADED === acctevt.memo) {
@@ -71,9 +65,9 @@ export class DemoPage {
     }
 
     onCommonEvent(acctevt) {
-        //console.log("DemoPage.onCommonEvent() acctevt.memo: " + acctevt.memo);
-        //console.log("DemoPage.onCommonEvent() acctevt.status: " + acctevt.status);
-        //console.log("DemoPage.onCommonEvent() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
+        //console.log("OffersAndTradesPage.onCommonEvent() acctevt.memo: " + acctevt.memo);
+        //console.log("OffersAndTradesPage.onCommonEvent() acctevt.status: " + acctevt.status);
+        //console.log("OffersAndTradesPage.onCommonEvent() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
         if (CommonConstants.APPCURR === acctevt.memo && CommonConstants.APPCURR_CHANGED === acctevt.status) {
             this.account.asset_code = this.commonSvrc.appCurr;
         }
@@ -85,7 +79,7 @@ export class DemoPage {
         }
         if (CommonConstants.PAYMETHOD === acctevt.memo && CommonConstants.PAYMETHOD === acctevt.status) {
         }
-        //console.log("DemoPage.onCommonEvent() this.account.asset_code: " + this.account.asset_code);
+        //console.log("OffersAndTradesPage.onCommonEvent() this.account.asset_code: " + this.account.asset_code);
     }
 
     toggleLeftMenu() {
@@ -96,25 +90,8 @@ export class DemoPage {
         this.menuCtrl.toggle('right');
     }
 
-    gotoAccountAcctkeyForm() {
-        this.navCtrl.push(AccountAcctkeyFormPage);
-    }
-
-    genKeypair() {
-        this.keysStored = this.keySettingsService.genKeypair();
-    }
-
-    saveKeypair() {
-        this.keySettingsService.saveKeysStore(this.keysStored);
-    }
-
     getPaymentInfo() {
         this.acctSvrc.getPaymentInfo(this.keysStored.address);
-    }
-
-    genKeyAndFundAccount() {
-        this.keysStored = this.keySettingsService.genKeypair();
-        //this.fundAccount();
     }
 
     getAccountBalances() {
@@ -142,28 +119,101 @@ export class DemoPage {
         }
     }
 
-    fundAccount() {
-        console.log("this.commonSvrc.appMode: " + this.commonSvrc.appMode);
-        if (CommonConstants.AppMode[CommonConstants.AppMode.PROD] === this.commonSvrc.appMode) {
-            this.createAndFundAccountAny();
-        } else {
-            this.fundAccountWithFriendbot();
+    createPassiveOffer() {
+        let self = this;
+        this.transaction.asset_code = this.account.asset_code;
+        //this.transaction.selling_issuer;
+        this.transaction.dest_asset_code = this.account.dest_asset_code;
+        //this.transaction.buying_issuer;
+        this.transaction.amount = this.account.pymtamt;
+        this.transaction.price = { numerator: this.transaction.sell_units, denominator: this.transaction.buy_units };
+        //this.transaction.sell_units = this.transaction.sell_units;
+        //this.transaction.buy_units = this.transaction.buy_units;   
+        //this.transaction.offerId = this.transaction.offerId;
+        this.transaction.sender = this.keysStored.address;
+        this.tradingSvrc.createPassiveOffer(this.transaction).then(data => {
+            //console.log('OffersAndTradesPage::createPassiveOffer() data: ' + JSON.stringify(data));
+            self.outArea = JSON.stringify(data);
+        },
+            onerr => {
+                console.error('OffersAndTradesPage::createPassiveOffer() error: ' + JSON.stringify(onerr));
+            });
+    }
+
+    manageOffers() {
+        let self = this;
+        this.transaction.asset_code = this.account.asset_code;
+        //this.transaction.selling_issuer;
+        this.transaction.dest_asset_code = this.account.dest_asset_code;
+        //this.transaction.buying_issuer;
+        this.transaction.amount = this.account.pymtamt;
+        this.transaction.price = { numerator: this.transaction.sell_units, denominator: this.transaction.buy_units };
+        //this.transaction.sell_units = this.transaction.sell_units;
+        //this.transaction.buy_units = this.transaction.buy_units;   
+        //this.transaction.offerId = this.transaction.offerId;
+        this.transaction.sender = this.keysStored.address;
+        this.tradingSvrc.manageOffers(this.transaction).then(data => {
+            //console.log('OffersAndTradesPage::manageOffers() data: ' + JSON.stringify(data));
+            self.outArea = JSON.stringify(data);
+        },
+            onerr => {
+                console.error('OffersAndTradesPage::manageOffers() error: ' + JSON.stringify(onerr));
+            });
+    }
+
+    offersForAccount() {
+        let self = this;
+        this.transaction.sender = this.keysStored.address;
+       
+        let account = this.transaction.sender;
+        let cursor = this.transaction.cursor;
+        let limit = this.transaction.limit;
+        let sort_order = this.transaction.order;
+
+        let cursor_r = '';
+        if (undefined !== cursor) {
+            cursor_r = '&cursor=' + cursor;
         }
+
+        let limit_r = '';
+        if (undefined !== limit) {
+            limit_r = '&limit=' + limit;
+        }
+
+        let sort_order_r = 'order=asc';
+        if (undefined !== sort_order) {
+            sort_order_r = 'order=' + sort_order;
+        }
+
+        let reQuery = '/accounts/' + account + '/offers?' + sort_order_r + cursor_r + limit_r;
+        console.log("OffersAndTradesPage::offersForAccount() sending GET reQuery: " + reQuery);
+
+        this.tradingSvrc.getHttpHorizon(reQuery).then(data => {
+            //console.log('OffersAndTradesPage::offersForAccount() data: ' + JSON.stringify(data));
+            self.outArea = JSON.stringify(data);
+        },
+        onerr => {
+            console.error('OffersAndTradesPage::offersForAccount() error: ' + JSON.stringify(onerr));
+        });
     }
 
-    createAndFundAccountAny() {
-        this.acctSvrc.createAndFundAccountAny(this.keysStored.address, this.account.destaddress, this.keysStored.address, this.keysStored.secret, this.account.pymtamt);
-    }
-
-    fundAccountWithFriendbot() {
-        this.acctSvrc.fundAccountWithFriendbot(this.keysStored.address);
-    }
-
-    fundAccountWithDcubeFriendbot() {
-        //this.stellarAcctSvrc.fundAccountWithFriendbot(this.keysStored.address);
-    }
-
-    requestPayment() {
+    paymentPath() {
+        let self = this;
+        this.transaction.asset_code = this.account.asset_code;
+        //this.transaction.send_max_amount;
+        this.transaction.receiver = this.account.destaddress;
+        this.transaction.dest_asset_code = this.account.dest_asset_code;
+        //this.transaction.dest_amount;
+        //this.transaction.buying_issuer;
+        //this.transaction.path;
+        this.transaction.sender = this.keysStored.address;
+        this.tradingSvrc.paymentPath(this.transaction).then(data => {
+            //console.log('OffersAndTradesPage::paymentPath() data: ' + JSON.stringify(data));
+            self.outArea = JSON.stringify(data);
+        },
+            onerr => {
+                console.error('OffersAndTradesPage::paymentPath() error: ' + JSON.stringify(onerr));
+            });
     }
 
     sendPayment() {
@@ -208,10 +258,6 @@ export class DemoPage {
         let pymtamt: string = "" + this.account.pymtamt;
         let trustLimitAmt: string = "" + this.account.trustLimitAmt;
         this.trustSvrc.changeTrustAndPay(issuingAddr, issuingSeed, signerSeed, asset_code, trustLimitAmt, pymtamt);
-    }
-
-    sendFederationRequest() {
-        this.tradingSvrc.sendFederationRequest(this.account.receiver_ename, this.account.req_type);
     }
 
     getOrderBookTrades() {

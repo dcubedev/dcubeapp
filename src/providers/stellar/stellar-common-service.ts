@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 import * as StellarConstants from "../stellar/stellar-constants";
+import { StellarRemoteService } from '../../providers/stellar/stellar-remote-service';
 
 declare var StellarSdk: any;
 

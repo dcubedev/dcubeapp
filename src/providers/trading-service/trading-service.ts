@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import * as CommonConstants from '../common-service/common-service';
+import { StellarRemoteService } from '../../providers/stellar/stellar-remote-service';
 import { StellarTradingService } from '../../providers/stellar/stellar-trading-service';
 
 /*
@@ -8,7 +10,8 @@ import { StellarTradingService } from '../../providers/stellar/stellar-trading-s
 @Injectable()
 export class TradingService {
 
-    constructor(private stsSrvc: StellarTradingService) {
+    constructor(private stsSrvc: StellarTradingService,
+        private srsSrvc: StellarRemoteService) {
     }
     
     sendFederationRequest(e_address, e_type) {
@@ -19,6 +22,58 @@ export class TradingService {
         //});
         //return promise;
         this.stsSrvc.sendFederationRequest(e_address, e_type);
+    }
+
+    getHttpHorizon(reQuery: string, opname?: string) {
+        return new Promise((resolve, reject) => {
+            this.srsSrvc.getHttpHorizon(reQuery, opname).then(data => {
+                console.log('TradingService::getHttpHorizon() data: ' + JSON.stringify(data));
+                resolve(data);
+            },
+            onerr => {
+                console.error('TradingService::getHttpHorizon() error: ' + JSON.stringify(onerr));
+                reject(onerr);
+            });
+        });
+    }
+
+    createPassiveOffer(transaction: CommonConstants.ITransaction) {
+        return new Promise((resolve, reject) => {
+            this.stsSrvc.createPassiveOffer(transaction).then(data => {
+                console.log('TradingService::createPassiveOffer() data: ' + JSON.stringify(data));
+                resolve(data);
+            },
+                onerr => {
+                    console.error('TradingService::createPassiveOffer() error: ' + JSON.stringify(onerr));
+                    reject(onerr);
+                });
+        });
+    }
+
+    paymentPath(transaction: CommonConstants.ITransaction) {
+        return new Promise((resolve, reject) => {
+            this.stsSrvc.paymentPath(transaction).then(data => {
+                console.log('TradingService::paymentPath() data: ' + JSON.stringify(data));
+                resolve(data);
+            },
+            onerr => {
+                console.error('TradingService::paymentPath() error: ' + JSON.stringify(onerr));
+                reject(onerr);
+            });
+        });
+    }
+
+    manageOffers(transaction: CommonConstants.ITransaction) {
+        return new Promise((resolve, reject) => {
+            this.stsSrvc.manageOffers(transaction).then(data => {
+                console.log('TradingService::manageOffers() data: ' + JSON.stringify(data));
+                resolve(data);
+            },
+            onerr => {
+                console.error('TradingService::manageOffers() error: ' + JSON.stringify(onerr));
+                reject(onerr);
+            });
+        });
     }
 
     getOrderBookTrades() {

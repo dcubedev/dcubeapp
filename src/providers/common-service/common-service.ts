@@ -59,6 +59,7 @@ export interface IAccountBase {
 export interface IAccount {
     address: any;
     asset_code?: string;
+    dest_asset_code?: string;
     balance: number;
     reserve: number;
     sequence: number;
@@ -93,19 +94,43 @@ export interface IDestinationInfo {
     acceptedIOUs: any;
 };
 
+export interface IPrice {
+    numerator: number;
+    denominator: number;
+}
+
 export interface ITransaction {
-    effectId: string;
+    sender: any;
+    sender_secret?: any;
+    sender_ename?: string;
+    receiver: any;
+    receiver_secret?: any;
+    receiver_ename?: string;
     asset_code?: string;
     asset_type?: string;
+    dest_asset_code?: string;
+    dest_asset_type?: string;
     amount: number;
+    dest_amount?: number;
+    send_max_amount?: number;
     debit: string; //account_debited
-    sender: string;
-    receiver: string;
     memo: any;
     memoType: string;
+    effectId: string;
     creationDate: Date;
     creationTimestamp?: Date;
     remoteContact?: string;
+    selling_issuer?: string;
+    buying_issuer?: string;
+    sell_units?: number;
+    buy_units?: number;
+    offerId?: number;
+    price?: IPrice;
+    path?: any;
+    cursor?: any;
+    order?: string; // sort order
+    limit?: number; // Maximum number of records to return
+    opname?: string; // operation name
 };
 
 export interface ITransactionContext {
@@ -305,7 +330,7 @@ export class CommonService {
     reconfigDcubeUrlSelf(self) {
         self.url_dcube = AppConstants.URL_DEMO_DCUBE;
         self.url_scom = AppConstants.URL_DEMO_SCOM;
-        console.log('reconfigDcubeUrlSelf() self.appMode: ', self.appMode);
+        //console.log('reconfigDcubeUrlSelf() self.appMode: ', self.appMode);
         switch (self.appMode) {
             case AppMode[AppMode.PROD]:
                 // production mode
@@ -330,8 +355,8 @@ export class CommonService {
                 }
         }
 
-        console.log('reconfigDcubeUrlSelf() self.url_dcube: ', self.url_dcube);
-        console.log('reconfigDcubeUrlSelf() self.url_scom: ', self.url_scom);
+        //console.log('reconfigDcubeUrlSelf() self.url_dcube: ', self.url_dcube);
+        //console.log('reconfigDcubeUrlSelf() self.url_scom: ', self.url_scom);
     }
 
     getDcubeUrl(appMode) {
@@ -526,11 +551,9 @@ export class CommonService {
         let self = this;
         this.local.get(PAYMETHOD).then((value: any) => {
             self.payMethod = value;
-            //console.log('getPayMethod() value: ', value);
             return this.payMethod;
         });
 
-        //console.log('getPayMethod() this.payMethod: ', this.payMethod);
         return this.payMethod;  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT,etc
     }
 
@@ -555,11 +578,9 @@ export class CommonService {
         let self = this;
         this.local.get(SOURCEOFKEYS).then((value: any) => {
             self.SourceOfKeys = value;
-            //console.log('getSourceOfKeys() value: ', value);
             return this.SourceOfKeys;
         });
 
-        //console.log('getSourceOfKeys() this.SourceOfKeys: ', this.SourceOfKeys);
         return this.SourceOfKeys;  // loadKeysFromDatabase, 
     }
 
@@ -595,23 +616,52 @@ export class CommonService {
             return value;
         })
 
-        console.log('CommonService::translateString() value: ', "");
         return "";
     }
 
-    initAccountTransaction(self, asset_type: string, amount: number) {
-        self.account = {
-            effectId: '',
-            asset_type: asset_type,
-            amount: amount,
-            debit: '',
-            sender: 'sender',
+    initTransaction(self, asset_code: string, amount: number, dest_amount_p?: number, send_max_amount_p?: number, dest_asset_code_p?: string) {
+        let dest_asset_code = 'GHS';
+        if (undefined !== dest_asset_code_p) {
+            dest_asset_code = dest_asset_code_p;
+        }
+        let dest_amount = 4;
+        if (undefined !== dest_amount_p) {
+            dest_amount = dest_amount_p;
+        }
+        let send_max_amount = 100;
+        if (undefined !== send_max_amount_p) {
+            send_max_amount = send_max_amount_p;
+        }
+        let sell_units: number = 1;
+        let buy_units: number = 4;
+        let price = { sell_units: sell_units, buy_units: buy_units };
+        self.transaction = {
+            sender: 'GANKXD6D7UH7HUUMZGFZWK6NDS6TYB5GO6NIWSN36B3JPCSCE7QV3Y5N',
+            sender_secret: '',
+            sender_ename: '',
             receiver: 'receiver',
+            receiver_secret: 'receiver',
+            receiver_ename: 'receiver',
+            asset_code: asset_code,
+            asset_type: '',
+            dest_asset_code: dest_asset_code_p,
+            dest_asset_type: '',
+            amount: amount,
+            dest_amount: dest_amount,
+            send_max_amount: send_max_amount,
+            debit: '',
             memo: null,
             memoType: 'none',
+            effectId: '',
             creationDate: null,
             creationTimestamp: null,
-            remoteContact: 'remoteContact'
+            remoteContact: 'remoteContact',
+            selling_issuer: 'GANKXD6D7UH7HUUMZGFZWK6NDS6TYB5GO6NIWSN36B3JPCSCE7QV3Y5N',
+            buying_issuer: 'GD7KZQJ2CDUOBWO67DGNJPYGKAPJXHGQE7UUCWWUCTPJLAESYP3B3QEH',
+            sell_units: sell_units,
+            buy_units: buy_units,
+            offerId: '0',
+            price: price
         }
     }
 
@@ -619,6 +669,7 @@ export class CommonService {
         self.account = {
             address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
+            dest_asset_code: 'GHS',
             balance: 0,
             reserve: 0,
             sequence: 0,
@@ -626,6 +677,7 @@ export class CommonService {
                 effectId: null,
                 asset_code: this.appCurr,
                 asset_type: null,
+                dest_asset_code: 'GHS',
                 amount: 1,
                 debit: null,
                 memo: 'usd_client',
@@ -656,6 +708,7 @@ export class CommonService {
         self.account = {
             address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
+            dest_asset_code: 'GHS',
             balance: 0,
             reserve: 0,
             sequence: 0,

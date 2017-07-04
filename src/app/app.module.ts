@@ -38,6 +38,7 @@ import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
 import { DemoPage } from '../pages/demo/demo';
+import { OffersAndTradesPage } from '../pages/trade-offers/trade-offers';
 import { LanguagePage } from '../pages/language/language';
 import { DevHelpPage } from '../pages/devhelp/devhelp';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
@@ -85,6 +86,7 @@ export function createTranslateLoader(http: Http) {
       CreateGroupPage,
       CurrencyPage,
       DemoPage,
+      OffersAndTradesPage,
       DevHelpPage,
       FeedbackSystemPage,
       GroupTypesPage,
@@ -129,6 +131,7 @@ export function createTranslateLoader(http: Http) {
       CreateGroupPage,
       CurrencyPage,
       DemoPage,
+      OffersAndTradesPage,
       DevHelpPage,
       FeedbackSystemPage,
       GroupTypesPage,

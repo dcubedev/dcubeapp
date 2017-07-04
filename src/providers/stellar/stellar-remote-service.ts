@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-//import * as StellarSdk from "www/build/stellar-sdk";
+import { RemoteService } from '../../providers/remote-service/remote-service';
 
 import { CommonService } from '../common-service/common-service';
 import * as CommonConstants from '../common-service/common-service';
@@ -27,7 +27,9 @@ export class StellarRemoteService {
     bridgeServerURL: string = null;
     federationServerURL: string = null;
 
-    constructor(private http: Http, private commonSvrc: CommonService) {
+    constructor(private http: Http,
+        private commonSvrc: CommonService,
+        private remoteSvrc: RemoteService) {
         let self = this;
         this.initServer();
         commonSvrc.commonEvents$.subscribe(commonevt => { this.onCommonEvent(commonevt, self) });
@@ -99,17 +101,27 @@ export class StellarRemoteService {
         return this.federationServerURL;
     }
 
-    send(data) {
-        try {
-            if (this.isConnected()) {
-                let msg = JSON.stringify(data);
-                console.log(msg);
-                //ws.send(msg);
+    getHttpHorizon(reQuery: string, opname?: string) {
+        return new Promise((resolve, reject) => {
+            let opname_r = '';
+            if (undefined !== opname) {
+                opname_r = '/' + opname;
             }
-        }
-        catch (ex) {
-            //UIHelper.showAlert('Network communication failed: ' + ex.message);
-        }
+            let _url = this.getServerURL() + opname_r;
+
+            let request_p = _url + reQuery;
+            console.log("StellarRemoteService::getHttpHorizon() sending GET: " + request_p);
+
+            this.remoteSvrc.getHttp(request_p).then(data => {
+                console.log('StellarRemoteService::getHttpHorizon() data: ' + JSON.stringify(data));
+                resolve(data);
+            },
+                onerr => {
+                    console.error('StellarRemoteService::getHttpHorizon() error: ' + JSON.stringify(onerr));
+                    reject(onerr);
+                });
+        });
+
     }
 
 }

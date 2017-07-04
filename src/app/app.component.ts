@@ -13,6 +13,7 @@ import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
 import { DemoPage } from '../pages/demo/demo';
+import { OffersAndTradesPage } from '../pages/trade-offers/trade-offers';
 import { LanguagePage } from '../pages/language/language';
 import { DevHelpPage } from '../pages/devhelp/devhelp';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
@@ -67,7 +68,7 @@ export class MyApp {
         { title: 'Send', component: SendPage, index: 3, icon: 'send', enabled: true },
         { title: 'Transactions', component: TransactionsPage, index: 4, icon: 'archive', enabled: true }
     ];
-
+    
     // items that go on the main menu (right menu)
     mainpages: IPageObj[] = [
         { title: 'tabs.home', component: TabsPage, enabled: true },
@@ -75,6 +76,7 @@ export class MyApp {
         { title: 'pages.clientform', component: AccountClientFormPage, enabled: true },
         { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: true },
         { title: 'pages.demo', component: DemoPage, enabled: true },
+        { title: 'pages.offertrades', component: OffersAndTradesPage, enabled: true },
         { title: 'pages.clientverify', component: ClientVerificationForm, enabled: true },
         { title: 'pages.quicksms', component: QuickSmsFormPage, enabled: true },
         { title: 'pages.quicksmspng', component: QuickSmsPage, enabled: true }
