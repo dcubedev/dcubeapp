@@ -39,6 +39,14 @@
             <ion-col width-80><input size="70" [(ngModel)]="account.dest_asset_code" type="text" placeholder="Destination Asset code" /></ion-col>
         </ion-row>
         <ion-row>
+            <ion-col width-20>Asset type (eg credit_alphanum4):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.asset_type" type="text" placeholder="Asset type" /></ion-col>
+        </ion-row>
+        <ion-row>
+            <ion-col width-20>Destination Asset type (eg credit_alphanum4):</ion-col>
+            <ion-col width-80><input size="70" [(ngModel)]="account.dest_asset_type" type="text" placeholder="Destination Asset type" /></ion-col>
+        </ion-row>
+        <ion-row>
             <ion-col width-20>Payment Amount:</ion-col>
             <ion-col width-80><input size="10" [(ngModel)]="account.pymtamt" type="text" placeholder="Payment amount" /></ion-col>
         </ion-row>
@@ -79,11 +87,11 @@
             <ion-col width-80><input size="70" [(ngModel)]="account.req_type" type="text" placeholder="request type" /></ion-col>
         </ion-row>
         <ion-row>
-            <ion-col width-20>Selling Asset Issuer:</ion-col>
+            <ion-col width-20>Selling/Source Asset Issuer:</ion-col>
             <ion-col width-80><input size="70" [(ngModel)]="transaction.selling_issuer" type="text" placeholder="Selling Asset Issuer" /></ion-col>
         </ion-row>
         <ion-row>
-            <ion-col width-20>Buying Asset Issuer:</ion-col>
+            <ion-col width-20>Buying/Destination Asset Issuer:</ion-col>
             <ion-col width-80><input size="70" [(ngModel)]="transaction.buying_issuer" type="text" placeholder="Buying Asset Issuer" /></ion-col>
         </ion-row>
         <ion-row>
@@ -117,9 +125,13 @@
                 <ion-icon name="archive"></ion-icon>
                 Create Passive Offer
             </button>
-            <button ion-button class="button button-block" (click)="paymentPath()">
+            <button ion-button class="button button-block" (click)="findPaymentPath()">
                 <ion-icon name="archive"></ion-icon>
-                Payment Paths
+                Find Payment Path
+            </button>
+            <button ion-button class="button button-block" (click)="makePaymentWithPath()">
+                <ion-icon name="archive"></ion-icon>
+                Make Payment with Paths (Different Currencies)
             </button>
             <button ion-button class="button button-block" (click)="offersForAccount()">
                 <ion-icon name="archive"></ion-icon>

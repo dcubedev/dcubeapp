@@ -59,7 +59,9 @@ export interface IAccountBase {
 export interface IAccount {
     address: any;
     asset_code?: string;
+    asset_type?: string;
     dest_asset_code?: string;
+    dest_asset_type?: string;
     balance: number;
     reserve: number;
     sequence: number;
@@ -645,7 +647,7 @@ export class CommonService {
             asset_code: asset_code,
             asset_type: '',
             dest_asset_code: dest_asset_code_p,
-            dest_asset_type: '',
+            dest_asset_type: 'credit_alphanum4',
             amount: amount,
             dest_amount: dest_amount,
             send_max_amount: send_max_amount,

@@ -197,16 +197,18 @@ export class OffersAndTradesPage {
         });
     }
 
-    paymentPath() {
+    findPaymentPath() {
         let self = this;
-        this.transaction.asset_code = this.account.asset_code;
-        //this.transaction.send_max_amount;
         this.transaction.receiver = this.account.destaddress;
+        this.transaction.sender = this.keysStored.address;
+        this.transaction.dest_asset_type = this.account.dest_asset_type;
         this.transaction.dest_asset_code = this.account.dest_asset_code;
+        //this.transaction.buying_issuer;
         //this.transaction.dest_amount;
+        //this.transaction.send_max_amount;
         //this.transaction.buying_issuer;
         //this.transaction.path;
-        this.transaction.sender = this.keysStored.address;
+        
         this.tradingSvrc.paymentPath(this.transaction).then(data => {
             //console.log('OffersAndTradesPage::paymentPath() data: ' + JSON.stringify(data));
             self.outArea = JSON.stringify(data);
@@ -216,6 +218,26 @@ export class OffersAndTradesPage {
             });
     }
 
+    makePaymentWithPath() {
+        let self = this;
+        this.transaction.receiver = this.account.destaddress;
+        this.transaction.sender = this.keysStored.address;
+        this.transaction.dest_asset_type = this.account.dest_asset_type;
+        this.transaction.dest_asset_code = this.account.dest_asset_code;
+        //this.transaction.buying_issuer;
+        //this.transaction.dest_amount;
+        //this.transaction.send_max_amount;
+        //this.transaction.buying_issuer;
+        //this.transaction.path;
+
+        this.tradingSvrc.paymentPath(this.transaction).then(data => {
+            //console.log('OffersAndTradesPage::paymentPath() data: ' + JSON.stringify(data));
+            self.outArea = JSON.stringify(data);
+        },
+            onerr => {
+                console.error('OffersAndTradesPage::paymentPath() error: ' + JSON.stringify(onerr));
+            });
+    }
     sendPayment() {
         // make payment
         let asset_code = this.account.asset_code;

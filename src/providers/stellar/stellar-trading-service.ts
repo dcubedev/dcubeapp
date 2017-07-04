@@ -60,30 +60,27 @@ export class StellarTradingService {
 
     paymentPath(transaction: CommonConstants.ITransaction) {
         return new Promise((resolve, reject) => {
-            let send_asset = transaction.asset_code;
-            let send_max_amount = transaction.send_max_amount;
             let receiver = transaction.receiver;
+            let source = transaction.sender;
+            let dest_asset_type = transaction.dest_asset_type;
             let dest_asset_code = transaction.dest_asset_code;
             let dest_asset_issuer = transaction.buying_issuer;
             let dest_amount = transaction.dest_amount;
-            let destAsset = this.scsSvrc.getAssetObject(dest_asset_code, dest_asset_issuer);
+            console.log("StellarTradingService::paymentPath() receiver: " + receiver);
+            console.log("StellarTradingService::paymentPath() source: " + source);
+            console.log("StellarTradingService::paymentPath() dest_asset_type: " + dest_asset_type);
+            console.log("StellarTradingService::paymentPath() dest_asset_code: " + dest_asset_code);
+            console.log("StellarTradingService::paymentPath() dest_asset_issuer: " + dest_asset_issuer);
+            console.log("StellarTradingService::paymentPath() dest_amount: " + dest_amount);
 
-            let source = transaction.sender;
-            let source_r = '';
-            if (undefined !== source) {
-                source_r = '&source=' + source;
-            }
-
-            let path_p = transaction.path;
-            let path_r = '';
-            if (undefined !== source) {
-                path_r = '&path=' + this.parsePath(path_p);
-            }
-
-            let _url = this.srsSrvc.getServerURL() + "/pathPayment";
-            let reQuery = '?sendAsset=' + send_asset + '&sendMax=' + send_max_amount
-                + '&destination=' + receiver + '&destAsset=' + destAsset
-                + path_r + source_r;
+            let _url = this.srsSrvc.getServerURL() + "/paths";
+            let reQuery = '?destination_account=' + receiver
+                + '&source=' + source
+                + '&destination_asset_type=' + dest_asset_type
+                + '&destination_asset_code=' + dest_asset_code
+                + '&destination_asset_issuer=' + dest_asset_issuer
+                + '&destination_amount=' + dest_amount;
+              
             let request_p = _url + reQuery;
             console.log("StellarTradingService::paymentPath() sending GET: " + request_p);
 
