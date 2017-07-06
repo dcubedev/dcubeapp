@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { StellarTrustlineService } from '../../providers/stellar/stellar-trustline-service';
+import { StellarTrustlineService } from '../../stellar/stellar-trustline-service';
 
 
 /*

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
-import * as CommonConstants from '../common-service/common-service';
+import * as CommonConstants from '../../common-service/common-service';
 
-import { StellarKeySettingsService } from '../stellar/stellar-key-settings-service';
+import { StellarKeySettingsService } from '../../stellar/stellar-key-settings-service';
 
 
 /*

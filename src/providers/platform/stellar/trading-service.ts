@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import * as CommonConstants from '../common-service/common-service';
-import { StellarRemoteService } from '../../providers/stellar/stellar-remote-service';
-import { StellarTradingService } from '../../providers/stellar/stellar-trading-service';
+import * as CommonConstants from '../../common-service/common-service';
+import { StellarRemoteService } from '../../stellar/stellar-remote-service';
+import { StellarTradingService } from '../../stellar/stellar-trading-service';
 
 /*
   Author: Stephen Agyepong
@@ -47,19 +47,6 @@ export class TradingService {
                     console.error('TradingService::createPassiveOffer() error: ' + JSON.stringify(onerr));
                     reject(onerr);
                 });
-        });
-    }
-
-    paymentPath(transaction: CommonConstants.ITransaction) {
-        return new Promise((resolve, reject) => {
-            this.stsSrvc.paymentPath(transaction).then(data => {
-                console.log('TradingService::paymentPath() data: ' + JSON.stringify(data));
-                resolve(data);
-            },
-            onerr => {
-                console.error('TradingService::paymentPath() error: ' + JSON.stringify(onerr));
-                reject(onerr);
-            });
         });
     }
 

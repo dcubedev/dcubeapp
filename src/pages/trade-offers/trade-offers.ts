@@ -4,10 +4,11 @@ import { MenuController, NavController } from 'ionic-angular';
 import * as AppConstants from '../../providers/app-constants/app-constants';
 import { CommonService } from '../../providers/common-service/common-service';
 import * as CommonConstants from '../../providers/common-service/common-service';
-import { KeySettingsService } from '../../providers/key-settings-service/key-settings-service';
-import { AccountService } from '../../providers/account-service/account-service';
-import { TrustService } from '../../providers/trust-service/trust-service';
-import { TradingService } from '../../providers/trading-service/trading-service';
+
+import { KeySettingsService } from '../../providers/platform/stellar/key-settings-service';
+import { AccountService } from '../../providers/platform/stellar/account-service';
+import { TrustService } from '../../providers/platform/stellar/trust-service';
+import { TradingService } from '../../providers/platform/stellar/trading-service';
 
 /*
   Author: Stephen Agyepong
@@ -41,8 +42,13 @@ export class OffersAndTradesPage {
     }
 
     ngOnInit() {
+        let asset_code = 'USD';
+        let amount = 1;
+        let dest_amount = 5;
+        let send_max_amount = 100;
+        let dest_asset_type = 'credit_alphanum4';
         this.commonSvrc.initAccount(this);
-        this.commonSvrc.initTransaction(this, 'USD', 1);
+        this.commonSvrc.initTransaction(this, asset_code, amount, dest_amount, send_max_amount, dest_asset_type);
         //console.log("OffersAndTradesPage.ngOnInit() this.account: " + this.account);
         //console.log("OffersAndTradesPage.ngOnInit() this.commonSvrc.appCurr: " + this.commonSvrc.appCurr);
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
@@ -126,7 +132,7 @@ export class OffersAndTradesPage {
         this.transaction.dest_asset_code = this.account.dest_asset_code;
         //this.transaction.buying_issuer;
         this.transaction.amount = this.account.pymtamt;
-        this.transaction.price = { numerator: this.transaction.sell_units, denominator: this.transaction.buy_units };
+        this.transaction.price = { n: this.transaction.sell_units, d: this.transaction.buy_units };
         //this.transaction.sell_units = this.transaction.sell_units;
         //this.transaction.buy_units = this.transaction.buy_units;   
         //this.transaction.offerId = this.transaction.offerId;
@@ -147,18 +153,20 @@ export class OffersAndTradesPage {
         this.transaction.dest_asset_code = this.account.dest_asset_code;
         //this.transaction.buying_issuer;
         this.transaction.amount = this.account.pymtamt;
-        this.transaction.price = { numerator: this.transaction.sell_units, denominator: this.transaction.buy_units };
+        this.transaction.price = { n: this.transaction.sell_units, d: this.transaction.buy_units };
         //this.transaction.sell_units = this.transaction.sell_units;
         //this.transaction.buy_units = this.transaction.buy_units;   
         //this.transaction.offerId = this.transaction.offerId;
         this.transaction.sender = this.keysStored.address;
+        this.transaction.sender_secret = this.keysStored.secret;
+        
         this.tradingSvrc.manageOffers(this.transaction).then(data => {
             //console.log('OffersAndTradesPage::manageOffers() data: ' + JSON.stringify(data));
             self.outArea = JSON.stringify(data);
         },
-            onerr => {
-                console.error('OffersAndTradesPage::manageOffers() error: ' + JSON.stringify(onerr));
-            });
+        onerr => {
+            console.error('OffersAndTradesPage::manageOffers() error: ' + JSON.stringify(onerr));
+        });
     }
 
     offersForAccount() {
@@ -203,23 +211,35 @@ export class OffersAndTradesPage {
         this.transaction.sender = this.keysStored.address;
         this.transaction.dest_asset_type = this.account.dest_asset_type;
         this.transaction.dest_asset_code = this.account.dest_asset_code;
-        //this.transaction.buying_issuer;
-        //this.transaction.dest_amount;
-        //this.transaction.send_max_amount;
-        //this.transaction.buying_issuer;
-        //this.transaction.path;
-        
-        this.tradingSvrc.paymentPath(this.transaction).then(data => {
-            //console.log('OffersAndTradesPage::paymentPath() data: ' + JSON.stringify(data));
+
+        let receiver = this.transaction.receiver;
+        let source = this.transaction.sender;
+        let dest_asset_type = this.transaction.dest_asset_type;
+        let dest_asset_code = this.transaction.dest_asset_code;
+        let dest_asset_issuer = this.transaction.buying_issuer;
+        let dest_amount = this.transaction.dest_amount;
+
+        let reQuery = '?destination_account=' + receiver
+            + '&source=' + source
+            + '&destination_asset_type=' + dest_asset_type
+            + '&destination_asset_code=' + dest_asset_code
+            + '&destination_asset_issuer=' + dest_asset_issuer
+            + '&destination_amount=' + dest_amount;
+        console.log('OffersAndTradesPage::findPaymentPath() reQuery: ' + reQuery);
+
+        let opname = 'paths';
+
+        this.tradingSvrc.getHttpHorizon(reQuery, opname).then(data => {
+            //console.log('OffersAndTradesPage::findPaymentPath() data: ' + JSON.stringify(data));
             self.outArea = JSON.stringify(data);
         },
-            onerr => {
-                console.error('OffersAndTradesPage::paymentPath() error: ' + JSON.stringify(onerr));
-            });
+        onerr => {
+            console.error('OffersAndTradesPage::findPaymentPath() error: ' + JSON.stringify(onerr));
+        });
     }
 
     makePaymentWithPath() {
-        let self = this;
+        //let self = this;
         this.transaction.receiver = this.account.destaddress;
         this.transaction.sender = this.keysStored.address;
         this.transaction.dest_asset_type = this.account.dest_asset_type;
@@ -230,13 +250,7 @@ export class OffersAndTradesPage {
         //this.transaction.buying_issuer;
         //this.transaction.path;
 
-        this.tradingSvrc.paymentPath(this.transaction).then(data => {
-            //console.log('OffersAndTradesPage::paymentPath() data: ' + JSON.stringify(data));
-            self.outArea = JSON.stringify(data);
-        },
-            onerr => {
-                console.error('OffersAndTradesPage::paymentPath() error: ' + JSON.stringify(onerr));
-            });
+        
     }
     sendPayment() {
         // make payment
@@ -259,7 +273,7 @@ export class OffersAndTradesPage {
 
     changeTrustline() {
         let issuingAddr = this.keysStored.address;
-        let signerSeed = this.account.destsecret;
+        let signerSeed = this.keysStored.secret;
         let asset_code = this.account.asset_code;
         let trustLimitAmt: string = "" + this.account.trustLimitAmt;
         this.trustSvrc.changeTrust(issuingAddr, signerSeed, asset_code, trustLimitAmt);

@@ -4,7 +4,8 @@ import { MenuController } from 'ionic-angular';
 
 import { CommonService } from '../../providers/common-service/common-service';
 import * as CommonConstants from '../../providers/common-service/common-service';
-import { AccountService } from '../../providers/account-service/account-service';
+
+import { AccountService } from '../../providers/platform/stellar/account-service';
 
 /*
   Author: Stephen Agyepong

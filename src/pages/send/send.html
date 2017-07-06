@@ -9,6 +9,11 @@
 </ion-header>
 
 <ion-content padding>
+    <ion-list>
+        <ion-item *ngFor="let asset of accountBalances">
+            Account Balance for <font size="+2">({{asset.asset_code}})</font>: <font size="+2">{{asset.balance.toFixed(2)}}</font>
+        </ion-item>
+    </ion-list>
     <ion-item ng-if="showDestTag && destInfo.memo">
         <ion-label>Destination Address: </ion-label>
         <ion-input type="text" [(ngModel)]="paymentData.destAddress" placeholder='{{"destaddr" | translate}}'></ion-input>
@@ -19,13 +24,17 @@
             <ion-input type="text" [(ngModel)]="paymentData.amount" placeholder="0"></ion-input>
         </ion-item>
     </div>
+    <ion-item ng-if="showDestTag && destInfo.memo">
+        <ion-label>Payment Currency: </ion-label>
+        <ion-input type="text" [(ngModel)]="paymentData.currency" placeholder="0"></ion-input>
+    </ion-item>
     <ion-item ng-if="showDestTag && !destInfo.memo">
         <ion-label>Payment Destinationtag: </ion-label>
         <ion-input type="text" [(ngModel)]="paymentData.destTag" placeholder='{{"desttag" | translate}}'></ion-input>
     </ion-item>
     <ion-item ng-if="showDestTag && destInfo.memo">
-        <ion-label>Payment Amount: </ion-label>
-        <ion-input type="text" [(ngModel)]="destInfo.memo" placeholder="0"></ion-input>
+        <ion-label>Extra memo for compliance: </ion-label>
+        <ion-input type="text" [(ngModel)]="destInfo.extraMemo" placeholder="0"></ion-input>
     </ion-item>
     
     <button ion-button on-tap="sendPayment()" class="button button-block button-positive">

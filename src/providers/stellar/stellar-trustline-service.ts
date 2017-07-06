@@ -76,6 +76,9 @@ export class StellarTrustlineService {
                 transaction.sign(signerKeys);
                 return server.submitTransaction(transaction);
             })
+            .catch(err => {
+                console.error('changeTrust() err: ', err);
+            })
     }
 
     changeTrustAndPay(issuingAddr, issuingSeed: string, receivingSeed: string, asset_code, trustLimitAmt, pymtAmt: string) {

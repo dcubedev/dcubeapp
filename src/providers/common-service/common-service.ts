@@ -83,6 +83,7 @@ export interface IPaymentData {
     destAddress: any;
     destTag: any;
     amount: number;
+    currency?: string;
     asset_code: string;
 };
 
@@ -90,6 +91,7 @@ export interface IDestinationInfo {
     accountId: any;
     memo: any;
     memoType: any;
+    extraMemo?: any;
     isValidAddress: boolean;
     needFunding: boolean;
     acceptedCurrencies: any;
@@ -97,8 +99,8 @@ export interface IDestinationInfo {
 };
 
 export interface IPrice {
-    numerator: number;
-    denominator: number;
+    n: number;
+    d: number;
 }
 
 export interface ITransaction {
@@ -621,10 +623,14 @@ export class CommonService {
         return "";
     }
 
-    initTransaction(self, asset_code: string, amount: number, dest_amount_p?: number, send_max_amount_p?: number, dest_asset_code_p?: string) {
+    initTransaction(self, asset_code: string, amount: number, dest_amount_p?: number, send_max_amount_p?: number, dest_asset_code_p?: string, dest_asset_type_p?: string) {
         let dest_asset_code = 'GHS';
         if (undefined !== dest_asset_code_p) {
             dest_asset_code = dest_asset_code_p;
+        }
+        let dest_asset_type = 'credit_alphanum4';
+        if (undefined !== dest_asset_type_p) {
+            dest_asset_type = dest_asset_type_p;
         }
         let dest_amount = 4;
         if (undefined !== dest_amount_p) {
@@ -647,7 +653,7 @@ export class CommonService {
             asset_code: asset_code,
             asset_type: '',
             dest_asset_code: dest_asset_code_p,
-            dest_asset_type: 'credit_alphanum4',
+            dest_asset_type: dest_asset_type,
             amount: amount,
             dest_amount: dest_amount,
             send_max_amount: send_max_amount,
@@ -666,12 +672,13 @@ export class CommonService {
             price: price
         }
     }
-
+   
     initAccount(self) {
         self.account = {
             address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
             dest_asset_code: 'GHS',
+            dest_asset_type: 'credit_alphanum4',
             balance: 0,
             reserve: 0,
             sequence: 0,
@@ -680,6 +687,7 @@ export class CommonService {
                 asset_code: this.appCurr,
                 asset_type: null,
                 dest_asset_code: 'GHS',
+                dest_asset_type: 'credit_alphanum4',
                 amount: 1,
                 debit: null,
                 memo: 'usd_client',
@@ -711,6 +719,7 @@ export class CommonService {
             address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
             asset_code: this.appCurr,
             dest_asset_code: 'GHS',
+            dest_asset_type: 'credit_alphanum4',
             balance: 0,
             reserve: 0,
             sequence: 0,

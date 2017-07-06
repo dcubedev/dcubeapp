@@ -4,10 +4,10 @@ import { MenuController, NavController } from 'ionic-angular';
 import * as AppConstants from '../../providers/app-constants/app-constants';
 import { CommonService } from '../../providers/common-service/common-service';
 import * as CommonConstants from '../../providers/common-service/common-service';
-import { KeySettingsService } from '../../providers/key-settings-service/key-settings-service';
-import { AccountService } from '../../providers/account-service/account-service';
-import { TrustService } from '../../providers/trust-service/trust-service';
-import { TradingService } from '../../providers/trading-service/trading-service';
+import { KeySettingsService } from '../../providers/platform/stellar/key-settings-service';
+import { AccountService } from '../../providers/platform/stellar/account-service';
+import { TrustService } from '../../providers/platform/stellar/trust-service';
+import { TradingService } from '../../providers/platform/stellar/trading-service';
 
 import { AccountAcctkeyFormPage } from '../account-acctkey-form/account-acctkey-form';
 

@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
+import * as AppConstants from '../../providers/app-constants/app-constants';
 import * as CommonConstants from '../../providers/common-service/common-service';
+import { AccountService } from '../../providers/platform/stellar/account-service';
 
 /*
   Author: Stephen Agyepong
@@ -17,56 +19,80 @@ import * as CommonConstants from '../../providers/common-service/common-service'
 export class SendPage {
     showDestTag: boolean = true;
 
-    public destInfo: CommonConstants.IDestinationInfo;
-    public paymentData: CommonConstants.IPaymentData;
-    public transactionContext: CommonConstants.ITransactionContext;
+    accountBalances: CommonConstants.IAccountBalance[] = null;
+    destInfo: CommonConstants.IDestinationInfo;
+    paymentData: CommonConstants.IPaymentData;
+    transactionContext: CommonConstants.ITransactionContext;
 
-    constructor(public navCtrl: NavController, public menuCtrl: MenuController) {
-      this.init();
-  }
+    constructor(public navCtrl: NavController,
+        public menuCtrl: MenuController,
+        private acctSvrc: AccountService) {
+        this.init();
+    }
 
-  init() {
-      this.destInfo = {
-          accountId: '',
-          memo: null,
-          memoType: null,
-          isValidAddress: false,
-          needFunding: false,
-          acceptedCurrencies: ['XLM'],
-          acceptedIOUs: []
-      };
+    ngOnInit() {
+        this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
+        this.getAccountBalances();
+    }
 
-      this.paymentData = {
-          destAddress: '',
-          destTag: null,
-          amount: 0,
-          asset_code: 'XLM'
-      };
+    init() {
+        this.destInfo = {
+            accountId: '',
+            memo: null,
+            memoType: null,
+            isValidAddress: false,
+            needFunding: false,
+            acceptedCurrencies: ['XLM'],
+            acceptedIOUs: []
+        };
 
-      this.transactionContext = {
-          isDirty: false,
-          isValidCurrency: false,
-          alternatives: [],
-          choice: [],
-          amount: 0
-      };
-  }
+        this.paymentData = {
+            destAddress: '',
+            destTag: null,
+            amount: 0,
+            asset_code: 'XLM'
+        };
 
-  sendPayment() {
-  }
+        this.transactionContext = {
+            isDirty: false,
+            isValidCurrency: false,
+            alternatives: [],
+            choice: [],
+            amount: 0
+        };
+    }
 
-  scanCode() {
-  }
+    onAccountEvent(self, acctevt: any) {
+        //console.log("send::onAccountEvent() acctevt.memo: " + acctevt.memo);
+        if (undefined !== self.acctSvrc && null !== self.acctSvrc) {
+            self.account = self.acctSvrc.getAccount();
+        }
 
-  donate() {
-  }
+        if (AppConstants.ACCT_INFO_LOADED === acctevt.memo) {
+            self.accountBalances = <CommonConstants.IAccountBalance[]>acctevt.status;
+        }
+    }
 
-  toggleLeftMenu() {
-      this.menuCtrl.toggle('left');
-  }
+    sendPayment() {
+    }
 
-  toggleRightMenu() {
-      this.menuCtrl.toggle('right');
-  }
+    scanCode() {
+    }
+
+    donate() {
+    }
+
+    toggleLeftMenu() {
+        this.menuCtrl.toggle('left');
+    }
+
+    toggleRightMenu() {
+        this.menuCtrl.toggle('right');
+    }
+
+    getAccountBalances() {
+        //console.log("SendPage::getAccountBalances() acctevt.memo: " + acctevt.memo);
+        this.acctSvrc.getAccountBalances();
+    }
 
 }

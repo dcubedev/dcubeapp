@@ -58,44 +58,6 @@ export class StellarTradingService {
         return '';
     }
 
-    paymentPath(transaction: CommonConstants.ITransaction) {
-        return new Promise((resolve, reject) => {
-            let receiver = transaction.receiver;
-            let source = transaction.sender;
-            let dest_asset_type = transaction.dest_asset_type;
-            let dest_asset_code = transaction.dest_asset_code;
-            let dest_asset_issuer = transaction.buying_issuer;
-            let dest_amount = transaction.dest_amount;
-            console.log("StellarTradingService::paymentPath() receiver: " + receiver);
-            console.log("StellarTradingService::paymentPath() source: " + source);
-            console.log("StellarTradingService::paymentPath() dest_asset_type: " + dest_asset_type);
-            console.log("StellarTradingService::paymentPath() dest_asset_code: " + dest_asset_code);
-            console.log("StellarTradingService::paymentPath() dest_asset_issuer: " + dest_asset_issuer);
-            console.log("StellarTradingService::paymentPath() dest_amount: " + dest_amount);
-
-            let _url = this.srsSrvc.getServerURL() + "/paths";
-            let reQuery = '?destination_account=' + receiver
-                + '&source=' + source
-                + '&destination_asset_type=' + dest_asset_type
-                + '&destination_asset_code=' + dest_asset_code
-                + '&destination_asset_issuer=' + dest_asset_issuer
-                + '&destination_amount=' + dest_amount;
-              
-            let request_p = _url + reQuery;
-            console.log("StellarTradingService::paymentPath() sending GET: " + request_p);
-
-            this.remoteSvrc.getHttp(request_p).then(data => {
-                console.log('StellarTradingService::paymentPath() data: ' + JSON.stringify(data));
-                resolve(data);
-                },
-                onerr => {
-                    console.error('StellarTradingService::paymentPath() error: ' + JSON.stringify(onerr));
-                    reject(onerr);
-                });
-        });
-
-    }
-
     createPassiveOffer(transaction: CommonConstants.ITransaction) {
         // The exchange rate ratio (selling / buying)
         return new Promise((resolve, reject) => {
@@ -103,33 +65,23 @@ export class StellarTradingService {
             let selling_issuer = transaction.selling_issuer;
             let buying = transaction.dest_asset_code;
             let buying_issuer = transaction.buying_issuer;
-            let amount = transaction.amount;
+            let amount: string = '' + transaction.amount;
             let price: CommonConstants.IPrice = transaction.price;
             let source = transaction.sender;
-
-            let source_r = '';
-            if (undefined !== source) {
-                source_r = '&source=' + source;
-            }
+            let sender_secret = transaction.sender_secret;
 
             let selling_asset = this.scsSvrc.getAssetObject(selling, selling_issuer);
             let buying_asset = this.scsSvrc.getAssetObject(buying, buying_issuer);
-            console.log("StellarTradingService::createPassiveOffer() selling: " + selling);
-            console.log("StellarTradingService::createPassiveOffer() selling: " + selling);
-            console.log("StellarTradingService::createPassiveOffer() buying: " + buying);
-            console.log("StellarTradingService::createPassiveOffer() buying_issuer: " + buying_issuer);
-            console.log("StellarTradingService::createPassiveOffer() price.sell_units: " + price.numerator);
-            console.log("StellarTradingService::createPassiveOffer() price.buy_units: " + price.denominator);
-
-            let _url = this.srsSrvc.getServerURL() + "/createPassiveOffer";
-            let reQuery = '?selling=' + selling_asset + '&buying=' + buying_asset
-                + '&amount=' + amount + '&price=' + price
-                + source_r;
-            let request_p = _url + reQuery;
-            console.log("StellarTradingService::createPassiveOffer() sending GET: " + request_p);
-
-            this.remoteSvrc.getHttp(request_p).then(data => {
-                console.log('StellarTradingService::createPassiveOffer() data: ' + JSON.stringify(data));
+            
+            let operation = StellarSdk.Operation.createPassiveOffer({
+                selling: selling_asset,
+                buying: buying_asset,
+                amount: amount,
+                price: price,
+                source: source
+            });
+      
+            this.srsSrvc.submitTransaction(source, sender_secret, operation).then(data => {
                 resolve(data);
             },
             onerr => {
@@ -147,45 +99,36 @@ export class StellarTradingService {
             let selling_issuer = transaction.selling_issuer;
             let buying = transaction.dest_asset_code;
             let buying_issuer = transaction.buying_issuer;
-            let amount = transaction.amount;
+            let amount: string = '' + transaction.amount;
             let price: CommonConstants.IPrice = transaction.price;
             let offerId_p = transaction.offerId;
             let source = transaction.sender;
+            let sender_secret = transaction.sender_secret;
 
             let offerId = 0; // assume new offer to create
             if (undefined !== offerId) {
                 offerId = offerId_p;
             }
 
-            let source_r = '';
-            if (undefined !== source) {
-                source_r = '&source=' + source;
-            }
-
             let selling_asset = this.scsSvrc.getAssetObject(selling, selling_issuer);
             let buying_asset = this.scsSvrc.getAssetObject(buying, buying_issuer);
-            console.log("StellarTradingService::manageOffers() selling: " + selling);
-            console.log("StellarTradingService::manageOffers() selling: " + selling);
-            console.log("StellarTradingService::manageOffers() buying: " + buying);
-            console.log("StellarTradingService::manageOffers() buying_issuer: " + buying_issuer);
-            console.log("StellarTradingService::manageOffers() price.sell_units: " + price.numerator);
-            console.log("StellarTradingService::manageOffers() price.buy_units: " + price.denominator);
 
-            let _url = this.srsSrvc.getServerURL() + "/manageOffer";
-            let reQuery = '?selling=' + selling_asset + '&buying=' + buying_asset
-                + '&amount=' + amount + '&price=' + price
-                + '&offerId=' + offerId + source_r;
-            let request_p = _url + reQuery;
-            console.log("StellarTradingService::manageOffers() sending GET: " + request_p);
+            let operation = StellarSdk.Operation.manageOffer({
+                selling: selling_asset,
+                buying: buying_asset,
+                amount: amount,
+                price: price,
+                offerId: offerId,
+                source: source
+            });
 
-            this.remoteSvrc.getHttp(request_p).then(data => {
-                console.log('StellarTradingService::manageOffers() data: ' + JSON.stringify(data));
+            this.srsSrvc.submitTransaction(source, sender_secret, operation).then(data => {
                 resolve(data);
             },
-                onerr => {
-                    console.error('StellarTradingService::manageOffers() error: ' + JSON.stringify(onerr));
-                    reject(onerr);
-                });
+            onerr => {
+                console.error('StellarTradingService::manageOffers() error: ' + JSON.stringify(onerr));
+                reject(onerr);
+            });
         });
 
     }

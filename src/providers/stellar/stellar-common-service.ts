@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import 'rxjs/add/operator/map';
 
 import * as StellarConstants from "../stellar/stellar-constants";
 import { StellarRemoteService } from '../../providers/stellar/stellar-remote-service';
@@ -16,7 +14,7 @@ declare var StellarSdk: any;
 @Injectable()
 export class StellarCommonService {
 
-    constructor(public http: Http) {
+    constructor(private srsSrvc: StellarRemoteService) {
     }
 
     isAssetNative(curr): boolean {

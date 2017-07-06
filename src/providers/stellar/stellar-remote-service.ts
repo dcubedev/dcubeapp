@@ -27,9 +27,9 @@ export class StellarRemoteService {
     bridgeServerURL: string = null;
     federationServerURL: string = null;
 
-    constructor(private http: Http,
-        private commonSvrc: CommonService,
-        private remoteSvrc: RemoteService) {
+    constructor(public http: Http,
+        public remoteSvrc: RemoteService,
+        public commonSvrc: CommonService) {
         let self = this;
         this.initServer();
         commonSvrc.commonEvents$.subscribe(commonevt => { this.onCommonEvent(commonevt, self) });
@@ -43,13 +43,33 @@ export class StellarRemoteService {
         }
     }
 
+    initServer() {
+        this.resetServer(this);
+    }
+
     isConnected() {
         //console.log("this.server: " + this.server)
         return (null !== this.server) ? true : false;
     }
 
-    initServer() {
-        this.resetServer(this);
+    getServer() {
+        if (null === this.server) {
+            this.initServer();
+        }
+
+        return this.server;
+    }
+
+    getServerURL(): string {
+        return this.hostname;
+    }
+
+    getBridgeServerURL(): string {
+        return this.bridgeServerURL;
+    }
+
+    getFederationServerURL(): string {
+        return this.federationServerURL;
     }
 
     resetServer(self) {
@@ -81,26 +101,6 @@ export class StellarRemoteService {
         }
     }
 
-    getServer() {
-        if (null === this.server) {
-            this.initServer();
-        }
-
-        return this.server;
-    }
-
-    getServerURL(): string {
-        return this.hostname;
-    }
-
-    getBridgeServerURL(): string {
-        return this.bridgeServerURL;
-    }
-
-    getFederationServerURL(): string {
-        return this.federationServerURL;
-    }
-
     getHttpHorizon(reQuery: string, opname?: string) {
         return new Promise((resolve, reject) => {
             let opname_r = '';
@@ -110,18 +110,57 @@ export class StellarRemoteService {
             let _url = this.getServerURL() + opname_r;
 
             let request_p = _url + reQuery;
+            console.log("StellarRemoteService::getHttpHorizon() _url: " + _url);
+            console.log("StellarRemoteService::getHttpHorizon() reQuery: " + reQuery);
             console.log("StellarRemoteService::getHttpHorizon() sending GET: " + request_p);
-
+            
             this.remoteSvrc.getHttp(request_p).then(data => {
                 console.log('StellarRemoteService::getHttpHorizon() data: ' + JSON.stringify(data));
                 resolve(data);
             },
-                onerr => {
-                    console.error('StellarRemoteService::getHttpHorizon() error: ' + JSON.stringify(onerr));
-                    reject(onerr);
-                });
+            onerr => {
+                console.error('StellarRemoteService::getHttpHorizon() error: ' + JSON.stringify(onerr));
+                reject(onerr);
+            });
         });
 
+    }
+
+    submitTransaction(account_id, secret, operation) {
+        let self = this;
+        return new Promise(function (resolve, reject) {
+            console.log("StellarRemoteService::submitTransaction() account_id: " + account_id);
+            console.log("StellarRemoteService::submitTransaction() secret: " + secret);
+            console.log("StellarRemoteService::submitTransaction() operation: " + operation);
+
+            console.log("StellarRemoteService::submitTransaction() account_id: " + account_id);
+            let server = self.getServer();
+            console.log("StellarRemoteService::submitTransaction() server: " + server);
+            server.loadAccount(account_id)
+                .then(sourceAccount => {
+                    let transaction = new StellarSdk.TransactionBuilder(sourceAccount)
+                        .addOperation(operation)
+                        .build();
+
+                    // sign the transaction
+                    console.log("StellarRemoteService::submitTransaction() transaction: " + transaction);
+                    transaction.sign(StellarSdk.Keypair.fromSecret(secret));
+
+                    // transaction is now ready to be sent to the network or saved somewhere
+                    // Ok, send it off to Stellar!
+                    server.submitTransaction(transaction)
+                        .then(transactionResult => {
+                            console.log("StellarRemoteService::submitTransaction() transactionResult: " + transactionResult);
+                            resolve(transactionResult);
+                        }, err => {
+                            console.log("StellarRemoteService::submitTransaction() err: " + err);
+                            reject(err);
+                        })
+                })
+                .catch(err => {
+                    reject(err);
+                });
+        });
     }
 
 }
