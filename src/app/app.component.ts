@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 
 import { Nav, Platform } from 'ionic-angular';
-import { StatusBar, Splashscreen } from 'ionic-native';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { StatusBar } from '@ionic-native/status-bar';
 import { MenuController } from 'ionic-angular';
-import { TranslateService } from 'ng2-translate';
+import { TranslateService } from '@ngx-translate/core';
 
 import { CommonService } from '../providers/common-service/common-service';
 
@@ -102,6 +103,8 @@ export class MyApp {
 
     constructor(public platform: Platform, menuCtrl: MenuController,
         public translateService: TranslateService,
+        private statusBar: StatusBar,
+        private splashScreen: SplashScreen,
         private commonSvrc: CommonService) {
         this.menuCtrl = menuCtrl;
         this.initializeApp();
@@ -115,8 +118,8 @@ export class MyApp {
         this.platform.ready().then(() => {
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
-            StatusBar.styleDefault();
-            Splashscreen.hide();
+            this.statusBar.styleDefault();
+            this.splashScreen.hide();
 
             let curlang: string = this.commonSvrc.appLang.toLocaleLowerCase();
 

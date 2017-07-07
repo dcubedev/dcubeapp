@@ -1,11 +1,18 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { Http } from '@angular/http';
 import { RouterModule } from '@angular/router';
-import 'rxjs/Rx';
-import { Storage } from '@ionic/storage';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule, Http } from '@angular/http';
+import { IonicStorageModule } from '@ionic/storage';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { StatusBar } from '@ionic-native/status-bar';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+//import 'rxjs/Rx';
 
-import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
+//import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
 import {InputTextModule, DataTableModule, ButtonModule, DialogModule} from "primeng/primeng";
 import {ToolbarModule} from 'primeng/primeng';
 import {CalendarModule} from 'primeng/primeng';
@@ -71,7 +78,7 @@ import { QuickSmsPage } from '../pages/sms-person/sms-person';
 */
 
 export function createTranslateLoader(http: Http) {
-    return new TranslateStaticLoader(http, 'assets/i18n', '.json');
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 @NgModule({
@@ -106,12 +113,17 @@ export function createTranslateLoader(http: Http) {
       QuickSmsPage
   ],
   imports: [
-      IonicModule.forRoot(MyApp),
+      BrowserModule,
+      HttpModule,
       TranslateModule.forRoot({
-          provide: TranslateLoader,
-          useFactory: (createTranslateLoader),
-          deps: [Http]
+          loader: {
+              provide: TranslateLoader,
+              useFactory: (createTranslateLoader),
+              deps: [Http]
+          }
       }),
+      IonicStorageModule.forRoot(),
+      IonicModule.forRoot(MyApp),
       RouterModule.forRoot([]),
       InputTextModule, DataTableModule, ButtonModule, DialogModule,
       ToolbarModule,
@@ -152,7 +164,9 @@ export function createTranslateLoader(http: Http) {
   ],
   providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler },
       RouterModule,
-      Storage,
+      StatusBar,
+      SplashScreen,
+      BarcodeScanner,
       AppConfig,
       CommonService,
       RemoteService,

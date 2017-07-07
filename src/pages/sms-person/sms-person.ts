@@ -84,12 +84,13 @@ export class QuickSmsPage implements OnInit {
     }
 
     getPersons() {
-        return this.http.get('assets/config/persons.json')
-            .toPromise()
-            .then(res => <Person[]>res.json().data)
-            .then(data => {
-                return data;
-            })
+        return null;
+        //return this.http.get('assets/config/persons.json')
+        //    .toPromise()
+        //    .then(res => <Person[]>res.json().data)
+        //    .then(data => {
+        //        return data;
+        //    })
     }
 
     

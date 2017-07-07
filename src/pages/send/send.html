@@ -29,8 +29,8 @@
         <ion-input type="text" [(ngModel)]="paymentData.currency" placeholder="0"></ion-input>
     </ion-item>
     <ion-item ng-if="showDestTag && !destInfo.memo">
-        <ion-label>Payment Destinationtag: </ion-label>
-        <ion-input type="text" [(ngModel)]="paymentData.destTag" placeholder='{{"desttag" | translate}}'></ion-input>
+        <ion-label>Memo: </ion-label>
+        <ion-input type="text" [(ngModel)]="paymentData.destTag" placeholder='enter memo'></ion-input>
     </ion-item>
     <ion-item ng-if="showDestTag && destInfo.memo">
         <ion-label>Extra memo for compliance: </ion-label>

@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 
 import { Platform } from 'ionic-angular';
-import { TranslateService } from 'ng2-translate';
+import { TranslateService } from '@ngx-translate/core';
 
 // ionic 2 imports
 import { Storage } from '@ionic/storage';
+//import { IonicStorageModule } from '@ionic/storage';
 
 // dcubedev imports
 import * as AppConstants from '../app-constants/app-constants';
@@ -244,9 +245,9 @@ export class CommonService {
     public commonEvents$: EventEmitter<any>;
 
     constructor(private platform: Platform,
-        public storage: Storage,
-        public translateService: TranslateService,
-        public appcfg: AppConfig) {
+        private storage: Storage,
+        private translateService: TranslateService,
+        private appcfg: AppConfig) {
 
         let self = this;
         if (this.platform.is('mobile')) {
@@ -260,6 +261,11 @@ export class CommonService {
         //console.log('CommonService.constructor() this.platform.lang: ', this.platform.lang());
 
         this.commonEvents$ = new EventEmitter();
+
+        this.storage.ready().then(() => {
+        }).catch()
+        ;
+
         console.log('CommonService.constructor() this.local: ', this.local);
         if (null === this.local) {
             this.local = storage;
