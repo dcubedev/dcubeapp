@@ -7,6 +7,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { SocialSharing } from '@ionic-native/social-sharing';
 //import 'rxjs/Rx';
 
 //import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
@@ -27,6 +28,7 @@ import { RemoteService } from '../providers/remote-service/remote-service';
 
 import { StellarCommonService } from '../providers/stellar/stellar-common-service';
 import { StellarRemoteService } from '../providers/stellar/stellar-remote-service';
+import { CommonUtilsService } from '../providers/platform/stellar/common-utils-service';
 
 import { KeySettingsService } from '../providers/platform/stellar/key-settings-service';
 import { StellarKeySettingsService } from '../providers/stellar/stellar-key-settings-service';
@@ -45,8 +47,8 @@ import { AboutPage } from '../pages/about/about';
 import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
-import { DemoPage } from '../pages/demo/demo';
-import { OffersAndTradesPage } from '../pages/trade-offers/trade-offers';
+import { DemoPage } from '../pages/platform/stellar/demo/demo';
+import { OffersAndTradesPage } from '../pages/platform/stellar/trade-offers/trade-offers';
 import { LanguagePage } from '../pages/language/language';
 import { DevHelpPage } from '../pages/devhelp/devhelp';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
@@ -54,7 +56,7 @@ import { PlatformPage } from '../pages/platform/platform';
 import { ReceivePage } from '../pages/receive/receive';
 import { SendPage } from '../pages/send/send';
 import { TabsPage } from '../pages/tabs/tabs';
-import { TransactionsPage } from '../pages/transactions/transactions';
+import { TransactionsPage } from '../pages/platform/stellar/transactions/transactions';
 import { WalletPage } from '../pages/wallet/wallet';
 import { HomePage } from '../pages/home/home';
 
@@ -167,8 +169,10 @@ export function createTranslateLoader(http: Http) {
       StatusBar,
       SplashScreen,
       BarcodeScanner,
+      SocialSharing,
       AppConfig,
       CommonService,
+      CommonUtilsService,
       RemoteService,
       StellarCommonService,
       StellarRemoteService,

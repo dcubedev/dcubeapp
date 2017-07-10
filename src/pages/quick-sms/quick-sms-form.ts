@@ -47,7 +47,7 @@ export class QuickSmsFormPage {
     sendSMS() {
         let self = this;
         let url_p = this.commonSvrc.url_scom + "sms/send";
-        let body_p = null;
+        let body_p: string = null;
 
         if (url_p != null) {
             let contentType = 'application/json';
@@ -83,6 +83,7 @@ export class QuickSmsFormPage {
             let message: string = '"message":"' + msgTextArea + '"}';
 
             body_p = numbers + message;
+            this.msgSizeArea = '' + body_p.length;
 
             console.log("sendSMS() url_p: " + url_p);
             console.log("sendSMS() body_p: " + body_p);

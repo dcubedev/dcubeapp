@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Input } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
@@ -9,6 +8,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import * as AppConstants from '../../providers/app-constants/app-constants';
 import * as CommonConstants from '../../providers/common-service/common-service';
 import { CommonService } from '../../providers/common-service/common-service';
+import { CommonUtilsService } from '../../providers/platform/stellar/common-utils-service';
 import { AccountService } from '../../providers/platform/stellar/account-service';
 
 /*
@@ -22,6 +22,8 @@ import { AccountService } from '../../providers/platform/stellar/account-service
     templateUrl: 'send.html'
 })
 export class SendPage {
+    pnames: string[];
+    selectedPname: string;
     showDestTag: boolean = true;
 
     accountBalances: CommonConstants.IAccountBalance[] = null;
@@ -34,11 +36,13 @@ export class SendPage {
         private translateService: TranslateService,
         private barcodeScanner: BarcodeScanner,
         private commonSvrc: CommonService,
-        private acctSvrc: AccountService) {
+        private acctSvrc: AccountService,
+        private cusSvrc: CommonUtilsService) {
         this.init();
     }
 
     ngOnInit() {
+        this.pnames = this.commonSvrc.getPlatformContextPnames();
         this.acctSvrc.onAccountEvent(this, this.onAccountEvent);
         this.getAccountBalances();
     }
@@ -81,7 +85,25 @@ export class SendPage {
         }
     }
 
+    anotheracct() {
+    }
+
     sendPayment() {
+        console.log("SendPage::sendPayment() this.selectedPname: " + this.selectedPname);
+        let pcntx: CommonConstants.IPlatformContext = this.commonSvrc.findPlatformContext(this.selectedPname);
+        console.log("SendPage::sendPayment(findPlatformContext) pcntx.anchorUrl: " + pcntx.anchorUrl);
+        let tomlurl = pcntx.anchorUrl + '/.well-known/stellar.toml';
+        console.log("SendPage::sendPayment() tomlurl: " + tomlurl);
+
+        if (true) {
+            this.cusSvrc.getFederationServer(pcntx.anchorUrl)
+                .then((fedurl) => {
+                    console.log("SendPage::sendPayment() fedurl: " + fedurl);
+                })
+                .catch((err) => {
+                    console.log("SendPage::sendPayment() err: " + err);
+                });
+        }
     }
 
     scanCode() {
@@ -114,13 +136,6 @@ export class SendPage {
             // An error occurred
             console.log("SendPage::scanCode() An error occurred err: " + err);
         });
-    }
-
-    encodeText() {
-        let type = 'QR_CODE';
-        //let type = cordova.plugins.barcodeScanner.Encode.TEXT_TYPE;
-        let data = this.paymentData.amount;
-        this.barcodeScanner.encode(type, data);
     }
 
     donate() {

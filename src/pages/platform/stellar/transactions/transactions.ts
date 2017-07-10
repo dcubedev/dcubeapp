@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
 
-import { CommonService } from '../../providers/common-service/common-service';
-import * as CommonConstants from '../../providers/common-service/common-service';
+import { CommonService } from '../../../../providers/common-service/common-service';
+import * as CommonConstants from '../../../../providers/common-service/common-service';
 
-import { AccountService } from '../../providers/platform/stellar/account-service';
+import { AccountService } from '../../../../providers/platform/stellar/account-service';
 
 /*
   Author: Stephen Agyepong

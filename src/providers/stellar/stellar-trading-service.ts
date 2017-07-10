@@ -27,33 +27,6 @@ export class StellarTradingService {
         private srsSrvc: StellarRemoteService) {
     }
 
-    getHttp(serverURL, reQuery) {
-        //let _url = this.srsSrvc.getServerURL();
-        let request_p = serverURL + reQuery;
-        console.log("getHttp() reQuery: " + reQuery);
-        console.log("getHttp() request_p: " + request_p);
-
-        this.remoteSvrc.getHttp(request_p).then(data => {
-            console.log("getHttp() data: " + JSON.stringify(data));
-        }, err => {
-            console.log("getHttp() err: " + JSON.stringify(err));
-        })
-    }
-
-    sendFederationRequest(e_address, e_type) {
-        //let _url = StellarConstants.URL_DEV_FEDERATION;
-        let _url = this.srsSrvc.getFederationServerURL();
-        let reQuery = '?q=' + e_address + '&type=' + e_type;
-        let request_p = _url + reQuery;
-        console.log("sendFederationRequest() sending GET: " + request_p);
-   
-        this.remoteSvrc.getHttp(request_p).then(data => {
-            console.log("sendFederationRequest() data: " + JSON.stringify(data));
-        }, err => {
-            console.log("sendFederationRequest() err: " + JSON.stringify(err));
-        })
-    }
-
     parsePath(path_p) {
         return '';
     }
@@ -161,7 +134,6 @@ export class StellarTradingService {
         }, err => {
             console.log("orderBookTrades() err: " + JSON.stringify(err));
         })
-
     }
 }
 

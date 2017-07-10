@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
 
 // ionic 2 imports
 import { Storage } from '@ionic/storage';
-//import { IonicStorageModule } from '@ionic/storage';
 
 // dcubedev imports
 import * as AppConstants from '../app-constants/app-constants';
@@ -168,14 +167,33 @@ export enum PaymentMethod {
     WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT,
     WITHIN_PLATFORM_ANCHOR_MULTI_ACCOUNT,
     BETWEEN_PLATFORMS_ANCHOR_ONE_ACCOUNT,
-    BETWEEN_PLATFORMS_ANCHOR_MULTI_ACCOUNT
+    BETWEEN_PLATFORMS_ANCHOR_MULTI_ACCOUNT,
+    DEBIT_CARD,
+    CREDIT_CARD,
+    GIFT,
+    COUPON
 }
 
 // AppPlatform (appplatform)
 export enum AppPlatform {
+    DCUBE,
     STELLAR,
+    FUNTRACKER,
+    STRIPE,
     UPHOLD,
-    RIPPLE
+    RIPPLE,
+    FIRSTCAPITAL,
+    MTNMOBILE,
+    ALIPAY,
+    PAYPAL
+}
+
+export enum PymtChannel {
+    ANCHOR,
+    RETAIL,
+    CREDITCARD,
+    DEBITCARD,
+    MOBILEMONEY
 }
 
 export enum AppMode {
@@ -209,6 +227,24 @@ export enum AppLanguage {
     NL
 }
 
+export interface IPlatformContext {
+    pname: string;
+    pkey?: IKeyPair;
+    anchorUrl?: string;
+    pymtUrl?: string;
+}
+
+export interface IAppContext {
+    appMode: string;
+    appCurr?: string;
+    appLang?: string;
+    appplatform?: string;
+    payMethod?: string;
+    SourceOfKeys?: string;
+    isMobile?: boolean;
+    keys?: IKeyPair;
+}
+
 export const APPCURR_CHANGED = 'currencyChanged';
 export const APPMODE_CHANGED = 'appmodeChanged';
 export const APPLANG_CHANGED = 'appLangChanged';
@@ -231,6 +267,9 @@ export const SOURCEOFKEYS = 'SourceOfKeys';
 */
 @Injectable()
 export class CommonService {
+    appContext: AppContext = new AppContext(AppMode[AppMode.DEV]);
+    platformContext: IPlatformContext[] = [];
+    selectedPlatformContext: IPlatformContext;
     SourceOfKeys: string;
     isMobile: boolean = false;
     url_dcube: string = AppConstants.URL_DEV_DCUBE;
@@ -253,6 +292,8 @@ export class CommonService {
         if (this.platform.is('mobile')) {
             this.isMobile = true;
         }
+
+        this.initPlatformContext(this);
         this.reconfigDcubeUrl();
 
         // see https://www.w3.org/International/questions/qa-html-language-declarations
@@ -264,7 +305,7 @@ export class CommonService {
 
         this.storage.ready().then(() => {
         }).catch()
-        ;
+            ;
 
         console.log('CommonService.constructor() this.local: ', this.local);
         if (null === this.local) {
@@ -275,11 +316,11 @@ export class CommonService {
             this.local.set(APPPLATFORM, this.appplatform);  // Stellar
             this.local.set(PAYMETHOD, this.payMethod);  // WITHIN_PLATFORM_ANCHOR_ONE_ACCOUNT
             this.local.set(SOURCEOFKEYS, this.SourceOfKeys);
-            
+
             // override with configuration data
             this.appcfg.load().then(cfgdata => {
                 self.cfgdata = cfgdata;
-           
+
                 self.local.set(APPMODE, cfgdata['AppMode']);  // dev, demo, prod
                 self.local.set(APPLANG, cfgdata['AppLanguage']);  // en, fr
                 self.local.set(APPCURR, cfgdata['AppCurrency']);  // XLM, GHS, USD
@@ -299,6 +340,15 @@ export class CommonService {
                 self.reconfigDcubeUrlSelf(self);
             })
         }
+    }
+
+    isOfType(type, obj) {
+        var clas = type(obj);
+        return obj !== undefined && obj !== null && clas === type;
+    }
+
+    type(obj) {
+        return Object.prototype.toString.call(obj).slice(8, -1);
     }
 
     onCommonEvent(callbackObj, evtFunc) {
@@ -384,7 +434,7 @@ export class CommonService {
                 // demonstration/learning mode
                 url_dcube = AppConstants.URL_TEST_DCUBE;
                 break;
-            default:  
+            default:
                 if (this.platform.is('mobile')) {
                     // demonstration/learning mode
                     url_dcube = AppConstants.URL_DEMO_DCUBE;
@@ -409,10 +459,10 @@ export class CommonService {
                 // demonstration/learning mode
                 url_scom = AppConstants.URL_TEST_SCOM;
                 break;
-            default:    
+            default:
                 if (this.platform.is('mobile')) {
-                   // demonstration/learning mode
-                   url_scom = AppConstants.URL_DEMO_SCOM;
+                    // demonstration/learning mode
+                    url_scom = AppConstants.URL_DEMO_SCOM;
                 }
         }
 
@@ -678,7 +728,7 @@ export class CommonService {
             price: price
         }
     }
-   
+
     initAccount(self) {
         self.account = {
             address: 'GD3SY2MVZNI7EVDP4ZPJ2KXUJVFZN6CFZKQ2BEEZ6TOM7Z3NL6UPJSMU',
@@ -744,5 +794,65 @@ export class CommonService {
         };
     }
 
+    addPlatformContext(self, platformContext: IPlatformContext) {
+        self.platformContext.push(platformContext);
+    }
+    findSelectedPlatformIndex(): number {
+        return this.platformContext.indexOf(this.selectedPlatformContext);
+    }
+
+    getPlatformContextPnames(): string[] {
+        let pnames: string[] = [];
+        for (var i = 0; i < this.platformContext.length; i++) {
+            pnames.push(this.platformContext[i].pname);
+        }
+
+        console.log('CommonService::getPlatformContextPnames() pnames.length: ', pnames.length);
+        return pnames;
+    }
+
+    findPlatformContext(pname: string): IPlatformContext {
+        for (var i = 0; i < this.platformContext.length; i++) {
+            if (this.platformContext[i].pname === pname) {
+                return this.platformContext[i];
+            }
+        }
+
+        return null;
+    }
+
+    initPlatformContext(self) {
+        let pc_DCUBE: IPlatformContext = {
+            pname: 'DCUBE',
+            pkey: {
+                address: '',
+                secret: ''
+            },
+            anchorUrl: 'https://www.dcubedev.com',
+            pymtUrl: 'https://www.dcubedev.com'
+        }
+        self.platformContext.push(pc_DCUBE);
+
+        let pc_FUNTRACKER: IPlatformContext = {
+            pname: 'FUNTRACKER',
+            pkey: {
+                address: '',
+                secret: ''
+            },
+            anchorUrl: 'https://www.funtracker.site',
+            pymtUrl: 'https://www.funtracker.site'
+        }
+        self.platformContext.push(pc_FUNTRACKER);
+
+        console.log('CommonService::getPlatformContextPnames() self.platformContext.length: ', self.platformContext.length);
+    }
+    // end of class
+}
+
+class AppContext implements IAppContext {
+    constructor(public appMode, public appCurr?, public appLang?,
+        public appplatform?, public payMethod?,
+        public SourceOfKeys?, public isMobile?, public keys?) {
+    }
 }
 

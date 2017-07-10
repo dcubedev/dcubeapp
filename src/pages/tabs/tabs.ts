@@ -7,8 +7,7 @@ import { CommonService } from '../../providers/common-service/common-service';
 import { ContactsPage } from '../contacts/contacts';
 import { ReceivePage } from '../receive/receive';
 import { SendPage } from '../send/send';
-import { TransactionsPage } from '../transactions/transactions';
-//import { WalletPage } from '../wallet/wallet';
+import { TransactionsPage } from '../platform/stellar/transactions/transactions';
 import { HomePage } from '../home/home';
 
 

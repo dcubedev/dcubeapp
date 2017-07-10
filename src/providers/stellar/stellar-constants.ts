@@ -8,19 +8,13 @@ export const URL_LIVE_NETWORK = 'https://horizon.stellar.org';
 export const URL_TEST_NETWORK = 'https://horizon-testnet.stellar.org';
 export const URL_FRIENDBOT = 'https://horizon-testnet.stellar.org/friendbot';
 export const URL_LIVE_BRIDGE = 'https://dcubedev.com:8001/payment';
-export const URL_TEST_BRIDGE = URL_LIVE_BRIDGE;
-export const URL_DEV_BRIDGE = URL_LIVE_BRIDGE;
-export const URL_DEMO_BRIDGE = URL_LIVE_BRIDGE;
+export const URL_TEST_BRIDGE = 'http://test.dcubedev.com:8001/payment';
+export const URL_DEV_BRIDGE = 'http://localhost:8001/payment';
+export const URL_DEMO_BRIDGE = 'http://demo.dcubedev.com:8001/payment';
 export const URL_LIVE_FEDERATION = 'https://dcubedev.com:8002/federation';
-export const URL_TEST_FEDERATION = URL_LIVE_FEDERATION;
-export const URL_DEV_FEDERATION = URL_LIVE_FEDERATION;
-export const URL_DEMO_FEDERATION = URL_LIVE_FEDERATION;
-//export const URL_TEST_BRIDGE = 'http://test.dcubedev.com:8001/payment';
-//export const URL_DEV_BRIDGE = 'http://dev.dcubedev.com:8001/payment';
-//export const URL_DEMO_BRIDGE = 'http://demo.dcubedev.com:8001/payment';
-//export const URL_TEST_FEDERATION = 'http://test.dcubedev.com:8002/federation';
-//export const URL_DEV_FEDERATION = 'http://dev.dcubedev.com:8002/federation';
-//export const URL_DEMO_FEDERATION = 'http://demo.dcubedev.com:8002/federation';
+export const URL_TEST_FEDERATION = 'http://test.dcubedev.com:8002/federation';
+export const URL_DEV_FEDERATION = 'https://localhost:8002/federation';
+export const URL_DEMO_FEDERATION = 'http://demo.dcubedev.com:8002/federation';
 
 export const NATIVE_CURRENCY_XLM = 'XLM';
 

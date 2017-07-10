@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { MenuController, NavController } from 'ionic-angular';
 
-import * as AppConstants from '../../providers/app-constants/app-constants';
-import { CommonService } from '../../providers/common-service/common-service';
-import * as CommonConstants from '../../providers/common-service/common-service';
+import * as AppConstants from '../../../../providers/app-constants/app-constants';
+import { CommonService } from '../../../../providers/common-service/common-service';
+import * as CommonConstants from '../../../../providers/common-service/common-service';
 
-import { KeySettingsService } from '../../providers/platform/stellar/key-settings-service';
-import { AccountService } from '../../providers/platform/stellar/account-service';
-import { TrustService } from '../../providers/platform/stellar/trust-service';
-import { TradingService } from '../../providers/platform/stellar/trading-service';
+import { KeySettingsService } from '../../../../providers/platform/stellar/key-settings-service';
+import { AccountService } from '../../../../providers/platform/stellar/account-service';
+import { TrustService } from '../../../../providers/platform/stellar/trust-service';
+import { TradingService } from '../../../../providers/platform/stellar/trading-service';
+import { CommonUtilsService } from '../../../../providers/platform/stellar/common-utils-service';
 
 /*
   Author: Stephen Agyepong
@@ -30,7 +31,8 @@ export class OffersAndTradesPage {
         private keySettingsService: KeySettingsService,
         private acctSvrc: AccountService,
         private trustSvrc: TrustService,
-        private tradingSvrc: TradingService) {
+        private tradingSvrc: TradingService,
+        private cusSvrc: CommonUtilsService) {
         this.keysStored = {
             address: "",
             secret: "",
@@ -196,7 +198,7 @@ export class OffersAndTradesPage {
         let reQuery = '/accounts/' + account + '/offers?' + sort_order_r + cursor_r + limit_r;
         console.log("OffersAndTradesPage::offersForAccount() sending GET reQuery: " + reQuery);
 
-        this.tradingSvrc.getHttpHorizon(reQuery).then(data => {
+        this.cusSvrc.getHttpHorizon(reQuery).then(data => {
             //console.log('OffersAndTradesPage::offersForAccount() data: ' + JSON.stringify(data));
             self.outArea = JSON.stringify(data);
         },
@@ -229,7 +231,7 @@ export class OffersAndTradesPage {
 
         let opname = 'paths';
 
-        this.tradingSvrc.getHttpHorizon(reQuery, opname).then(data => {
+        this.cusSvrc.getHttpHorizon(reQuery, opname).then(data => {
             //console.log('OffersAndTradesPage::findPaymentPath() data: ' + JSON.stringify(data));
             self.outArea = JSON.stringify(data);
         },

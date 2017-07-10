@@ -36,17 +36,32 @@
         <ion-label>Extra memo for compliance: </ion-label>
         <ion-input type="text" [(ngModel)]="destInfo.extraMemo" placeholder="0"></ion-input>
     </ion-item>
-    
-    <button ion-button on-tap="sendPayment()" class="button button-block button-positive">
-        {{"send" | translate}}
+
+    <button ion-button class="button button-block" (click)="anotheracct()">
+        <ion-icon name="archive"></ion-icon>
+        {{ "common.anotheracct" | translate }}
+    </button>
+    <div>
+        <ion-list>
+            <ion-item>
+                <ion-label>{{"common.pymtplatform" | translate}}</ion-label>
+                <ion-select [(ngModel)]="selectedPname">
+                    <ion-option *ngFor="let pname of pnames">{{pname}}</ion-option>
+                </ion-select>
+            </ion-item>
+        </ion-list>
+    </div>
+    <button ion-button class="button button-block" (click)="sendPayment()">
+        <ion-icon name="archive"></ion-icon>
+        {{ "tabs.send" | translate }}
     </button>
     <div class="item item-body narrow">
         <button ion-button (click)="scanCode()" class="button button-block">
-            <i class="icon ion-qr-scanner"></i> {{"scan" | translate}}
+            <i class="icon ion-qr-scanner"></i> {{"common.scan" | translate}}
         </button>
         <button ion-button (click)="donate()" class="button button-block">
             <i class="icon ion-star"></i>
-            <font size="-1">{{"donate" | translate}}</font>
+            <font size="-1">{{"common.donate" | translate}}</font>
         </button>
     </div>
 </ion-content>

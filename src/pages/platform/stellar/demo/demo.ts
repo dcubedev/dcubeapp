@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { MenuController, NavController } from 'ionic-angular';
 
-import * as AppConstants from '../../providers/app-constants/app-constants';
-import { CommonService } from '../../providers/common-service/common-service';
-import * as CommonConstants from '../../providers/common-service/common-service';
-import { KeySettingsService } from '../../providers/platform/stellar/key-settings-service';
-import { AccountService } from '../../providers/platform/stellar/account-service';
-import { TrustService } from '../../providers/platform/stellar/trust-service';
-import { TradingService } from '../../providers/platform/stellar/trading-service';
+import * as AppConstants from '../../../../providers/app-constants/app-constants';
+import { CommonService } from '../../../../providers/common-service/common-service';
+import * as CommonConstants from '../../../../providers/common-service/common-service';
+import { KeySettingsService } from '../../../../providers/platform/stellar/key-settings-service';
+import { AccountService } from '../../../../providers/platform/stellar/account-service';
+import { TrustService } from '../../../../providers/platform/stellar/trust-service';
+import { TradingService } from '../../../../providers/platform/stellar/trading-service';
+import { CommonUtilsService } from '../../../../providers/platform/stellar/common-utils-service';
 
-import { AccountAcctkeyFormPage } from '../account-acctkey-form/account-acctkey-form';
+import { AccountAcctkeyFormPage } from '../../../account-acctkey-form/account-acctkey-form';
 
 
 /*
@@ -31,7 +32,8 @@ export class DemoPage {
         private keySettingsService: KeySettingsService,
         private acctSvrc: AccountService,
         private trustSvrc: TrustService,
-        private tradingSvrc: TradingService) {
+        private tradingSvrc: TradingService,
+        private cusSvrc: CommonUtilsService) {
         this.keysStored = {
             address: "",
             secret: "",
@@ -211,7 +213,7 @@ export class DemoPage {
     }
 
     sendFederationRequest() {
-        this.tradingSvrc.sendFederationRequest(this.account.receiver_ename, this.account.req_type);
+        this.cusSvrc.sendFederationRequest(this.account.receiver_ename, this.account.req_type);
     }
 
     getOrderBookTrades() {
