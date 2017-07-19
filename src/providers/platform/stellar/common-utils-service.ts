@@ -12,25 +12,42 @@ export class CommonUtilsService {
     constructor(private scsSrvc: StellarCommonService,
         private srsSrvc: StellarRemoteService) {
     }
-    
-    sendFederationRequest(e_address, e_type) {
-        //let self = this;
-        //let promise = new Promise(function (resolve, reject) {
-        //    resolve(balances);
-        //    reject(err);
-        //});
-        //return promise;
-        this.scsSrvc.sendFederationRequest(e_address, e_type);
+
+    getFederationServer(domain) {
+        let self = this;
+        return new Promise(function (resolve, reject) {
+            self.scsSrvc.getFederationServer(domain)
+                .then((fedurl) => {
+                    resolve(fedurl);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    sendFederationRequest(req_data, req_type: string, req_domain?: string) {
+        return new Promise((resolve, reject) => {
+            this.scsSrvc.sendFederationRequest(req_data, req_type, req_domain)
+                .then(data => {
+                    console.log('CommonUtilsService::sendFederationRequest() data: ' + JSON.stringify(data));
+                    resolve(data);
+                },
+                onerr => {
+                    console.error('CommonUtilsService::sendFederationRequest() error: ' + JSON.stringify(onerr));
+                    reject(onerr);
+                });
+        });
     }
 
     getHttpHorizon(reQuery: string, opname?: string) {
         return new Promise((resolve, reject) => {
             this.srsSrvc.getHttpHorizon(reQuery, opname).then(data => {
-                console.log('TradingService::getHttpHorizon() data: ' + JSON.stringify(data));
+                console.log('CommonUtilsService::getHttpHorizon() data: ' + JSON.stringify(data));
                 resolve(data);
             },
             onerr => {
-                console.error('TradingService::getHttpHorizon() error: ' + JSON.stringify(onerr));
+                console.error('CommonUtilsService::getHttpHorizon() error: ' + JSON.stringify(onerr));
                 reject(onerr);
             });
         });
@@ -42,19 +59,6 @@ export class CommonUtilsService {
             self.scsSrvc.getTomlByDomain(domain)
                 .then((toml) => {
                     resolve(toml);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
-        });
-    }
-
-    getFederationServer(domain) {
-        let self = this;
-        return new Promise(function (resolve, reject) {
-            self.scsSrvc.getFederationServer(domain)
-                .then((fedurl) => {
-                    resolve(fedurl);
                 })
                 .catch((err) => {
                     reject(err);

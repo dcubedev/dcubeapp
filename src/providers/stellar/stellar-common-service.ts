@@ -39,16 +39,15 @@ export class StellarCommonService {
         return asset;
     }
 
-    getMemo(memo_p) {
+    getMemo(req_type, req_data) {
         let memo = null;
-        if (memo_p) {
-            if (memo_p === 'id')
-                memo = StellarSdk.Memo.id(memo_p.toString());
-            else if (memo_p === 'hash')
-                memo = StellarSdk.Memo.hash(memo_p);
+        if (req_data) {
+            if (req_type === 'id')
+                memo = StellarSdk.Memo.id(req_data.toString());
+            else if (req_type === 'hash')
+                memo = StellarSdk.Memo.hash(req_data);
             else
-                memo = StellarSdk.Memo.text(memo_p);
-
+                memo = StellarSdk.Memo.text(req_data);
         }
 
         return memo;
@@ -67,18 +66,32 @@ export class StellarCommonService {
         })
     }
 
-    sendFederationRequest(e_address, e_type) {
-        //let _url = StellarConstants.URL_DEV_FEDERATION;
-        let _url = this.srsSrvc.getFederationServerURL();
-        let reQuery = '?q=' + e_address + '&type=' + e_type;
-        let request_p = _url + reQuery;
-        console.log("sendFederationRequest() sending GET: " + request_p);
+    sendFederationRequest(req_data, req_type: string, req_domain?: string) {
+        return new Promise((resolve, reject) => {
+            let _url = this.srsSrvc.getFederationServerURL();
+            if ((undefined !== req_domain) && (null !== req_domain) && ('' !== req_domain)) {
+                _url = req_domain;
+            }
 
-        this.remoteSvrc.getHttp(request_p).then(data => {
-            console.log("sendFederationRequest() data: " + JSON.stringify(data));
-        }, err => {
-            console.log("sendFederationRequest() err: " + JSON.stringify(err));
-        })
+            let reQuery = null;
+            if (req_type === 'id')
+                reQuery = '?q=' + req_data + '&type=' + req_type;
+            else if (req_type === 'hash')
+                reQuery = '?q=' + req_data + '&type=' + req_type;
+            else
+                reQuery = '?q=' + req_data + '&type=' + req_type;
+
+            let request_p = _url + reQuery;
+            console.log("sendFederationRequest() sending GET: " + request_p);
+
+            this.remoteSvrc.getHttp(request_p).then(data => {
+                console.log("sendFederationRequest() data: " + JSON.stringify(data));
+                resolve(data);
+            }, err => {
+                console.log("sendFederationRequest() err: " + JSON.stringify(err));
+                reject(err);
+            });
+        });
     }
 
     getTomlByDomain(domain) {

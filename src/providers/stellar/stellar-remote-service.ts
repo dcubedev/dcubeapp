@@ -90,8 +90,17 @@ export class StellarRemoteService {
                     self.bridgeServerURL = StellarConstants.URL_DEMO_BRIDGE;
                     self.federationServerURL = StellarConstants.URL_DEMO_FEDERATION;
                 } else {
-                    self.bridgeServerURL = StellarConstants.URL_DEV_BRIDGE;
-                    self.federationServerURL = StellarConstants.URL_DEV_FEDERATION;
+                    if (this.commonSvrc.isMobile) {
+                        self.bridgeServerURL = StellarConstants.URL_LIVE_BRIDGE;
+                        self.federationServerURL = StellarConstants.URL_LIVE_FEDERATION;
+                        self.network = 'liveNetwork';
+                        self.hostname = StellarConstants.URL_LIVE_NETWORK;
+                        StellarSdk.Network.usePublicNetwork();
+                        self.server = new StellarSdk.Server(self.hostname, { secure: true, port: 443 });
+                    } else {
+                        self.bridgeServerURL = StellarConstants.URL_DEV_BRIDGE;
+                        self.federationServerURL = StellarConstants.URL_DEV_FEDERATION;
+                    }
                 }
             }
             self.network = 'testNetwork';
