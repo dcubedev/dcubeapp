@@ -1,9 +1,6 @@
-﻿<div hostcontentmain>
+﻿<div hostcontentlogin>
     <form [formGroup]="loginForm" (ngSubmit)="login(loginForm.value)">
         <ion-list>
-            <div padding text-center>
-                <img src="assets/images/logo.png">
-            </div>
             <ion-item>
                 <ion-label floating>Username</ion-label>
                 <ion-input type="text" formControlName="user" name="user"></ion-input>
