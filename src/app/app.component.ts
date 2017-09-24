@@ -7,22 +7,23 @@ import { MenuController } from 'ionic-angular';
 import { TranslateService } from '@ngx-translate/core';
 
 import { CommonService } from '../providers/common-service/common-service';
+import { SwitchPageService } from '../providers/common-service/switch-page-service';
 
 // Pages that communicate with Stellar/digital currency platforms
 import { AboutPage } from '../pages/about/about';
 import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
-import { DemoPage } from '../pages/platform/stellar/demo/demo';
-import { OffersAndTradesPage } from '../pages/platform/stellar/trade-offers/trade-offers';
 import { LanguagePage } from '../pages/language/language';
-import { DevHelpPage } from '../pages/devhelp/devhelp';
+import { LoginPage } from '../pages/login/login';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
 import { PlatformPage } from '../pages/platform/platform';
 import { ReceivePage } from '../pages/receive/receive';
+import { RegisterPage } from '../components/register/register';
 import { SendPage } from '../pages/send/send';
 import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/platform/stellar/transactions/transactions';
+import { HomePage } from '../pages/home/home';
 import { WalletPage } from '../pages/wallet/wallet';
 
 import { GroupTypesPage } from '../pages/grouptypes/grouptypes';
@@ -31,14 +32,21 @@ import { FeedbackSystemPage } from '../pages/dfbs/dfbs';
 import { RecommendationSystemPage } from '../pages/drds/drds';
 import { ManageGroupsPage } from '../pages/manage-group/manage-group';
 
+// Demo, Development and Testing pages
+
+import { DemoPage } from '../pages/platform/stellar/demo/demo';
+import { OffersAndTradesPage } from '../pages/platform/stellar/trade-offers/trade-offers';
+
 // Pages that communicate with Dcube web services
-import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-acctkey-form';
-import { AccountClientFormPage } from '../pages/account-client-form/account-client-form';
-import { ClientVerificationForm } from '../pages/client-verification-form/client-verification-form';
+import { AccountAcctkeyFormPage } from '../pages/dev/account-acctkey-form/account-acctkey-form';
+import { AccountClientFormPage } from '../pages/dev/account-client-form/account-client-form';
+import { ClientVerificationForm } from '../pages/dev/client-verification-form/client-verification-form';
 
 // Pages that communicate with SCOM micro service
-import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
-import { QuickSmsPage } from '../pages/sms-person/sms-person';
+import { QuickSmsFormPage } from '../pages/dev/quick-sms/quick-sms-form';
+import { QuickSmsPage } from '../pages/dev/sms-person/sms-person';
+
+import { DevHelpPage } from '../pages/dev/devhelp/devhelp';
 
 /*
   Author: Stephen Agyepong
@@ -59,13 +67,14 @@ interface IPageObj {
 export class MyApp {
     @ViewChild(Nav) nav: Nav;
 
-    rootPage: any = TabsPage;
+    //rootPage: any = TabsPage;
+    rootPage: any = WalletPage;
 
     // items that go on the main menu (left menu)
     footerpages: IPageObj[] = [
         { title: 'Contacts', component: ContactsPage, index: 0, icon: 'contacts', enabled: true },
         { title: 'Receive', component: ReceivePage, index: 1, icon: 'arrow-round-back', enabled: true },
-        { title: 'Home', component: WalletPage, index: 2, icon: 'home', enabled: true },
+        { title: 'Home', component: HomePage, index: 2, icon: 'home', enabled: true },
         { title: 'Send', component: SendPage, index: 3, icon: 'send', enabled: true },
         { title: 'Transactions', component: TransactionsPage, index: 4, icon: 'archive', enabled: true }
     ];
@@ -73,14 +82,15 @@ export class MyApp {
     // items that go on the main menu (right menu)
     mainpages: IPageObj[] = [
         { title: 'tabs.home', component: TabsPage, enabled: true },
+        { title: 'pages.login', component: LoginPage, enabled: true },
         { title: 'pages.wallet', component: WalletPage, enabled: true },
-        { title: 'pages.clientform', component: AccountClientFormPage, enabled: true },
-        { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: true },
-        { title: 'pages.demo', component: DemoPage, enabled: true },
-        { title: 'pages.offertrades', component: OffersAndTradesPage, enabled: true },
-        { title: 'pages.clientverify', component: ClientVerificationForm, enabled: true },
-        { title: 'pages.quicksms', component: QuickSmsFormPage, enabled: true },
-        { title: 'pages.quicksmspng', component: QuickSmsPage, enabled: true }
+        { title: 'pages.clientform', component: AccountClientFormPage, enabled: false },
+        { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: false },
+        { title: 'pages.demo', component: DemoPage, enabled: false },
+        { title: 'pages.offertrades', component: OffersAndTradesPage, enabled: false },
+        { title: 'pages.clientverify', component: ClientVerificationForm, enabled: false },
+        { title: 'pages.quicksms', component: QuickSmsFormPage, enabled: false },
+        { title: 'pages.quicksmspng', component: QuickSmsPage, enabled: false }
     ];
 
     // items that go on the setup menu (right more/setup menu)
@@ -99,14 +109,23 @@ export class MyApp {
         { title: 'pages.about', component: AboutPage, enabled: true }
     ];
 
+    menupages: IPageObj[] = [
+        { title: 'pages.login', component: LoginPage, enabled: true },
+        { title: 'home', component: TabsPage, enabled: true },
+        { title: 'pages.about', component: AboutPage, enabled: true },
+        { title: 'pages.blankdemo', component: RegisterPage, enabled: true }
+    ]
+
     menuCtrl: MenuController;
 
     constructor(public platform: Platform, menuCtrl: MenuController,
         public translateService: TranslateService,
         private statusBar: StatusBar,
         private splashScreen: SplashScreen,
-        private commonSvrc: CommonService) {
+        private commonSvrc: CommonService,
+        public spSvrc: SwitchPageService) {
         this.menuCtrl = menuCtrl;
+        this.spSvrc.register(this);
         this.initializeApp();
     }
     
@@ -149,6 +168,19 @@ export class MyApp {
     openPageFromFooter(f_index: number) {
         // open the Wallet page from the footer Wallet button
         this.openPage(this.footerpages[f_index]);
+    }
+
+    openLogin() {
+        this.openPage(this.menupages[0]);
+    }
+    openHome() {
+        this.openPage(this.menupages[1]);
+    }
+    openAbout() {
+        this.openPage(this.menupages[2]);
+    }
+    openRegister() {
+        this.openPage(this.menupages[3]);
     }
 
 }

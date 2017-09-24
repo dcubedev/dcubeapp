@@ -1,0 +1,128 @@
+﻿<!--
+  Author: Stephen Agyepong
+-->
+<ion-header>
+    <ion-navbar>
+        <app-header ptitle="common.userreg"></app-header>
+    </ion-navbar>
+    <p-tabMenu id="tabMenuId" [model]="items"></p-tabMenu>
+</ion-header>
+
+
+<ion-content padding style="background-color:#808080">
+
+    <!--subcriber registration form
+    <ion-title class="center" color="secondary">Sign Up</ion-title>
+    -->
+    <ion-card>
+        <form (ngSubmit)="register(userForm.value)" [formGroup]="userForm">
+            <ion-list>
+
+                <ion-item>
+                    <ion-label floating>Select Your Country</ion-label>
+                    <ion-select formControlName="selectedCountry" name="selectedCountry" (change)='onValueChanged($event.target.value)'>
+                        <!-- <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>-->
+                    </ion-select>
+                </ion-item>
+                <div *ngIf="formErrors.selectedCountry">
+                    <div *ngFor="let errors of formErrors.selectedCountry">
+                        <p class="note danger">
+                            {{errors}}
+                        </p>
+                    </div>
+                </div>
+
+                <ion-item>
+                    <ion-label floating>Select Your Policy</ion-label>
+                    <ion-select formControlName="selectedPolicy" name="selectedPolicy" (change)='onValueChanged($event.target.value)'>
+                        <!-- <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>-->
+                    </ion-select>
+                </ion-item>
+                <div *ngIf="formErrors.selectedPolicy">
+                    <div *ngFor="let errors of formErrors.selectedPolicy">
+                        <p class="note danger">
+                            {{errors}}
+                        </p>
+                    </div>
+                </div>
+
+                <ion-item>
+                    <ion-label floating>Your Upline Mobile Number</ion-label>
+                    <ion-input type="text" formControlName="uplineMobileNumber" name="uplineMobileNumber" (change)='onValueChanged($event.target.value)'></ion-input>
+                </ion-item>
+
+                <div *ngIf="formErrors.uplineMobileNumber">
+                    <div *ngFor="let errors of formErrors.uplineMobileNumber">
+                        <p class="note danger">
+                            {{errors}}
+                        </p>
+                    </div>
+                </div>
+
+
+                <ion-item>
+                    <ion-label floating>Your Mobile Number</ion-label>
+                    <ion-input type="tel" formControlName="mobileNumber" name="mobileNumber" (change)='onValueChanged($event.target.value)'></ion-input>
+                </ion-item>
+                <div *ngIf="formErrors.mobileNumber">
+                    <div *ngFor="let errors of formErrors.mobileNumber">
+                        <p class="note danger">
+                            {{errors}}
+                        </p>
+                    </div>
+                </div>
+
+                <ion-item class="tos">
+                    <ion-toggle item-left formControlName="agree" name="agree" type="button" (change)='onValueChanged($event.target.value)'></ion-toggle>
+                    <ion-label item-right>
+                        Agree to terms and conditions
+                    </ion-label>
+                </ion-item>
+                <div *ngIf="formErrors.agree">
+                    <div *ngFor="let errors of formErrors.agree">
+                        <p class="note danger">
+                            {{errors}}
+                        <p>
+                    </div>
+                </div>
+
+            </ion-list>
+            <button ion-button round end favorite type="submit" [disabled]="!userForm.valid">Continue With Registration</button>
+
+        </form>
+    </ion-card>
+    <ion-card style="background-color:silver">
+        <ion-card-header>
+
+            <h3 style="background-color:#808080 ; font-size:20px; text-align:center"><marquee> Contact </marquee></h3>
+
+        </ion-card-header>
+        <ion-card-content>
+
+            <div class="row">
+
+                <div class="col">
+                    <pre style="font-family">
+Head Office
+4139 McBride Dr
+Powder Springs, GA 30127
+Georgia - United States.
+Tel: 678-403-1723
+          </pre>
+                </div>
+                <div class="col">
+                    <pre>
+Ghana Office
+P.O. Box ks 1632, Kumasi
+In the same building with Sabonay Technologies LTD.
+ Pankrono Estate, F-Line
+Tel: +233 (0)3220 72797
+          </pre>
+                </div>
+
+
+            </div>
+        </ion-card-content>
+
+    </ion-card>
+</ion-content>

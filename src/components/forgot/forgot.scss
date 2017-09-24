@@ -1,0 +1,15 @@
+.register {
+    .note.danger {
+        padding-left: 16px;
+        color: #d14;
+    }
+    .tos {
+        padding-top: 10px;
+        ion-toggle {
+            padding-left: 0px;
+        }
+        .item-inner {
+            border-bottom: 0;
+        }
+    }
+}

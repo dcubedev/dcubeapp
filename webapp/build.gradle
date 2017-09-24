@@ -1,0 +1,65 @@
+/* ============================================================================
+   This file contains the configurations for 
+   Eclipse and Webapp settings
+   ============================================================================
+   
+   Included from: "${rootProject.projectDir}/build.gradle"
+   ============================================================================
+ */
+
+apply plugin: 'eclipse'
+apply plugin: 'war'
+
+ext {
+  appName = 'dcubeapp'
+  builddir = "${appName}/build"
+  contentdir = "${appName}/WebContent"
+}
+
+task copyTask(type : Copy) {
+  from '../www'
+  into contentdir
+}
+
+war {
+  destinationDir = new File(builddir)
+  webAppDirName = contentdir
+  archiveName = "${appName}.war"
+}
+
+/* ensure eclipse source folders are always created, even when not inside GIT */
+def eclipseSourceFolders=[
+	builddir,
+	contentdir,
+];
+
+tasks.eclipse.dependsOn << {
+		
+	for (String sourceFolder: eclipseSourceFolders){ 
+		def resourceDir = new File(project.projectDir, sourceFolder)
+		if( !resourceDir.exists() && ! resourceDir.mkdirs() ) {
+    		logger.info("Not able to create %1",resourceDir);
+    	}
+	}
+}
+
+/* To have javadocs in eclipse added - where no source are available - we need these lines:
+ * see https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.eclipse.model.EclipseClasspath.html
+ */
+eclipse {	 
+  classpath {
+	downloadSources = true // default: true
+	downloadJavadoc = true // default: false
+  }
+}
+copyTask.dependsOn 'eclipse'
+war.dependsOn 'copyTask'
+
+/* setup eclipse with project encoding as UTF-8 (for editors) */
+eclipseJdt.doLast {
+	File f = file('.settings/org.eclipse.core.resources.prefs')
+	f.write('eclipse.preferences.version=1\n')
+	f.append('encoding/<project>=utf-8')
+}
+    
+

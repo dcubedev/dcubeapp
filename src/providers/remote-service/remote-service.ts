@@ -14,6 +14,7 @@ import { Http, RequestOptionsArgs } from '@angular/http';
 @Injectable()
 export class RemoteService {
     _data: any = null;
+	_timeout: number = 3000;
 
     constructor(public http: Http) {
     }

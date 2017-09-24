@@ -8,7 +8,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { SocialSharing } from '@ionic-native/social-sharing';
-//import 'rxjs/Rx';
+import { Geolocation } from '@ionic-native/geolocation';
 
 //import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -21,10 +21,17 @@ import {TabMenuModule, MenuModule} from 'primeng/primeng';
 import 'primeng/primeng';
 
 import { MyApp } from './app.component';
-import { Appheader } from '../pages/appheader/appheader';
 import { AppConfig } from '../providers/app-config/app-config';
 import { CommonService } from '../providers/common-service/common-service';
+
+import { EqualValidator } from '../providers/common-service/equal-validator';
+import { EmailValidator } from '../providers/common-service/email-validator';
+import { Utils } from '../providers/common-service/Utils';
+
+import { SwitchPageService } from '../providers/common-service/switch-page-service';
 import { RemoteService } from '../providers/remote-service/remote-service';
+import { AuthService } from '../providers/common-service/auth-service';
+import { RegisterService } from '../providers/common-service/register-service';
 
 import { StellarCommonService } from '../providers/stellar/stellar-common-service';
 import { StellarRemoteService } from '../providers/stellar/stellar-remote-service';
@@ -42,23 +49,24 @@ import { StellarTrustlineService } from '../providers/stellar/stellar-trustline-
 import { TradingService } from '../providers/platform/stellar/trading-service';
 import { StellarTradingService } from '../providers/stellar/stellar-trading-service';
 
-// Pages that communicate with digital currency platforms (Stellar, etc)
+import { CompModule } from '../components/comp.module';
+import { LoginModule } from '../components/login.module';
+
+// Pages that communicate with Stellar/digital currency platforms
 import { AboutPage } from '../pages/about/about';
 import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
-import { DemoPage } from '../pages/platform/stellar/demo/demo';
-import { OffersAndTradesPage } from '../pages/platform/stellar/trade-offers/trade-offers';
 import { LanguagePage } from '../pages/language/language';
-import { DevHelpPage } from '../pages/devhelp/devhelp';
+import { LoginPage } from '../pages/login/login';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
-import { PlatformPage } from '../pages/platform/platform';
+import { PlatformPage } from '../pages/platform/platform'; 
 import { ReceivePage } from '../pages/receive/receive';
 import { SendPage } from '../pages/send/send';
 import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/platform/stellar/transactions/transactions';
-import { WalletPage } from '../pages/wallet/wallet';
 import { HomePage } from '../pages/home/home';
+import { WalletPage } from '../pages/wallet/wallet';
 
 import { GroupTypesPage } from '../pages/grouptypes/grouptypes';
 import { CreateGroupPage } from '../pages/create-group/create-group';
@@ -66,27 +74,34 @@ import { FeedbackSystemPage } from '../pages/dfbs/dfbs';
 import { RecommendationSystemPage } from '../pages/drds/drds';
 import { ManageGroupsPage } from '../pages/manage-group/manage-group';
 
+// Demo, Development and Testing pages
+
+import { DemoPage } from '../pages/platform/stellar/demo/demo';
+import { OffersAndTradesPage } from '../pages/platform/stellar/trade-offers/trade-offers';
+
 // Pages that communicate with Dcube web services
-import { AccountAcctkeyFormPage } from '../pages/account-acctkey-form/account-acctkey-form';
-import { AccountClientFormPage } from '../pages/account-client-form/account-client-form';
-import { ClientVerificationForm } from '../pages/client-verification-form/client-verification-form';
+import { AccountAcctkeyFormPage } from '../pages/dev/account-acctkey-form/account-acctkey-form';
+import { AccountClientFormPage } from '../pages/dev/account-client-form/account-client-form';
+import { ClientVerificationForm } from '../pages/dev/client-verification-form/client-verification-form';
 
 // Pages that communicate with SCOM micro service
-import { QuickSmsFormPage } from '../pages/quick-sms/quick-sms-form';
-import { QuickSmsPage } from '../pages/sms-person/sms-person';
+import { QuickSmsFormPage } from '../pages/dev/quick-sms/quick-sms-form';
+import { QuickSmsPage } from '../pages/dev/sms-person/sms-person';
+
+import { DevHelpPage } from '../pages/dev/devhelp/devhelp';
+
 
 /*
   Author: Stephen Agyepong
 */
 
 export function createTranslateLoader(http: Http) {
-    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
 }
 
 @NgModule({
   declarations: [
       MyApp,
-      Appheader,
       AboutPage,
       AccountAcctkeyFormPage,
       AccountClientFormPage,
@@ -100,8 +115,8 @@ export function createTranslateLoader(http: Http) {
       DevHelpPage,
       FeedbackSystemPage,
       GroupTypesPage,
-      HomePage,
       LanguagePage,
+	  LoginPage,
       ManageGroupsPage,
       PaymethodPage,
       PlatformPage,
@@ -110,6 +125,7 @@ export function createTranslateLoader(http: Http) {
       SendPage,
       TabsPage,
       TransactionsPage,
+      HomePage,
       WalletPage,
       QuickSmsFormPage,
       QuickSmsPage
@@ -131,12 +147,13 @@ export function createTranslateLoader(http: Http) {
       ToolbarModule,
       CalendarModule,
       TabMenuModule,
-      MenuModule
+      MenuModule,
+      LoginModule,
+      CompModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
       MyApp,
-      Appheader,
       AboutPage,
       AccountAcctkeyFormPage,
       AccountClientFormPage,
@@ -151,7 +168,9 @@ export function createTranslateLoader(http: Http) {
       FeedbackSystemPage,
       GroupTypesPage,
       HomePage,
+      WalletPage,
       LanguagePage,
+	  LoginPage,
       ManageGroupsPage,
       PaymethodPage,
       PlatformPage,
@@ -160,7 +179,6 @@ export function createTranslateLoader(http: Http) {
       SendPage,
       TabsPage,
       TransactionsPage,
-      WalletPage,
       QuickSmsFormPage,
       QuickSmsPage
   ],
@@ -170,9 +188,16 @@ export function createTranslateLoader(http: Http) {
       SplashScreen,
       BarcodeScanner,
       SocialSharing,
+      Geolocation,
       AppConfig,
       CommonService,
       CommonUtilsService,
+      SwitchPageService,
+      EqualValidator,
+      EmailValidator,
+      Utils,
+      AuthService,
+      RegisterService,
       RemoteService,
       StellarCommonService,
       StellarRemoteService,

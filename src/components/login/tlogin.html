@@ -1,0 +1,18 @@
+﻿<div hostcontentmain>
+    <form [formGroup]="loginForm" (ngSubmit)="login(loginForm.value)">
+        <ion-list>
+            <div padding text-center>
+                <img src="assets/images/logo.png">
+            </div>
+            <ion-item>
+                <ion-label floating>Username</ion-label>
+                <ion-input type="text" formControlName="user" name="user"></ion-input>
+            </ion-item>
+            <ion-item class="input-password">
+                <ion-label floating>Password</ion-label>
+                <ion-input type="password" formControlName="pword" name="pword"></ion-input>
+            </ion-item>
+        </ion-list>
+        <button style="border-radius:45px;float:left;" (click)="login()" [disabled]="!loginForm.valid" class="button button-small button-default"><ion-icon name="key"></ion-icon>{{'common.login' | translate}}</button>
+    </form>
+</div>

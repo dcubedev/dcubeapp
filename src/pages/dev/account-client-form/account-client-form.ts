@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MenuController, NavController } from 'ionic-angular';
 
-import { CommonService } from '../../providers/common-service/common-service';
-import { RemoteService } from '../../providers/remote-service/remote-service';
+import { CommonService } from '../../../providers/common-service/common-service';
+import { RemoteService } from '../../../providers/remote-service/remote-service';
 
 /*
   Author: Stephen Agyepong

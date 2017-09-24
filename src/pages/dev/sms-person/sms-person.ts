@@ -8,8 +8,8 @@ import { RequestMethod, Headers, RequestOptionsArgs } from '@angular/http';
 //import {AccordionModule} from 'primeng/primeng';     //accordion and accordion tab
 import {MenuItem, Message} from 'primeng/primeng';            //api
 
-import { CommonService } from '../../providers/common-service/common-service';
-import { RemoteService } from '../../providers/remote-service/remote-service';
+import { CommonService } from '../../../providers/common-service/common-service';
+import { RemoteService } from '../../../providers/remote-service/remote-service';
 
 /*
   Author: Stephen Agyepong

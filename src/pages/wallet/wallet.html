@@ -5,42 +5,29 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-    <app-header ptitle="pages.wallet"></app-header>
+    <button ion-button class="button button-block" (click)="home()">
+        <ion-icon name="archive"></ion-icon>
+        Home
+    </button>
 </ion-header>
 
-<ion-content padding>
-    <ion-list>
-        <ion-item *ngFor="let asset of accountBalances">
-            Account Balance for <font size="+2">({{asset.asset_code}})</font>: <font size="+2">{{asset.balance.toFixed(2)}}</font>
-        </ion-item>
-    </ion-list>
+<ion-content class="wallet" padding #wcontent>
+    <thome>
+        <div hostcontentmain>
+            <tacctbals></tacctbals>
+        </div>
+        
+        <div hostcontentlogin>
+            <tlogin></tlogin>
+        </div>
 
-    <div class="button-bar">
-        <button ion-button class="button button-block">
-            <ion-icon name="archive"></ion-icon>
-            {{ "common.import" | translate }}
-        </button>
-        <button ion-button class="button button-block">
-            <ion-icon name="share"></ion-icon>
-            {{ "common.export" | translate }}
-        </button>
-    </div>
-    <div class="text-center" style="padding-bottom:10px">
-        <button ion-button class="button button-block">
-            <ion-icon name="ios-unlock"></ion-icon>
-            {{ "common.revealsecret" | translate }}
-        </button>
-    </div>
-    <div class="item item-divider">
-        {{ "common.announcements" | translate }}
-    </div>
-    <div class="item item-body">
-        Stellar Foundation has decided to launch a new consensus network called Stellar-Core.
-        It has a new native currency called Lumen (XLM). You have to upgrade to the new network in order to continue using centraurus and stellar.
-        Your stellars from the old account will be migrated to XLM.
-    </div>
-    <button ion-button class="button button-block">
-        <ion-icon name="ios-refresh-circle"></ion-icon>
-        Upgrade to Stellar-Core
-    </button>
+        <div hostcontentregbtn>
+            <tregister></tregister>
+        </div>
+        
+        <div hostcontentforgotbtn>
+            <tforgot></tforgot>
+        </div>
+    </thome>
+
 </ion-content>
