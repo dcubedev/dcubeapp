@@ -9,17 +9,18 @@ import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../providers/common-service/common-service';
 import { SwitchPageService } from '../providers/common-service/switch-page-service';
 
+import { LoginPage } from '../actions/login/login';
+import { RegisterPage } from '../actions/register/register';
+
 // Pages that communicate with Stellar/digital currency platforms
 import { AboutPage } from '../pages/about/about';
 import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
 import { LanguagePage } from '../pages/language/language';
-import { LoginPage } from '../pages/login/login';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
 import { PlatformPage } from '../pages/platform/platform';
 import { ReceivePage } from '../pages/receive/receive';
-import { RegisterPage } from '../components/register/register';
 import { SendPage } from '../pages/send/send';
 import { TabsPage } from '../pages/tabs/tabs';
 import { TransactionsPage } from '../pages/platform/stellar/transactions/transactions';
@@ -84,13 +85,13 @@ export class MyApp {
         { title: 'tabs.home', component: TabsPage, enabled: true },
         { title: 'pages.login', component: LoginPage, enabled: true },
         { title: 'pages.wallet', component: WalletPage, enabled: true },
-        { title: 'pages.clientform', component: AccountClientFormPage, enabled: false },
-        { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: false },
-        { title: 'pages.demo', component: DemoPage, enabled: false },
-        { title: 'pages.offertrades', component: OffersAndTradesPage, enabled: false },
-        { title: 'pages.clientverify', component: ClientVerificationForm, enabled: false },
-        { title: 'pages.quicksms', component: QuickSmsFormPage, enabled: false },
-        { title: 'pages.quicksmspng', component: QuickSmsPage, enabled: false }
+        { title: 'pages.clientform', component: AccountClientFormPage, enabled: true },
+        { title: 'pages.acctsetup', component: AccountAcctkeyFormPage, enabled: true },
+        { title: 'pages.demo', component: DemoPage, enabled: true },
+        { title: 'pages.offertrades', component: OffersAndTradesPage, enabled: true },
+        { title: 'pages.clientverify', component: ClientVerificationForm, enabled: true },
+        { title: 'pages.quicksms', component: QuickSmsFormPage, enabled: true },
+        { title: 'pages.quicksmspng', component: QuickSmsPage, enabled: true }
     ];
 
     // items that go on the setup menu (right more/setup menu)

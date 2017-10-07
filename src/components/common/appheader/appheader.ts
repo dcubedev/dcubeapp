@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Input } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
-import { CommonService } from '../../providers/common-service/common-service';
+import { CommonService } from '../../../providers/common-service/common-service';
 
 /*
   Generated class for the Appheader page.

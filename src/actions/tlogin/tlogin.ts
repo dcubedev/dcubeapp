@@ -3,15 +3,15 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms"
 
 import { NavController, AlertController} from 'ionic-angular';
 
+import { CryptoJSService } from '../../components/services/security/cryptojs';
 import { AuthService } from '../../providers/common-service/auth-service';
 
-import { LoginPage } from '../../pages/login/login';
 
 @Component({
     selector: 'tlogin',
     templateUrl: 'tlogin.html'
 })
-export class TloginBtn {
+export class Tlogin {
     loginForm: FormGroup;
     registerCredentials = { email: '', password: '' };
 
@@ -19,6 +19,7 @@ export class TloginBtn {
     constructor(public navCtrl: NavController,
         public _form: FormBuilder,
         private auth: AuthService,
+        private cryptoSrvc: CryptoJSService,
         private alertCtrl: AlertController) {
         //using the FormBuilder to build a form
         this.loginForm = _form.group({
@@ -27,21 +28,16 @@ export class TloginBtn {
         })
     }
 
-    //the form submit function that will console.log the results
-    submit(value: any) {
-        // console.log(this.registrationForm.value)
-        console.log('Reactive Form Data: ');
-        console.log(value);
-    }
-
-    loginBtn() {
-        this.navCtrl.push(LoginPage);
-    }
-
     public login(value: any) {
+        if ((value === undefined) || (value === null)) return;
+
         this.registerCredentials.email = value.user;
         this.registerCredentials.password = value.pword;
         // this.showLoading();
+        let encryptedData = this.cryptoSrvc.encrypt(value.pword);
+        console.log("Tlogin::login() encryptedData(value.pword): " + encryptedData);
+        let decryptedData = this.cryptoSrvc.decrypt(encryptedData);
+        console.log("Tlogin::login() decryptedData: " + decryptedData);
         this.auth.login(this.registerCredentials).subscribe(allowed => {
             if (allowed) {
                 //this.navCtrl.setRoot(HomePage);
@@ -51,10 +47,10 @@ export class TloginBtn {
                 this.displayAlert("Access Denied");
             }
         },
-            error => {
+        error => {
                 // this.showError(error);
                 this.displayAlert(error);
-            });
+        });
 
 
         /*  this.showLoading().then(() => { // Show the loading before making the request
@@ -115,5 +111,5 @@ export class TloginBtn {
         });
         headsUp.present();
     }
-    
+
 }

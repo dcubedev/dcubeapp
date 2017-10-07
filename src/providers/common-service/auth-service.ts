@@ -17,8 +17,9 @@ export class AuthService {
     currentUser: User;
 
     public login(credentials) {
-        if (credentials.email === null || credentials.password === null) {
-            return Observable.throw("Please insert credentials");
+        if ((credentials.email === undefined || credentials.password === undefined) ||
+            (credentials.email === null || credentials.password === null)) {
+            return Observable.throw("Please enter credentials");
         } else {
             return Observable.create(observer => {
                 // At this point make a request to your backend to make a real check!

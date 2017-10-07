@@ -10,7 +10,6 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Geolocation } from '@ionic-native/geolocation';
 
-//import { TranslateModule, TranslateStaticLoader, TranslateLoader } from "ng2-translate/ng2-translate";
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
@@ -49,8 +48,16 @@ import { StellarTrustlineService } from '../providers/stellar/stellar-trustline-
 import { TradingService } from '../providers/platform/stellar/trading-service';
 import { StellarTradingService } from '../providers/stellar/stellar-trading-service';
 
-import { CompModule } from '../components/comp.module';
-import { LoginModule } from '../components/login.module';
+import { CommonModule } from '../components/common/common.module';
+import { Appheader } from '../components/common/appheader/appheader';
+
+import { ActionsModule } from '../actions/actions.module';
+import { ThomePage } from '../actions/thome/thome';
+import { Tlogin } from '../actions/tlogin/tlogin';
+import { TforgotPage } from '../actions/tforgot/tforgot';
+import { TregisterPage } from '../actions/tregister/tregister';
+import { LoginPage } from '../actions/login/login';
+import { RegisterPage } from '../actions/register/register';
 
 // Pages that communicate with Stellar/digital currency platforms
 import { AboutPage } from '../pages/about/about';
@@ -58,7 +65,6 @@ import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
 import { CurrencyPage } from '../pages/currency/currency';
 import { LanguagePage } from '../pages/language/language';
-import { LoginPage } from '../pages/login/login';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
 import { PlatformPage } from '../pages/platform/platform'; 
 import { ReceivePage } from '../pages/receive/receive';
@@ -90,7 +96,6 @@ import { QuickSmsPage } from '../pages/dev/sms-person/sms-person';
 
 import { DevHelpPage } from '../pages/dev/devhelp/devhelp';
 
-
 /*
   Author: Stephen Agyepong
 */
@@ -116,7 +121,6 @@ export function createTranslateLoader(http: Http) {
       FeedbackSystemPage,
       GroupTypesPage,
       LanguagePage,
-	  LoginPage,
       ManageGroupsPage,
       PaymethodPage,
       PlatformPage,
@@ -148,12 +152,19 @@ export function createTranslateLoader(http: Http) {
       CalendarModule,
       TabMenuModule,
       MenuModule,
-      LoginModule,
-      CompModule
+      ActionsModule,
+      CommonModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
       MyApp,
+      Appheader,
+      ThomePage,
+      Tlogin,
+      TforgotPage,
+      TregisterPage,
+      LoginPage,
+      RegisterPage,
       AboutPage,
       AccountAcctkeyFormPage,
       AccountClientFormPage,
@@ -170,7 +181,6 @@ export function createTranslateLoader(http: Http) {
       HomePage,
       WalletPage,
       LanguagePage,
-	  LoginPage,
       ManageGroupsPage,
       PaymethodPage,
       PlatformPage,

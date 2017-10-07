@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
-import { RegisterPage } from './register';
+import { RegisterPage } from '../register/register';
 
 /*
  * Author: Stephen Agyepong
@@ -15,6 +15,7 @@ export class TregisterPage {
    
     constructor(private navCtrl: NavController,
         public menuCtrl: MenuController) {
+        this.registerPage = RegisterPage;
     }
 
     ngOnInit() {

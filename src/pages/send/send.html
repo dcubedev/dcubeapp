@@ -8,11 +8,7 @@
     <app-header ptitle="tabs.send"></app-header>
 </ion-header>
 <ion-content padding>
-    <ion-list>
-        <ion-item *ngFor="let asset of accountBalances">
-            Account Balance for <font size="+2">({{asset.asset_code}})</font>: <font size="+2">{{asset.balance.toFixed(2)}}</font>
-        </ion-item>
-    </ion-list>
+    <tacctbals></tacctbals>
     <ion-item ng-if="showDestTag && destInfo.memo">
         <ion-label>Destination Address: </ion-label>
         <ion-input type="text" [(ngModel)]="paymentData.destAddress" placeholder='{{"destaddr" | translate}}'></ion-input>
@@ -68,7 +64,7 @@
         <ion-list>
             <ion-item>
                 <ion-label>{{"common.pymtplatform" | translate}}</ion-label>
-                <ion-select [(ngModel)]="selectedPname">
+                <ion-select [(ngModel)]="selectedPname" (ionChange)="onSelectPymtPlatform($event)">
                     <ion-option *ngFor="let pname of pnames">{{pname}}</ion-option>
                 </ion-select>
             </ion-item>

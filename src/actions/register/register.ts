@@ -13,10 +13,7 @@ import { SwitchPageService } from '../../providers/common-service/switch-page-se
 import { MenuItem } from 'primeng/primeng';
 
 /*
-  Generated class for the Register page.
-
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
+ * Author: Stephen Agyepong
 */
 @Component({
     selector: 'page-register',

@@ -24,7 +24,7 @@ import { TabsPage } from '../tabs/tabs';
     templateUrl: 'wallet.html'
 })
 export class WalletPage implements OnInit{
-  
+    
     constructor(private navCtrl: NavController,
         private menuCtrl: MenuController,
         private acctSvrc: AccountService,

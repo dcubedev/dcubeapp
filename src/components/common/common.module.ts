@@ -8,30 +8,30 @@ import { Storage, IonicStorageModule } from '@ionic/storage';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { CommonService } from '../providers/common-service/common-service';
-import { AppConfig } from '../providers/app-config/app-config';
-import { AuthService } from '../providers/common-service/auth-service';
-
 import {TabMenuModule, MenuModule} from 'primeng/primeng';
-import 'primeng/primeng';
 
-import { CompModule } from '../components/comp.module';
+import { CommonService } from '../../providers/common-service/common-service';
+import { AppConfig } from '../../providers/app-config/app-config';
+import { AuthService } from '../../providers/common-service/auth-service';
 
-import { ThomePage } from './home/thome';
-import { TloginBtn } from './login/tlogin';
-import { TforgotPage } from './forgot/tforgot';
-import { RegisterPage } from './register/register';
-import { TregisterPage } from './register/tregister';
-import { ForgotPage } from './forgot/forgot';
+import { Appheader } from './appheader/appheader';
+import { TacctBalances } from './acctbalances/tacctbalances';
 
 export function createTranslateLoader(http: Http) {
     return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
 }
 
 @NgModule({
+    declarations: [
+        Appheader,
+        TacctBalances
+    ],
     imports: [
         IonicModule,
-        IonicStorageModule.forRoot(),
+        IonicStorageModule.forRoot({
+            name: 'dcubeDB',
+            driverOrder: ['sqlite', 'indexeddb', 'websql']
+        }),
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
@@ -42,29 +42,17 @@ export function createTranslateLoader(http: Http) {
 
         HttpModule,
         MenuModule,
-        TabMenuModule,
-        CompModule
+        TabMenuModule
     ],
     providers: [
         { provide: ErrorHandler, useClass: IonicErrorHandler },
         CommonService,
-        AppConfig, AuthService
-    ],
-    declarations: [
-        ThomePage,
-        TloginBtn,
-        TforgotPage,
-        ForgotPage,
-        TregisterPage,
-        RegisterPage
+        AppConfig,
+        AuthService
     ],
     exports: [
-        ThomePage,
-        TloginBtn,
-        TforgotPage,
-        ForgotPage,
-        TregisterPage,
-        RegisterPage
+        Appheader,
+        TacctBalances
     ]
 })
-export class LoginModule { }
+export class CommonModule { }

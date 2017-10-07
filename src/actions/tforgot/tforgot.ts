@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
-import { ForgotPage } from './forgot';
+import { ForgotPage } from '../forgot/forgot';
 
 /*
  * Author: Stephen Agyepong

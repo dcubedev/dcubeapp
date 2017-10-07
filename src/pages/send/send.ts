@@ -23,14 +23,14 @@ import { AccountService } from '../../providers/platform/stellar/account-service
 })
 export class SendPage {
     pnames: string[];
-    pmthds: string[];
-    currencies: string[];
     selectedPname: string;
+    pmthds: string[];
     selectedPmthds: string;
-    showDestTag: boolean = true;
 
+    currencies: string[];
     accountBalances: CommonConstants.IAccountBalance[] = null;
     destInfo: CommonConstants.IDestinationInfo;
+    showDestTag: boolean = true;
     paymentData: CommonConstants.IPaymentData;
     transactionContext: CommonConstants.ITransactionContext;
 
@@ -88,6 +88,15 @@ export class SendPage {
     }
 
     anotheracct() {
+    }
+
+    onSelectPymtPlatform(selectedValue: any) {
+        //commonSvrc
+        // self.pymtmthdContext.push(pc_WITHIN_PLATFORM_DIRECT);
+        // self.platformContext.push(pc_ALIPAY);
+        console.log('SendPage::onSelectPymtPlatform() Selected', selectedValue);
+        this.pmthds = this.commonSvrc.getPymtMthdContextPmthdsForPlatform(selectedValue);
+        this.selectedPmthds = "";
     }
 
     sendPayment() {

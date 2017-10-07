@@ -39,4 +39,5 @@
     <engine name="windows" spec="~4.4.3" />
     <plugin name="cordova-plugin-x-socialsharing" spec="~5.1.8" />
     <engine name="android" spec="~6.0.0" />
+    <plugin name="cordova-sqlite-storage" spec="~2.0.4" />
 </widget>

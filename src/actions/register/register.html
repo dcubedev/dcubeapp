@@ -10,10 +10,10 @@
 
 
 <ion-content padding style="background-color:#808080">
-
+register form
     <!--subcriber registration form
     <ion-title class="center" color="secondary">Sign Up</ion-title>
-    -->
+    
     <ion-card>
         <form (ngSubmit)="register(userForm.value)" [formGroup]="userForm">
             <ion-list>
@@ -21,7 +21,7 @@
                 <ion-item>
                     <ion-label floating>Select Your Country</ion-label>
                     <ion-select formControlName="selectedCountry" name="selectedCountry" (change)='onValueChanged($event.target.value)'>
-                        <!-- <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>-->
+                        --<!-- <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>  -  -   >
                     </ion-select>
                 </ion-item>
                 <div *ngIf="formErrors.selectedCountry">
@@ -35,7 +35,7 @@
                 <ion-item>
                     <ion-label floating>Select Your Policy</ion-label>
                     <ion-select formControlName="selectedPolicy" name="selectedPolicy" (change)='onValueChanged($event.target.value)'>
-                        <!-- <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>-->
+                        < ! - - <ion-option *ngFor="let post of posts" [value]="post.code">{{post.name}}</ion-option>  -  -   >
                     </ion-select>
                 </ion-item>
                 <div *ngIf="formErrors.selectedPolicy">
@@ -125,4 +125,5 @@ Tel: +233 (0)3220 72797
         </ion-card-content>
 
     </ion-card>
+    -->
 </ion-content>

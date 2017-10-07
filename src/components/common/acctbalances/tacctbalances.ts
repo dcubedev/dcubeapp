@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { NavController, MenuController } from 'ionic-angular';
 
-import * as AppConstants from '../../providers/app-constants/app-constants';
-import * as CommonConstants from '../../providers/common-service/common-service';
-import { CommonService } from '../../providers/common-service/common-service';
+import * as AppConstants from '../../../providers/app-constants/app-constants';
+import * as CommonConstants from '../../../providers/common-service/common-service';
+import { CommonService } from '../../../providers/common-service/common-service';
 
-import { KeySettingsService } from '../../providers/platform/stellar/key-settings-service';
-import { AccountService } from '../../providers/platform/stellar/account-service';
+import { KeySettingsService } from '../../../providers/platform/stellar/key-settings-service';
+import { AccountService } from '../../../providers/platform/stellar/account-service';
 
 /*
  * Author: Stephen Agyepong
