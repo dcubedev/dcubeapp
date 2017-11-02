@@ -3,7 +3,7 @@ import { HttpModule } from '@angular/http';
 import { Http } from '@angular/http';
 
 import { IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { Storage, IonicStorageModule } from '@ionic/storage';
+import { IonicStorageModule } from '@ionic/storage';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';

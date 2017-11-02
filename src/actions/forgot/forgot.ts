@@ -1,11 +1,10 @@
-﻿import { Component, OnInit  } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
 import { RegisterService } from '../../providers/common-service/register-service';
 import * as Models from '../../providers/models/models';
-import { Observable } from 'rxjs';
-import { HttpModule, Http, Response, Headers } from '@angular/http';
+import { Http } from '@angular/http';
 
 import { SwitchPageService } from '../../providers/common-service/switch-page-service';
 

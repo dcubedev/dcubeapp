@@ -9,5 +9,17 @@
 </ion-header>
 
 <ion-content padding>
-    Contacts
+    <ion-searchbar (ionInput)="findContact($event)" placeholder="Enter display name"></ion-searchbar>
+
+    <ion-list [hidden]="!search">
+        <button ion-item *ngFor="let item of contactsfound" (click)="contactSelected(item)">{{item.displayName}}</button>
+    </ion-list>
+
 </ion-content>
+
+<ion-footer no-border>
+    <button ion-button (click)="newContact()">Add Contact</button>
+    <ion-buttons ion-button end>
+        <button ion-button (click)="cancel()">Cancel</button>
+    </ion-buttons>
+</ion-footer>

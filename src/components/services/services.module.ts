@@ -1,8 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpModule } from '@angular/http';
-import { Http } from '@angular/http';
 
-import { IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicErrorHandler } from 'ionic-angular';
 
 import { CommonService } from '../../providers/common-service/common-service';
 import { AppConfig } from '../../providers/app-config/app-config';

@@ -31,6 +31,7 @@
     "@angular/platform-browser-dynamic": "4.1.3",
     "@angular/router": "4.1.3",
     "@ionic-native/barcode-scanner": "3.13.1",
+    "@ionic-native/contacts": "^4.3.2",
     "@ionic-native/core": "3.12.1",
     "@ionic-native/geolocation": "4.2.1",
     "@ionic-native/social-sharing": "3.14.0",
@@ -54,7 +55,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "1.3.7",
-    "ionic": "3.12.0",
+    "ionic": "3.16.0",
     "typescript": "2.3.4"
   },
   "cordovaPlugins": [

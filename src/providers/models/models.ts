@@ -1,5 +1,3 @@
-import { Injectable } from '@angular/core';
-
 export class Country {
     constructor(public code: string,
         public name: string,
@@ -12,16 +10,6 @@ export class DropDownListModel {
         public label: string) {
     }
 }
-
-/*export class User {
-    name: string;
-    email: string;
-
-    constructor(name: string, email: string) {
-        this.name = name;
-        this.email = email;
-    }
-}*/
 
 export class PartialReg {
     countryCode: string;

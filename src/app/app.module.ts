@@ -9,6 +9,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Contacts } from '@ionic-native/contacts';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -63,6 +64,7 @@ import { RegisterPage } from '../actions/register/register';
 import { AboutPage } from '../pages/about/about';
 import { AppmodePage } from '../pages/appmode/appmode';
 import { ContactsPage } from '../pages/contacts/contacts';
+import { AddContactPage } from '../pages/contacts/add-contact/add-contact';
 import { CurrencyPage } from '../pages/currency/currency';
 import { LanguagePage } from '../pages/language/language';
 import { PaymethodPage } from '../pages/paymethod/paymethod';
@@ -113,6 +115,7 @@ export function createTranslateLoader(http: Http) {
       AppmodePage,
       ClientVerificationForm,
       ContactsPage,
+      AddContactPage,
       CreateGroupPage,
       CurrencyPage,
       DemoPage,
@@ -171,6 +174,7 @@ export function createTranslateLoader(http: Http) {
       AppmodePage,
       ClientVerificationForm,
       ContactsPage,
+      AddContactPage,
       CreateGroupPage,
       CurrencyPage,
       DemoPage,
@@ -199,6 +203,7 @@ export function createTranslateLoader(http: Http) {
       BarcodeScanner,
       SocialSharing,
       Geolocation,
+      Contacts,
       AppConfig,
       CommonService,
       CommonUtilsService,

@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { Storage, IonicStorageModule } from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 
 import { CryptoJSService } from '../security/cryptojs';
 

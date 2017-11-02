@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
+import { Contacts, Contact } from '@ionic-native/contacts';
+import { ContactFieldType, ContactFindOptions } from '@ionic-native/contacts';
+import { ModalController } from 'ionic-angular';
+//import { NavParams } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
+
+import { AddContactPage } from './add-contact/add-contact';
 
 /*
   Author: Stephen Agyepong
@@ -10,16 +17,13 @@ import { MenuController } from 'ionic-angular';
     templateUrl: 'contacts.html',
 })
 export class ContactsPage {
-    Contacts = [
-        {
-            name: 'DcubeFoundation',
-            address: null,
-            memo: null,
-            memoType: null
-        }
-    ];
+    contactsfound = [];
+    search = false;
 
-    constructor(private navCtrl: NavController, public menuCtrl: MenuController) {
+    constructor(private navCtrl: NavController, public menuCtrl: MenuController,
+        public modalCtrl: ModalController,
+        private alertController: AlertController,
+        private contacts: Contacts) {
     }
 
     toggleLeftMenu() {
@@ -29,4 +33,51 @@ export class ContactsPage {
     toggleRightMenu() {
         this.menuCtrl.toggle('right');
     }
+
+    newContact() {
+        this.navCtrl.push(AddContactPage);
+    }
+
+    itemSelected(item) {
+        //const contactModal = this.modalCtrl.create(Profile, item);
+        //contactModal.present();
+
+        this.contacts.pickContact().then((value) => {
+            console.log('itemSelected() selected value: ', value);
+        }, (error) => {
+            console.log('itemSelected() error: ' + error);
+        });
+    }
+
+    contactSelected(item: any) {
+        const contactModal = this.modalCtrl.create(AddContactPage, item);
+        contactModal.present();
+    }
+
+    cancel() {
+        this.navCtrl.pop();
+    }
+
+    findContact(event: any) {
+        let fields: ContactFieldType[] = ['addresses', 'birthday', 'categories', 'country',
+            'department', 'displayName', 'emails', 'familyName', 'formatted',
+            'givenName', 'honorificPrefix', 'honorificSuffix', 'id', 'ims', 'locality',
+            'middleName', 'name', 'nickname', 'note', 'organizations', 'phoneNumbers',
+            'photos', 'postalCode', 'region', 'streetAddress', 'title', 'urls'];
+
+        const options = new ContactFindOptions();
+        options.filter = event.target.value;
+        options.multiple = true;
+        options.desiredFields = fields;
+
+        this.contacts.find(fields, options).then((contacts) => {
+            this.contactsfound = contacts;
+        });
+
+        if (this.contactsfound.length == 0) {
+            this.contactsfound.push({ displayName: 'No Contacts found' });
+        }
+        this.search = true;
+    }
+
 }

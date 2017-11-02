@@ -1,0 +1,89 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>Add Contact</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ion-item>
+            <ion-label floating>Anchor Name</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.anchorName"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>First Name</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.fname" (ionChange)="nameChanged()"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Middle Name</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.mname" (ionChange)="nameChanged()"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Last Name</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.lname" (ionChange)="nameChanged()"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label floating>Full Name</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.fullName" *ngIf="contactObject.useFullname"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating>Payment Address</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.pymtAddr"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Is Anchor</ion-label>
+            <ion-checkbox item-end [(ngModel)]="contactObject.isAnchor" (ionChange)="isAnchorChanged()" checked="false"></ion-checkbox>
+        </ion-item>
+        <ion-item>
+            <ion-label>Anchor URL</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.anchorUrl" *ngIf="contactObject.isAnchor"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Payment URL</ion-label>
+            <ion-input type="text" [(ngModel)]="contactObject.pymtUrl" *ngIf="contactObject.isAnchor"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating>Contact Phone</ion-label>
+            <ion-input type="tel" [(ngModel)]="contactObject.phoneNumber"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>PhoneType</ion-label>
+            <ion-select [(ngModel)]="contactObject.phoneType">
+                <ion-option value="home">Home</ion-option>
+                <ion-option value="work">Work</ion-option>
+                <ion-option value="other">Other</ion-option>
+            </ion-select>
+        </ion-item>
+        <ion-item>
+            <ion-label>Preferred Phone</ion-label>
+            <ion-checkbox item-end [(ngModel)]="contactObject.phonePref" checked="false"></ion-checkbox>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating>Email</ion-label>
+            <ion-input type="email" [(ngModel)]="contactObject.email" pattern="[A-Za-z0-9._%+-]{3,}@[a-zA-Z]{3,}([.]{1}[a-zA-Z]{2,}|[.]{1}[a-zA-Z]{2,}[.]{1}[a-zA-Z]{2,})"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label>Select relation</ion-label>
+            <ion-select [(ngModel)]="contactObject.relation">
+                <ion-option value="family">Family</ion-option>
+                <ion-option value="friend">Friend</ion-option>
+                <ion-option value="other">Other</ion-option>
+            </ion-select>
+        </ion-item>
+
+    </ion-list>
+
+</ion-content>
+<ion-footer no-border> 
+    <ion-navbar>
+        <button ion-button (click)="saveContact(contactObject)">Save</button>
+        <ion-buttons ion-button end>
+            <button ion-button (click)="setupAnchors()">Setup Anchors</button>
+            <button ion-button (click)="cancel()">Cancel</button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-footer>

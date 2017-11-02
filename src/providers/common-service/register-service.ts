@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpModule, Http, Response, Headers } from '@angular/http';
+import { Http, Response, Headers } from '@angular/http';
 import 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/throw'
 import { Observable } from 'rxjs';
-import { Platform } from 'ionic-angular';
-import { TranslateService } from '@ngx-translate/core';
 
 // dcubedev imports
 import * as AppConstants from '../app-constants/app-constants';
@@ -41,15 +39,6 @@ export class RegisterService {
         let apiURL = `https://httpbin.org/ip`;
         return this.http.get(apiURL).map(res => res.json());
     }
-
-    /* getIPAddress() {
-         return new Promise(resolve => {
-             this.http.get('https://httpbin.org/ip')
-                 .subscribe(data => {
-                     resolve(data.json());
-                 });
-         });
-     }*/
 
     getMovies(): Observable<Models.Country[]> {
         let apiURL = `${this.url_dcube}rest/mysql/getCountriesJpaMysql`;
