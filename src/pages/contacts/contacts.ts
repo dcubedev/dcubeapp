@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { MenuController } from 'ionic-angular';
-import { Contacts, Contact } from '@ionic-native/contacts';
+import { Contacts } from '@ionic-native/contacts';
 import { ContactFieldType, ContactFindOptions } from '@ionic-native/contacts';
 import { ModalController } from 'ionic-angular';
 //import { NavParams } from 'ionic-angular';
@@ -59,11 +59,19 @@ export class ContactsPage {
     }
 
     findContact(event: any) {
+      /*
         let fields: ContactFieldType[] = ['addresses', 'birthday', 'categories', 'country',
             'department', 'displayName', 'emails', 'familyName', 'formatted',
             'givenName', 'honorificPrefix', 'honorificSuffix', 'id', 'ims', 'locality',
             'middleName', 'name', 'nickname', 'note', 'organizations', 'phoneNumbers',
             'photos', 'postalCode', 'region', 'streetAddress', 'title', 'urls'];
+       */
+      let fields: ContactFieldType[] = ['addresses', 'birthday',
+        'categories', 'country', 'department', 'displayName', 'emails',
+        'name.familyName', 'name.formatted', 'name.givenName', 'name.honorificPrefix', 'name.honorificSuffix',
+        'id', 'ims',
+        'locality', 'name.middleName', 'name', 'nickname', 'note', 'organizations', 'phoneNumbers',
+        'photos', 'postalCode', 'region', 'streetAddress', 'title', 'urls'];
 
         const options = new ContactFindOptions();
         options.filter = event.target.value;

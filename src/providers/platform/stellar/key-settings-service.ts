@@ -11,27 +11,29 @@ import { StellarKeySettingsService } from '../../stellar/stellar-key-settings-se
 */
 @Injectable()
 export class KeySettingsService {
-  
-    constructor(private http: Http, private stellarKeySvrc: StellarKeySettingsService) {}
 
-    onKeyEvent(callbackObj, acctevtFunc) {
-        //console.log("KeySettingsService.onKeyEvent() acctevtFunc: " + acctevtFunc);
-        this.stellarKeySvrc.keyEvents$.subscribe(acctevt => {
-            acctevtFunc(callbackObj, acctevt);
-        });
-    }
+  constructor(private http: Http, private stellarKeySvrc: StellarKeySettingsService) { }
 
-    loadKeysStore(source?: string): CommonConstants.IWalletKey {
-        return this.stellarKeySvrc.loadKeysStore(source);
-    }
+  onKeyEvent(callbackObj, acctevtFunc) {
+    this.stellarKeySvrc.keyEvents$.subscribe(acctevt => {
+      //console.log("KeySettingsService.onKeyEvent() callbackObj: " + callbackObj);
+      //console.log("KeySettingsService.onKeyEvent() acctevtFunc: " + acctevtFunc);
+      //console.log("KeySettingsService.onKeyEvent() acctevt: " + JSON.stringify(acctevt));
+      acctevtFunc(callbackObj, acctevt);
+    });
+  }
 
-    genKeypair() {
-        return this.stellarKeySvrc.genStellarKeypair();
-    }
+  loadKeysStore(source?: string) {
+    this.stellarKeySvrc.loadKeysStore(source);
+  }
 
-    saveKeysStore(keysStored) {
-        this.stellarKeySvrc.saveKeysStore(keysStored);
-    }
+  genKeypair() {
+    return this.stellarKeySvrc.genStellarKeypair();
+  }
+
+  saveKeysStore(keysStored) {
+    this.stellarKeySvrc.saveKeysStore(this, keysStored);
+  }
 
 }
 

@@ -3,6 +3,8 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule, Http } from '@angular/http';
+//import { HttpClientModule, HttpClient } from '@angular/common/http';
+
 import { IonicStorageModule } from '@ionic/storage';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -197,7 +199,8 @@ export function createTranslateLoader(http: Http) {
       QuickSmsPage
   ],
   providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler },
-      RouterModule,
+    RouterModule,
+    HttpModule,
       StatusBar,
       SplashScreen,
       BarcodeScanner,

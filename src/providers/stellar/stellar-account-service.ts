@@ -24,737 +24,772 @@ declare var StellarSdk: any;
 */
 @Injectable()
 export class StellarAccountService {
-    public acctEvent$: EventEmitter<any>;
+  public acctEvent$: EventEmitter<any>;
 
-    account: CommonConstants.IAccount;
-    destinationInfo: CommonConstants.IDestinationInfo;
+  account: CommonConstants.IAccount;
+  destinationInfo: CommonConstants.IDestinationInfo;
 
-    keysChanged = false;
-    connectionChanged = false;
-    paymentsEventSource;
-    pagingToken = 0;
+  keysChanged = false;
+  connectionChanged = false;
+  paymentsEventSource;
+  pagingToken = 0;
 
-    constructor(private http: Http, private comSrvc: CommonService,
-        private remoteSvrc: RemoteService,
-        private keysettings: StellarKeySettingsService,
-        private srsSrvc: StellarRemoteService,
-        private scsSrvc: StellarCommonService) {
-        this.acctEvent$ = new EventEmitter();
+  constructor(private http: Http, private comSrvc: CommonService,
+    private remoteSvrc: RemoteService,
+    private keysettings: StellarKeySettingsService,
+    private srsSrvc: StellarRemoteService,
+    private scsSrvc: StellarCommonService) {
+    this.acctEvent$ = new EventEmitter();
 
-        this.resetAccount("");
+    this.resetAccount("");
+  }
+
+  getAccountAddress() {
+    return this.account.address;
+  }
+
+  resetAccount(acctaddr) {
+    this.account = {
+      address: acctaddr,
+      balance: 0,
+      reserve: 0,
+      sequence: 0,
+      transactions: [],
+      otherCurrencies: [],
+      pymtamt: 0
+    }
+    this.destinationInfo = {
+      accountId: acctaddr,
+      memo: '',
+      memoType: '',
+      isValidAddress: false,
+      needFunding: true,
+      acceptedCurrencies: [],
+      acceptedIOUs: []
+    };
+  }
+
+  healthCheck() {
+    if (!this.srsSrvc.isConnected()) {
+      this.srsSrvc.initServer();
+      this.connectionChanged = true;
     }
 
-    getAccountAddress() {
-        return this.account.address;
+    if (this.srsSrvc.isConnected()) {
+      // Now get account balances
+      console.log('StellarAccountService::healthCheck() SourceOfKeys: ' + this.comSrvc.SourceOfKeys);
+      this.attachToKeys(this.comSrvc.SourceOfKeys);
+      this.keysChanged = false;
+      this.connectionChanged = false;
+    }
+  }
+
+  setInflationDestination() {
+    if (this.account.balance < this.account.reserve + StellarConstants.inflationDestBalanceBuffer)
+      return;
+
+    let operation = StellarSdk.Operation.setOptions({
+      inflationDest: StellarKeySettingsConstants.INFLATION_DESTINATION,
+      homeDomain: StellarConstants.HOME_DOMAIN
+    });
+    let transaction = this.buildTransaction(operation, null, true);
+    this.srsSrvc.getServer().submitTransaction(transaction)
+      .then((transactionResult) => {
+        console.log(transactionResult);
+        var sdkAcc = new StellarSdk.Account(this.account.address, this.account.sequence);
+        sdkAcc.incrementSequenceNumber();
+        this.account.sequence = sdkAcc.sequenceNumber();
+      })
+      .catch(console.log('setInflationDestination error'));
+  }
+
+  getAccountBalances(source?: string) {
+    console.log('StellarAccountService::getAccountBalances() source: ' + source);
+    this.getAccountBalanceForKey(source);
+  }
+
+  getAccountBalancesCallback() {
+    let balances: CommonConstants.IAccountBalance[] = [];
+    let balance: CommonConstants.IAccountBalance = {
+      asset_code: CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM],
+      balance: this.account.balance
+    };
+    balances.push(balance);
+
+    for (let index = 0; index < this.account.otherCurrencies.length; ++index) {
+      let entry = this.account.otherCurrencies[index];
+      balance = {
+        asset_code: entry.currency,
+        balance: entry.amount
+      };
+      balances.push(balance);
     }
 
-    resetAccount(acctaddr) {
-        this.account = {
-            address: acctaddr,
-            balance: 0,
-            reserve: 0,
-            sequence: 0,
-            transactions: [],
-            otherCurrencies: [],
-            pymtamt: 0
-        }
-        this.destinationInfo = {
-            accountId: acctaddr,
-            memo: '',
-            memoType: '',
-            isValidAddress: false,
-            needFunding: true,
-            acceptedCurrencies: [],
-            acceptedIOUs: []
-        };
-    }
+    return balances;
+  }
 
-    healthCheck() {
-        if (!this.srsSrvc.isConnected()) {
-            this.srsSrvc.initServer();
-            this.connectionChanged = true;
-        }
+  getAccountBalancesUseStellarBalances(addr_p) {
+    let self = this;
+    let promise = new Promise(function (resolve, reject) {
+      self.srsSrvc.getServer().accounts()
+        .accountId(self.account.address)
+        .call()
+        .then((acc) => {
+          let balances: CommonConstants.IAccountBalance[] = [];
+          for (let i = 0; i < acc.balances.length; i++) {
+            let bal = acc.balances[i];
+            let assetCode = null;
+            let curr = bal.asset_code;
 
-        if (this.srsSrvc.isConnected()) {
-            // Now get account balances
-            console.log('StellarAccountService::healthCheck() SourceOfKeys: ' + this.comSrvc.SourceOfKeys);
-            this.attachToKeys(this.comSrvc.SourceOfKeys);
-            this.keysChanged = false;
-            this.connectionChanged = false;
-        }
-    }
+            if (self.scsSrvc.isAssetNative(curr)) {
+              assetCode = CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM];
+            } else {
+              assetCode = curr;
+            }
 
-    setInflationDestination() {
-        if (this.account.balance < this.account.reserve + StellarConstants.inflationDestBalanceBuffer)
-            return;
-
-        let operation = StellarSdk.Operation.setOptions({
-            inflationDest: StellarKeySettingsConstants.INFLATION_DESTINATION,
-            homeDomain: StellarConstants.HOME_DOMAIN
-        });
-        let transaction = this.buildTransaction(operation, null, true);
-        this.srsSrvc.getServer().submitTransaction(transaction)
-            .then((transactionResult) => {
-                console.log(transactionResult);
-                var sdkAcc = new StellarSdk.Account(this.account.address, this.account.sequence);
-                sdkAcc.incrementSequenceNumber();
-                this.account.sequence = sdkAcc.sequenceNumber();
-            })
-            .catch(console.log('setInflationDestination error'));
-    }
-
-    getAccountBalances(source?: string) {
-        //console.log('StellarAccountService::getAccountBalances() source: ' + source);
-        this.getAccountBalanceForKey(source);
-    }
-
-    getAccountBalancesCallback() {
-        let balances: CommonConstants.IAccountBalance[] = [];
-        let balance: CommonConstants.IAccountBalance = {
-            asset_code: CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM],
-            balance: this.account.balance
-        };
-        balances.push(balance);
-
-        for (let index = 0; index < this.account.otherCurrencies.length; ++index) {
-            let entry = this.account.otherCurrencies[index];
-            balance = {
-                asset_code: entry.currency,
-                balance: entry.amount
+            let amount: number = parseFloat(bal.balance);
+            let balance: CommonConstants.IAccountBalance = {
+              asset_code: assetCode,
+              balance: amount
             };
             balances.push(balance);
-        }
+          }
+          resolve(balances);
+        })
+        .catch(StellarSdk.NotFoundError, function (err) {
+          console.log("getAccountBalances account not found: " + self.account.address);
+          reject(err);
+        })
+        .catch(function (err) {
+          console.log("getAccountBalances error for: " + self.account.address);
+          console.log(err.stack || err);
+          reject(err);
+        })
+    });
+    return promise;
+  }
 
-        return balances;
-    }
-
-    getAccountBalancesUseStellarBalances(addr_p) {
-        let self = this;
-        let promise = new Promise(function (resolve, reject) {
-            self.srsSrvc.getServer().accounts()
-                .accountId(self.account.address)
-                .call()
-                .then((acc) => {
-                    let balances: CommonConstants.IAccountBalance[] = [];
-                    for (let i = 0; i < acc.balances.length; i++) {
-                        let bal = acc.balances[i];
-                        let assetCode = null;
-                        let curr = bal.asset_code;
-
-                        if (self.scsSrvc.isAssetNative(curr)) {
-                            assetCode = CommonConstants.AppCurrency[CommonConstants.AppCurrency.XLM];
-                        } else {
-                            assetCode = curr;
-                        }
-
-                        let amount: number = parseFloat(bal.balance);
-                        let balance: CommonConstants.IAccountBalance = {
-                            asset_code: assetCode,
-                            balance: amount
-                        };
-                        balances.push(balance);
-                    }
-                    resolve(balances);
-                })
-                .catch(StellarSdk.NotFoundError, function (err) {
-                    console.log("getAccountBalances account not found: " + self.account.address);
-                    reject(err);
-                })
-                .catch(function (err) {
-                    console.log("getAccountBalances error for: " + self.account.address);
-                    console.log(err.stack || err);
-                    reject(err);
-                })
-        });
-        return promise;
-    }
-
-    getKeyAddress(source?: string) {
-        //console.log("StellarAccountService::getKeyAddress() source: " + source);
-        let keyaddr = null;
-        if ((undefined === source || null === source) &&
-            undefined !== this.account && null !== this.account &&
-            undefined !== this.account.address && null !== this.account.address) {
-            if (this.account.address.length > 0) {
-                keyaddr = this.account.address;
-            } else {
-                keyaddr = this.keysettings.loadKeysStore(source).address;
-            }
+  getKeyAddress(source?: string) {
+    console.log("StellarAccountService::getKeyAddress() source: " + source);
+    console.log("StellarAccountService::getKeyAddress() this.account: " + JSON.stringify(this.account));
+    let keys1 = null;
+    let keys2 = null;
+    let keys = null;
+    let keyaddr = null;
+    if ((undefined === source || null === source) &&
+      undefined !== this.account && null !== this.account &&
+      undefined !== this.account.address && null !== this.account.address) {
+      if (this.account.address.length > 0) {
+        keyaddr = this.account.address;
+      } else {
+        keys = this.keysettings.selectedDbKeys;
+        keys1 = this.keysettings.loadKeysStore(source);
+        keys2 = this.keysettings.getDefaultKeys();
+        console.log("StellarAccountService::getKeyAddress() keys: " + JSON.stringify(keys));
+        console.log("StellarAccountService::getKeyAddress() keys1: " + JSON.stringify(keys1));
+        console.log("StellarAccountService::getKeyAddress() keys2: " + JSON.stringify(keys2));
+        
+        if ((undefined !== keys1) && (null !== keys1)) {
+          keyaddr = keys1['address'];
         } else {
-            keyaddr = this.keysettings.loadKeysStore(source).address;
-        }
-
-        return keyaddr;
-    }
-
-    getAccountBalanceForKey(source?: string) {
-        //console.log("StellarAccountService::getAccountBalanceForKey() source: " + source);
-        // get initial account balances
-        let keyaddr = this.getKeyAddress(source);
-        this.getAccountBalanceForKeyWithAddr(keyaddr);
-    }
-
-    getAccountBalanceForKeyWithAddr(keyaddr) {
-        // get initial account balances
-        let self = this;
-
-        this.resetAccount(keyaddr);
-
-        if (undefined !== this.account.address && this.account.address.length > 0) {
-            self.srsSrvc.getServer().accounts()
-                .accountId(self.account.address)
-                .call()
-                .then(function (acc) {
-                    let reserveChunks = 1 + acc.signers.length; // minimum reserve
-                    for (let i = 0; i < acc.balances.length; i++) {
-                        let bal = acc.balances[i];
-                        if (bal.asset_code)
-                            reserveChunks++;
-                    }
-                    self.account.sequence = acc.sequence;
-                    if (acc.offers && acc.offers.length) {
-                        for (let i = 0; i < acc.offers.length; i++) {
-                            let offer = acc.offers[i];
-                            if (offer)
-                                reserveChunks++;
-                        }
-                    }
-                    self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
-                })
-                .catch(StellarSdk.NotFoundError, function (err) {
-                    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() account not found");
-                })
-                .catch(function (err) {
-                    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() err: " + (err.stack || err));
-                })
-
-            self.srsSrvc.getServer().effects()
-                .forAccount(self.account.address)
-                .limit(StellarConstants.accountEffectLimit)
-                .order('desc')
-                .call()
-                .then(function (effectResults) {
-                    self.clearBalance();
-                    //console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() effectResponse: " + JSON.stringify(effectResults));
-                    let length = effectResults.records ? effectResults.records.length : 0;
-                    for (let index = length - 1; index >= 0; index--) {
-                        let currentEffect = effectResults.records[index];
-                        self.applyToBalance(currentEffect);
-                    }
-
-                    self.acctEvent$.emit({
-                        memo: AppConstants.ACCT_INFO_LOADED,
-                        status: self.getAccountBalancesCallback()
-                    });
-                })
-                .catch(function (err) {
-                    //self.getAccountBalanceForKeyWithAddr('now');
-                    console.log("getAccountBalanceForKeyWithAddr() err: " + err)
-                });
-        }
-    }
-
-    attachToKeys(source?: string) {
-        console.log("attachToKeys() source: " + source);
-        // get initial account balances
-        let self = this;
-        let keyaddr = this.getKeyAddress(source);
-        this.resetAccount(keyaddr);
-        self.srsSrvc.getServer().accounts()
-            .accountId(self.account.address)
-            .call()
-            .then(function (acc) {
-                //console.log("StellarAccountService::attachToKeys() acctResponse: " + JSON.stringify(acc));
-                let reserveChunks = 1 + acc.signers.length; // minimum reserve
-                for (let i = 0; i < acc.balances.length; i++) {
-                    let bal = acc.balances[i];
-                    let amount: number = parseFloat(bal.balance);
-                    if (bal.asset_code)
-                        reserveChunks++;
-                    self.addToBalance(bal.asset_code, amount);
-                }
-                self.account.sequence = acc.sequence;
-                if (acc.offers && acc.offers.length) {
-                    for (let i = 0; i < acc.offers.length; i++) {
-                        let offer = acc.offers[i];
-                        if (offer)
-                            reserveChunks++;
-                    }
-                }
-                self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
-            })
-            .catch(StellarSdk.NotFoundError, function (err) {
-                console.log("attachToKeys account not found");
-            })
-            .catch(function (err) {
-                console.log("StellarAccountService::attachToKeys() err: " + (err.stack || err));
-            })
-
-        self.srsSrvc.getServer().effects()
-            .forAccount(self.account.address)
-            .limit(StellarConstants.accountEffectLimit)
-            .order('desc')
-            .call()
-            .then(function (effectResults) {
-                //console.log("StellarAccountService::attachToKeys() effectResponse: " + JSON.stringify(effectResults));
-                let length = effectResults.records ? effectResults.records.length : 0;
-                for (let index = length - 1; index >= 0; index--) {
-                    let currentEffect = effectResults.records[index];
-                    self.effectHandler(currentEffect, false);
-                }
-
-                self.acctEvent$.emit({
-                    memo: AppConstants.MEMO_ACCT,
-                    status: AppConstants.ACCT_INFO_LOADED
-                });
-
-                let startListeningFrom;
-                if (length > 0) {
-                    let latestPayment = effectResults.records[0];
-                    startListeningFrom = latestPayment.paging_token;
-                }
-                self.attachToPaymentsStream(startListeningFrom);
-            })
-            .catch(function (err) {
-                self.attachToPaymentsStream('now');
-                console.log("attachToKeys err: " + err)
-            });
-    }
-
-    clearBalance() {
-        // clear account balances
-        this.account.balance = 0;
-        this.account.transactions.splice(0, this.account.transactions.length);
-        this.account.otherCurrencies.splice(0, this.account.otherCurrencies.length);
-    }
-
-    addToBalance(curr, amount: number) {
-        if (this.scsSrvc.isAssetNative(curr)) {
-            this.account.balance += amount;
-            return;
-        }
-        for (let index = 0; index < this.account.otherCurrencies.length; ++index) {
-            let entry = this.account.otherCurrencies[index];
-            if (entry.currency == curr) {
-                entry.amount += amount;
-                return;
+          if((undefined !== keys2) && (null !== keys2)) {
+            keyaddr = keys2['address'];
+          } else {
+            if ((undefined !== keys) && (null !== keys)) {
+              keyaddr = keys['address'];
             }
+          }
         }
-        // no entry for currency exists -> add new entry
-        this.account.otherCurrencies.push({ currency: curr, amount: amount });
+        
+        console.log("StellarAccountService::getKeyAddress() keys: " + JSON.stringify(keys));
+        //keyaddr = this.keysettings.loadKeysStore(source).address;
+      }
+    } else {
+      this.keysettings.loadKeysStore(source);
+      keys = this.keysettings.getDefaultKeys();
+      if (undefined !== keys) {
+        keyaddr = keys['address'];
+      }
+      console.log("StellarAccountService::getKeyAddress() keys: " + JSON.stringify(keys));
+      //keyaddr = this.keysettings.loadKeysStore(source).address;
     }
 
-    applyToBalance(effect) {
-        if (effect.type === AppConstants.ACCT_CREATED)
-            this.addToBalance(effect.asset_code, parseFloat(effect.starting_balance));
-        else if (effect.type === AppConstants.ACCT_DEBITED)
-            this.addToBalance(effect.asset_code, -parseFloat(effect.amount));
-        else if (effect.type === AppConstants.ACCT_CREDITED)
-            this.addToBalance(effect.asset_code, parseFloat(effect.amount));
-    }
+    console.log("StellarAccountService::getKeyAddress() source: " + source);
+    return keyaddr;
+  }
 
-    buildTransaction(operation: any, memo: any, bSign: any) {
-        let acc = new StellarSdk.Account(this.account.address, this.account.sequence);
-        let builder = new StellarSdk.TransactionBuilder(acc);
-        builder = builder.addOperation(operation);
-        if (memo)
-            builder = builder.addMemo(memo);
-        let transaction = builder.build();
-        if (bSign === true)
-            transaction.sign({
-                address: this.keysettings.keysStored.address,
-                secret: this.keysettings.keysStored.secret
-            });
-        return transaction;
-    }
+  getAccountBalanceForKey(source?: string) {
+    console.log("StellarAccountService::getAccountBalanceForKey() source: " + source);
+    // get initial account balances
+    let keyaddr = this.getKeyAddress(source);
+    console.log("StellarAccountService::getAccountBalanceForKey() keyaddr: " + keyaddr);
+    this.getAccountBalanceForKeyWithAddr(keyaddr);
+  }
 
-    insertTransaction(trx, op, effect, fromStream) {
-        let asset_code = effect.asset_code;
-        if (asset_code === null || !asset_code)
-            asset_code = StellarConstants.NATIVE_CURRENCY_XLM;
+  getAccountBalanceForKeyWithAddr(keyaddr) {
+    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() keyaddr: " + keyaddr);
+    // get initial account balances
+    let self = this;
 
-        let date = new Date(trx.created_at)
-        let displayEffect = {
-            effectId: effect.paging_token,
-            asset_code: asset_code,
-            asset_type: effect.asset_type,
-            amount: effect.amount,
-            debit: effect.type === AppConstants.ACCT_DEBITED,
-            sender: op.from,
-            receiver: op.to,
-            memo: trx.memo,
-            memoType: trx.memo_type,
-            creationDate: date,
-            creationTimestamp: date.getTime()
-        }
+    this.resetAccount(keyaddr);
 
-        if (op.type === AppConstants.CREATE_ACCT) {
-            displayEffect.amount = op.starting_balance;
-            displayEffect.sender = op.funder;
-            displayEffect.receiver = op.account;
-        }
-
-        if (fromStream && this.account.address === trx.source_account)
-            this.account.sequence = trx.source_account_sequence;
-
-        // insert at correct position
-        let i;
-        for (i = 0; i < this.account.transactions.length; i++) {
-            var compareEffect = this.account.transactions[i];
-            if (displayEffect.effectId === compareEffect.effectId)
-                throw 'transaction already seen: ' + displayEffect.effectId;
-            if (displayEffect.creationTimestamp > compareEffect.creationTimestamp) {
-                break;
+    console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() this.account.address: " + this.account.address);
+    if (undefined !== this.account.address && null !== this.account.address && this.account.address.length > 0) {
+      self.srsSrvc.getServer().accounts()
+        .accountId(self.account.address)
+        .call()
+        .then(function (acc) {
+          let reserveChunks = 1 + acc.signers.length; // minimum reserve
+          for (let i = 0; i < acc.balances.length; i++) {
+            let bal = acc.balances[i];
+            if (bal.asset_code)
+              reserveChunks++;
+          }
+          self.account.sequence = acc.sequence;
+          if (acc.offers && acc.offers.length) {
+            for (let i = 0; i < acc.offers.length; i++) {
+              let offer = acc.offers[i];
+              if (offer)
+                reserveChunks++;
             }
-        }
-        this.account.transactions.splice(i, 0, displayEffect);
-
-        return displayEffect;
-    }
-
-    insertEffect(effect, fromStream) {
-        let self = this;
-        let promise = new Promise(function (resolve, reject) {
-            try {
-                effect.operation()
-                    .then(function (op) {
-                        op.transaction()
-                            .then(function (trx) {
-                                try {
-                                    let displayEffect = self.insertTransaction(trx, op, effect, fromStream);
-                                    resolve(displayEffect);
-                                }
-                                catch (err) {
-                                    reject(err);
-                                }
-                            });
-                    })
-            }
-            catch (err) {
-                reject(err);
-            }
-        });
-        return promise;
-    }
-
-    effectHandler(effect, fromStream) {
-        //console.log("effectHandler() effect : " + JSON.stringify(effect));
-        let isRelevant = effect.type === AppConstants.ACCT_CREATED
-            || effect.type === AppConstants.ACCT_DEBITED
-            || effect.type === AppConstants.ACCT_CREDITED;
-
-        if (isRelevant) {
-            let self = this;
-            this.insertEffect(effect, fromStream)
-                .then((displayEffect) => {
-                    if (fromStream) {
-                        self.applyToBalance(effect);
-                        self.acctEvent$.emit({
-                            memo: 'account',
-                            status: AppConstants.ACCT_INFO_LOADED
-                        });
-                    }
-                    else {
-                        self.acctEvent$.emit({
-                            memo: 'account',
-                            status: AppConstants.NEW_TRANSACT
-                        });
-                    }
-                });
-        }
-    }
-
-    attachToPaymentsStream(opt_startFrom) {
-        let self = this;
-        let futurePayments = this.srsSrvc.getServer().effects()
-            .forAccount(self.account.address);
-        if (opt_startFrom) {
-            futurePayments = futurePayments.cursor(opt_startFrom);
-        }
-        if (this.paymentsEventSource) {
-            console.log('close open effects stream')
-            this.paymentsEventSource.close();
-        }
-        console.log('open effects stream with cursor: ' + opt_startFrom);
-        this.paymentsEventSource = futurePayments.stream({
-            onmessage: function (effect) { self.effectHandler(effect, true); }
-        });
-    }
-
-    onKeysAvailable() {
-        if (this.srsSrvc.isConnected())
-            this.attachToKeys();
-        else
-            this.keysChanged = true;
-    }
-
-    createAndFundAccountAny(srckey, destkey, src_acct, secret, pymtamt) {
-        let self = this;
-        // create an Account object using locally tracked sequence number
-        let seq = 0;
-        let an_account = new StellarSdk.Account(srckey, seq);
-        let transaction = new StellarSdk.TransactionBuilder(an_account)
-            .addOperation(StellarSdk.Operation.createAccount({
-                destination: destkey,
-                startingBalance: pymtamt,
-                source: src_acct
-            }))
-            .build();
-
-        // sign the transaction
-        transaction.sign(StellarSdk.Keypair.fromSecret(secret));
-
-        // transaction is now ready to be sent to the network or saved somewhere
-        // Ok, send it off to Stellar!
-        self.srsSrvc.getServer().submitTransaction(transaction)
-            .then(data => {
-                console.log("StellarAccountService::createAndFundAccountAny() data: " + data);
-            }, err => {
-                console.log("StellarAccountService::createAndFundAccountAny() err: " + err);
-            })
-    }
-
-    // Remote.getServer().friendbot(keys.address).call();
-    fundAccountWithFriendbot(addrp) {
-        let server = this.srsSrvc.getServer();
-        server.friendbot(addrp)
-            .call()
-            .then(data => {
-                console.log("StellarAccountService::fundAccountWithFriendbot() data: " + JSON.stringify(data));
-            }, err => {
-                console.log("StellarAccountService::fundAccountWithFriendbot() err: " + JSON.stringify(err));
-            })
-    }
-
-    fundAccountWithDcubeFriendbot(addrp) {
-        let url_p = StellarConstants.URL_FRIENDBOT + '?json=true&addr=' + addrp;
-
-        this.remoteSvrc.getHttp(url_p).then(data => {
-            console.log("StellarAccountService::fundAccountWithFriendbot() data: " + data);
-        }, err => {
-            console.log("StellarAccountService::fundAccountWithFriendbot() err: " + err);
+          }
+          self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
         })
-    }
+        .catch(StellarSdk.NotFoundError, function (err) {
+          console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() account not found");
+        })
+        .catch(function (err) {
+          console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() err: " + (err.stack || err));
+        })
 
-    makePaymentUsingBridgeWithHttp(contentType, _body) {
-        let self = this;
-        let promise = new Promise(function (resolve, reject) {
-            let _url = self.srsSrvc.getBridgeServerURL();
-            let headers = new Headers();
-            headers.append('Content-Type', contentType);
-            //headers.append('Content-Type', 'application/text');
-            //headers.append('Content-Type', 'application/json');
-            //headers.append('Content-Type', 'application/x-www-form-urlencoded');
-            //headers.append('Origin', 'http://localhost:8001');
-            var reqOptions: RequestOptionsArgs = {
-                url: null,
-                method: RequestMethod.Post,
-                search: null,
-                headers: headers,
-                body: null
-            };
+      self.srsSrvc.getServer().effects()
+        .forAccount(self.account.address)
+        .limit(StellarConstants.accountEffectLimit)
+        .order('desc')
+        .call()
+        .then(function (effectResults) {
+          self.clearBalance();
+          //console.log("StellarAccountService::getAccountBalanceForKeyWithAddr() effectResponse: " + JSON.stringify(effectResults));
+          let length = effectResults.records ? effectResults.records.length : 0;
+          for (let index = length - 1; index >= 0; index--) {
+            let currentEffect = effectResults.records[index];
+            self.applyToBalance(currentEffect);
+          }
 
-            console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _url: " + _url);
-            console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _body: " + _body);
-            self.remoteSvrc.postHttp(_url, _body, reqOptions).then(data => {
-                console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() data: " + JSON.stringify(data));
-                resolve(data);
-            }, err => {
-                console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() err: " + JSON.stringify(err));
-                reject(err);
-            })
+          self.acctEvent$.emit({
+            memo: AppConstants.ACCT_INFO_LOADED,
+            status: self.getAccountBalancesCallback()
+          });
+        })
+        .catch(function (err) {
+          //self.getAccountBalanceForKeyWithAddr('now');
+          console.log("getAccountBalanceForKeyWithAddr() err: " + err)
         });
-        return promise;
     }
+  }
 
-    makePaymentUsingBridgeWithCompliance(asset_issuer, asset_issuer_seed, receiver_ename, sender_ename, asset_code, amount, memo, memo_type_p, extra_memo) {
-        let self = this;
-        let contentType = 'application/x-www-form-urlencoded';
+  attachToKeys(source?: string) {
+    console.log("attachToKeys() source: " + source);
+    // get initial account balances
+    let self = this;
+    let keyaddr = this.getKeyAddress(source);
+    this.resetAccount(keyaddr);
+    self.srsSrvc.getServer().accounts()
+      .accountId(self.account.address)
+      .call()
+      .then(function (acc) {
+        //console.log("StellarAccountService::attachToKeys() acctResponse: " + JSON.stringify(acc));
+        let reserveChunks = 1 + acc.signers.length; // minimum reserve
+        for (let i = 0; i < acc.balances.length; i++) {
+          let bal = acc.balances[i];
+          let amount: number = parseFloat(bal.balance);
+          if (bal.asset_code)
+            reserveChunks++;
+          self.addToBalance(bal.asset_code, amount);
+        }
+        self.account.sequence = acc.sequence;
+        if (acc.offers && acc.offers.length) {
+          for (let i = 0; i < acc.offers.length; i++) {
+            let offer = acc.offers[i];
+            if (offer)
+              reserveChunks++;
+          }
+        }
+        self.account.reserve = reserveChunks * StellarConstants.reserveChunkCost;
+      })
+      .catch(StellarSdk.NotFoundError, function (err) {
+        console.log("attachToKeys account not found");
+      })
+      .catch(function (err) {
+        console.log("StellarAccountService::attachToKeys() err: " + (err.stack || err));
+      })
 
-        let add_memo = "";
-        if (undefined !== memo && null !== memo && undefined !== memo_type_p && null !== memo_type_p) {
-            let memo_type = "&memo_type=" + memo_type_p;
-            add_memo = "&memo=" + memo + memo_type;
+    self.srsSrvc.getServer().effects()
+      .forAccount(self.account.address)
+      .limit(StellarConstants.accountEffectLimit)
+      .order('desc')
+      .call()
+      .then(function (effectResults) {
+        //console.log("StellarAccountService::attachToKeys() effectResponse: " + JSON.stringify(effectResults));
+        let length = effectResults.records ? effectResults.records.length : 0;
+        for (let index = length - 1; index >= 0; index--) {
+          let currentEffect = effectResults.records[index];
+          self.effectHandler(currentEffect, false);
         }
 
-        // `extra_memo` is required for compliance (use it instead of `memo`)
-        let body_urlenc = "amount=" + amount +
-            "&asset_code=" + asset_code +
-            "&asset_issuer=" + asset_issuer +
-            "&destination=" + receiver_ename +
-            "&source=" + asset_issuer_seed +
-            "&sender=" + sender_ename +
-            "&extra_memo=" + extra_memo;
+        self.acctEvent$.emit({
+          memo: AppConstants.MEMO_ACCT,
+          status: AppConstants.ACCT_INFO_LOADED
+        });
 
-        this.makePaymentUsingBridgeWithHttp(contentType, body_urlenc).then(data => {
-            console.log("makePaymentWithCompliance() data: " + JSON.stringify(data));
+        let startListeningFrom;
+        if (length > 0) {
+          let latestPayment = effectResults.records[0];
+          startListeningFrom = latestPayment.paging_token;
+        }
+        self.attachToPaymentsStream(startListeningFrom);
+      })
+      .catch(function (err) {
+        self.attachToPaymentsStream('now');
+        console.log("attachToKeys err: " + err)
+      });
+  }
+
+  clearBalance() {
+    // clear account balances
+    this.account.balance = 0;
+    this.account.transactions.splice(0, this.account.transactions.length);
+    this.account.otherCurrencies.splice(0, this.account.otherCurrencies.length);
+  }
+
+  addToBalance(curr, amount: number) {
+    if (this.scsSrvc.isAssetNative(curr)) {
+      this.account.balance += amount;
+      return;
+    }
+    for (let index = 0; index < this.account.otherCurrencies.length; ++index) {
+      let entry = this.account.otherCurrencies[index];
+      if (entry.currency == curr) {
+        entry.amount += amount;
+        return;
+      }
+    }
+    // no entry for currency exists -> add new entry
+    this.account.otherCurrencies.push({ currency: curr, amount: amount });
+  }
+
+  applyToBalance(effect) {
+    if (effect.type === AppConstants.ACCT_CREATED)
+      this.addToBalance(effect.asset_code, parseFloat(effect.starting_balance));
+    else if (effect.type === AppConstants.ACCT_DEBITED)
+      this.addToBalance(effect.asset_code, -parseFloat(effect.amount));
+    else if (effect.type === AppConstants.ACCT_CREDITED)
+      this.addToBalance(effect.asset_code, parseFloat(effect.amount));
+  }
+
+  buildTransaction(operation: any, memo: any, bSign: any) {
+    let acc = new StellarSdk.Account(this.account.address, this.account.sequence);
+    let builder = new StellarSdk.TransactionBuilder(acc);
+    builder = builder.addOperation(operation);
+    if (memo)
+      builder = builder.addMemo(memo);
+    let transaction = builder.build();
+    if (bSign === true)
+      transaction.sign({
+        address: this.keysettings.keysStored.address,
+        secret: this.keysettings.keysStored.secret
+      });
+    return transaction;
+  }
+
+  insertTransaction(trx, op, effect, fromStream) {
+    let asset_code = effect.asset_code;
+    if (asset_code === null || !asset_code)
+      asset_code = StellarConstants.NATIVE_CURRENCY_XLM;
+
+    let date = new Date(trx.created_at)
+    let displayEffect = {
+      effectId: effect.paging_token,
+      asset_code: asset_code,
+      asset_type: effect.asset_type,
+      amount: effect.amount,
+      debit: effect.type === AppConstants.ACCT_DEBITED,
+      sender: op.from,
+      receiver: op.to,
+      memo: trx.memo,
+      memoType: trx.memo_type,
+      creationDate: date,
+      creationTimestamp: date.getTime()
+    }
+
+    if (op.type === AppConstants.CREATE_ACCT) {
+      displayEffect.amount = op.starting_balance;
+      displayEffect.sender = op.funder;
+      displayEffect.receiver = op.account;
+    }
+
+    if (fromStream && this.account.address === trx.source_account)
+      this.account.sequence = trx.source_account_sequence;
+
+    // insert at correct position
+    let i;
+    for (i = 0; i < this.account.transactions.length; i++) {
+      var compareEffect = this.account.transactions[i];
+      if (displayEffect.effectId === compareEffect.effectId)
+        throw 'transaction already seen: ' + displayEffect.effectId;
+      if (displayEffect.creationTimestamp > compareEffect.creationTimestamp) {
+        break;
+      }
+    }
+    this.account.transactions.splice(i, 0, displayEffect);
+
+    return displayEffect;
+  }
+
+  insertEffect(effect, fromStream) {
+    let self = this;
+    let promise = new Promise(function (resolve, reject) {
+      try {
+        effect.operation()
+          .then(function (op) {
+            op.transaction()
+              .then(function (trx) {
+                try {
+                  let displayEffect = self.insertTransaction(trx, op, effect, fromStream);
+                  resolve(displayEffect);
+                }
+                catch (err) {
+                  reject(err);
+                }
+              });
+          })
+      }
+      catch (err) {
+        reject(err);
+      }
+    });
+    return promise;
+  }
+
+  effectHandler(effect, fromStream) {
+    //console.log("effectHandler() effect : " + JSON.stringify(effect));
+    let isRelevant = effect.type === AppConstants.ACCT_CREATED
+      || effect.type === AppConstants.ACCT_DEBITED
+      || effect.type === AppConstants.ACCT_CREDITED;
+
+    if (isRelevant) {
+      let self = this;
+      this.insertEffect(effect, fromStream)
+        .then((displayEffect) => {
+          if (fromStream) {
+            self.applyToBalance(effect);
             self.acctEvent$.emit({
-                memo: AppConstants.NEW_PAYMENT,
-                status: body_urlenc
+              memo: 'account',
+              status: AppConstants.ACCT_INFO_LOADED
             });
-        }, err => {
-            console.log("StellarAccountService::makePaymentWithCompliance() err: " + JSON.stringify(err));
-        })
-
-    }
-
-    makePaymentUsingBridge(asset_issuer, issuer_seed, asset_receiver, asset_code, amount, memo, memo_type_p) {
-        let self = this;
-        let contentType = 'application/x-www-form-urlencoded';
-        let add_memo = "";
-
-        if (undefined !== memo && null !== memo && undefined !== memo_type_p && null !== memo_type_p) {
-            let memo_type = "&memo_type=" + memo_type_p;
-            add_memo = "&memo=" + memo + memo_type;
-        }
-
-        let body_urlenc = "amount=" + amount +
-            "&asset_code=" + asset_code +
-            "&asset_issuer=" + asset_issuer +
-            "&destination=" + asset_receiver +
-            "&source=" + issuer_seed +
-            add_memo;
-
-        this.makePaymentUsingBridgeWithHttp(contentType, body_urlenc).then(data => {
-            console.log("makePaymentUsingBridge() response data: " + JSON.stringify(data));
+          }
+          else {
             self.acctEvent$.emit({
-                memo: AppConstants.NEW_PAYMENT,
-                status: body_urlenc
+              memo: 'account',
+              status: AppConstants.NEW_TRANSACT
             });
-        }, err => {
-            console.log("StellarAccountService::makePaymentUsingBridge() err: " + JSON.stringify(err));
-        })
+          }
+        });
+    }
+  }
 
+  attachToPaymentsStream(opt_startFrom) {
+    let self = this;
+    let futurePayments = this.srsSrvc.getServer().effects()
+      .forAccount(self.account.address);
+    if (opt_startFrom) {
+      futurePayments = futurePayments.cursor(opt_startFrom);
+    }
+    if (this.paymentsEventSource) {
+      console.log('close open effects stream')
+      this.paymentsEventSource.close();
+    }
+    console.log('open effects stream with cursor: ' + opt_startFrom);
+    this.paymentsEventSource = futurePayments.stream({
+      onmessage: function (effect) { self.effectHandler(effect, true); }
+    });
+  }
+
+  onKeysAvailable() {
+    if (this.srsSrvc.isConnected())
+      this.attachToKeys();
+    else
+      this.keysChanged = true;
+  }
+
+  createAndFundAccountAny(srckey, destkey, src_acct, secret, pymtamt) {
+    let self = this;
+    // create an Account object using locally tracked sequence number
+    let seq = 0;
+    let an_account = new StellarSdk.Account(srckey, seq);
+    let transaction = new StellarSdk.TransactionBuilder(an_account)
+      .addOperation(StellarSdk.Operation.createAccount({
+        destination: destkey,
+        startingBalance: pymtamt,
+        source: src_acct
+      }))
+      .build();
+
+    // sign the transaction
+    transaction.sign(StellarSdk.Keypair.fromSecret(secret));
+
+    // transaction is now ready to be sent to the network or saved somewhere
+    // Ok, send it off to Stellar!
+    self.srsSrvc.getServer().submitTransaction(transaction)
+      .then(data => {
+        console.log("StellarAccountService::createAndFundAccountAny() data: " + data);
+      }, err => {
+        console.log("StellarAccountService::createAndFundAccountAny() err: " + err);
+      })
+  }
+
+  // Remote.getServer().friendbot(keys.address).call();
+  fundAccountWithFriendbot(addrp) {
+    console.log("StellarAccountService::fundAccountWithFriendbot() addrp: " + JSON.stringify(addrp));
+    let server = this.srsSrvc.getServer();
+    server.friendbot(addrp)
+      .call()
+      .then(data => {
+        console.log("StellarAccountService::fundAccountWithFriendbot() data: " + JSON.stringify(data));
+      }, err => {
+        console.log("StellarAccountService::fundAccountWithFriendbot() err: " + JSON.stringify(err));
+      })
+  }
+
+  fundAccountWithDcubeFriendbot(addrp) {
+    let url_p = StellarConstants.URL_FRIENDBOT + '?json=true&addr=' + addrp;
+
+    this.remoteSvrc.getHttp(url_p).then(data => {
+      console.log("StellarAccountService::fundAccountWithFriendbot() data: " + data);
+    }, err => {
+      console.log("StellarAccountService::fundAccountWithFriendbot() err: " + err);
+    })
+  }
+
+  makePaymentUsingBridgeWithHttp(contentType, _body) {
+    let self = this;
+    let promise = new Promise(function (resolve, reject) {
+      let _url = self.srsSrvc.getBridgeServerURL();
+      let headers = new Headers();
+      headers.append('Content-Type', contentType);
+      //headers.append('Content-Type', 'application/text');
+      //headers.append('Content-Type', 'application/json');
+      //headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      //headers.append('Origin', 'http://localhost:8001');
+      var reqOptions: RequestOptionsArgs = {
+        url: null,
+        method: RequestMethod.Post,
+        search: null,
+        headers: headers,
+        body: null
+      };
+
+      console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _url: " + _url);
+      console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() sending POST _body: " + _body);
+      self.remoteSvrc.postHttp(_url, _body, reqOptions).then(data => {
+        console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() data: " + JSON.stringify(data));
+        resolve(data);
+      }, err => {
+        console.log("StellarAccountService::makePaymentUsingBridgeWithHttp() err: " + JSON.stringify(err));
+        reject(err);
+      })
+    });
+    return promise;
+  }
+
+  makePaymentUsingBridgeWithCompliance(asset_issuer, asset_issuer_seed, receiver_ename, sender_ename, asset_code, amount, memo, memo_type_p, extra_memo) {
+    let self = this;
+    let contentType = 'application/x-www-form-urlencoded';
+
+    let add_memo = "";
+    if (undefined !== memo && null !== memo && undefined !== memo_type_p && null !== memo_type_p) {
+      let memo_type = "&memo_type=" + memo_type_p;
+      add_memo = "&memo=" + memo + memo_type;
     }
 
-    makePayment(srcAddrKey, srcSeedkey, destkey, asset_code, amount: string, memo: string) {
-        let server = this.srsSrvc.getServer();
-        let sourceKeys = StellarSdk.Keypair.fromSecret(srcSeedkey);
+    // `extra_memo` is required for compliance (use it instead of `memo`)
+    let body_urlenc = "amount=" + amount +
+      "&asset_code=" + asset_code +
+      "&asset_issuer=" + asset_issuer +
+      "&destination=" + receiver_ename +
+      "&source=" + asset_issuer_seed +
+      "&sender=" + sender_ename +
+      "&extra_memo=" + extra_memo;
 
-        let self = this;
-        // First, check to make sure that the destination account exists.
-        // You could skip this, but if the account does not exist, you will be charged
-        // the transaction fee when the transaction fails.
-        let asset = this.scsSrvc.getAssetObject(asset_code, srcAddrKey);
+    this.makePaymentUsingBridgeWithHttp(contentType, body_urlenc).then(data => {
+      console.log("makePaymentWithCompliance() data: " + JSON.stringify(data));
+      self.acctEvent$.emit({
+        memo: AppConstants.NEW_PAYMENT,
+        status: body_urlenc
+      });
+    }, err => {
+      console.log("StellarAccountService::makePaymentWithCompliance() err: " + JSON.stringify(err));
+    })
 
-        server.loadAccount(destkey)
-            // If the account is not found, surface a nicer error message for logging.
-            .catch(StellarSdk.NotFoundError, function (error) {
-                throw new Error('makePayment() The destination account does not exist!');
-            })
-            // If there was no error, load up-to-date information on source account.
-            .then(function () {
-                return server.loadAccount(sourceKeys.publicKey());
-            })
-            .then(function (sourceAccount) {
-                // Start building the transaction.
-                var transaction = new StellarSdk.TransactionBuilder(sourceAccount)
-                    .addOperation(StellarSdk.Operation.payment({
-                        destination: destkey,
-                        // Because Stellar allows transaction in many currencies, you must
-                        // specify the asset type. The special "native" asset represents Lumens:
-                        // StellarSdk.Asset.native()
-                        asset: asset,
-                        amount: amount
-                    }))
-                    // A memo allows you to add your own metadata to a transaction. It's
-                    // optional and does not affect how Stellar treats the transaction.
-                    .addMemo(StellarSdk.Memo.text(memo))
-                    .build();
-                // Sign the transaction to prove you are actually the person sending it.
-                transaction.sign(sourceKeys);
-                // And finally, send it off to Stellar!
-                return server.submitTransaction(transaction);
-            })
-            .then(function (result) {
-                console.log('StellarAccountService::makePayment() Success! Results:', result);
-                self.acctEvent$.emit({
-                    memo: amount,
-                    status: AppConstants.NEW_PAYMENT
-                });
-            })
-            .catch(function (error) {
-                console.error('StellarAccountService::makePayment() Something went wrong!', error);
-            });
+  }
+
+  makePaymentUsingBridge(asset_issuer, issuer_seed, asset_receiver, asset_code, amount, memo, memo_type_p) {
+    let self = this;
+    let contentType = 'application/x-www-form-urlencoded';
+    let add_memo = "";
+
+    if (undefined !== memo && null !== memo && undefined !== memo_type_p && null !== memo_type_p) {
+      let memo_type = "&memo_type=" + memo_type_p;
+      add_memo = "&memo=" + memo + memo_type;
     }
 
-    getPaymentInfo(accountId) {
-        //var StellarSdk = require('stellar-sdk');
-        //let server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
-        //var accountId = 'GC2BKLYOOYPDEFJKLKY6FNNRQMGFLVHJKQRGNSSRRGSMPGF32LHCQVGF';
-        let self = this;
-        let server = this.srsSrvc.getServer();
+    let body_urlenc = "amount=" + amount +
+      "&asset_code=" + asset_code +
+      "&asset_issuer=" + asset_issuer +
+      "&destination=" + asset_receiver +
+      "&source=" + issuer_seed +
+      add_memo;
 
-        // Create an API call to query payments involving the account.
-        let payments = server.payments().forAccount(accountId);
+    this.makePaymentUsingBridgeWithHttp(contentType, body_urlenc).then(data => {
+      console.log("makePaymentUsingBridge() response data: " + JSON.stringify(data));
+      self.acctEvent$.emit({
+        memo: AppConstants.NEW_PAYMENT,
+        status: body_urlenc
+      });
+    }, err => {
+      console.log("StellarAccountService::makePaymentUsingBridge() err: " + JSON.stringify(err));
+    })
 
-        // If some payments have already been handled, start the results from the
-        // last seen payment. (See below in `handlePayment` where it gets saved.)
-        let lastToken = this.loadLastPagingToken();
-        console.log("StellarAccountService::getPaymentInfo() receivePayment lastToken: " + lastToken);
-        if (lastToken) {
-            payments.cursor(lastToken);
+  }
+
+  makePayment(srcAddrKey, srcSeedkey, destkey, asset_code, amount: string, memo: string) {
+    let server = this.srsSrvc.getServer();
+    let sourceKeys = StellarSdk.Keypair.fromSecret(srcSeedkey);
+
+    let self = this;
+    // First, check to make sure that the destination account exists.
+    // You could skip this, but if the account does not exist, you will be charged
+    // the transaction fee when the transaction fails.
+    let asset = this.scsSrvc.getAssetObject(asset_code, srcAddrKey);
+
+    server.loadAccount(destkey)
+      // If the account is not found, surface a nicer error message for logging.
+      .catch(StellarSdk.NotFoundError, function (error) {
+        throw new Error('makePayment() The destination account does not exist!');
+      })
+      // If there was no error, load up-to-date information on source account.
+      .then(function () {
+        return server.loadAccount(sourceKeys.publicKey());
+      })
+      .then(function (sourceAccount) {
+        // Start building the transaction.
+        var transaction = new StellarSdk.TransactionBuilder(sourceAccount)
+          .addOperation(StellarSdk.Operation.payment({
+            destination: destkey,
+            // Because Stellar allows transaction in many currencies, you must
+            // specify the asset type. The special "native" asset represents Lumens:
+            // StellarSdk.Asset.native()
+            asset: asset,
+            amount: amount
+          }))
+          // A memo allows you to add your own metadata to a transaction. It's
+          // optional and does not affect how Stellar treats the transaction.
+          .addMemo(StellarSdk.Memo.text(memo))
+          .build();
+        // Sign the transaction to prove you are actually the person sending it.
+        transaction.sign(sourceKeys);
+        // And finally, send it off to Stellar!
+        return server.submitTransaction(transaction);
+      })
+      .then(function (result) {
+        console.log('StellarAccountService::makePayment() Success! Results:', result);
+        self.acctEvent$.emit({
+          memo: amount,
+          status: AppConstants.NEW_PAYMENT
+        });
+      })
+      .catch(function (error) {
+        console.error('StellarAccountService::makePayment() Something went wrong!', error);
+      });
+  }
+
+  getPaymentInfo(accountId) {
+    //var StellarSdk = require('stellar-sdk');
+    //let server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
+    //var accountId = 'GC2BKLYOOYPDEFJKLKY6FNNRQMGFLVHJKQRGNSSRRGSMPGF32LHCQVGF';
+    let self = this;
+    let server = this.srsSrvc.getServer();
+
+    // Create an API call to query payments involving the account.
+    let payments = server.payments().forAccount(accountId);
+
+    // If some payments have already been handled, start the results from the
+    // last seen payment. (See below in `handlePayment` where it gets saved.)
+    let lastToken = this.loadLastPagingToken();
+    console.log("StellarAccountService::getPaymentInfo() receivePayment lastToken: " + lastToken);
+    if (lastToken) {
+      payments.cursor(lastToken);
+    }
+
+    // `stream` will send each recorded payment, one by one, then keep the
+    // connection open and continue to send you new payments as they occur.
+    payments.stream({
+      onmessage: function (payment) {
+        // Record the paging token so we can start from here next time.
+        self.savePagingToken(payment.paging_token);
+
+        // The payments stream includes both sent and received payments. We only
+        // want to process received payments here.
+        if (payment.to !== accountId) {
+          return;
         }
 
-        // `stream` will send each recorded payment, one by one, then keep the
-        // connection open and continue to send you new payments as they occur.
-        payments.stream({
-            onmessage: function (payment) {
-                // Record the paging token so we can start from here next time.
-                self.savePagingToken(payment.paging_token);
+        // In Stellarâ€™s API, Lumens are referred to as the â€œnativeâ€ type. Other
+        // asset types have more detailed information.
+        var asset;
+        if (this.isAssetNative(payment.asset_code)) {
+          asset = 'lumens';
+        }
+        else {
+          asset = payment.asset_code + ':' + payment.asset_issuer;
+        }
 
-                // The payments stream includes both sent and received payments. We only
-                // want to process received payments here.
-                if (payment.to !== accountId) {
-                    return;
-                }
+        console.log("StellarAccountService::getPaymentInfo() " + payment.amount + ' ' + asset + ' from ' + payment.from);
+      },
 
-                // In Stellar’s API, Lumens are referred to as the “native” type. Other
-                // asset types have more detailed information.
-                var asset;
-                if (this.isAssetNative(payment.asset_code)) {
-                    asset = 'lumens';
-                }
-                else {
-                    asset = payment.asset_code + ':' + payment.asset_issuer;
-                }
+      onerror: function (error) {
+        console.error('StellarAccountService::getPaymentInfo() Error in payment stream: ' + JSON.stringify(error));
+      }
+    });
+  }
 
-                console.log("StellarAccountService::getPaymentInfo() " + payment.amount + ' ' + asset + ' from ' + payment.from);
-            },
+  savePagingToken(token) {
+    // In most cases, you should save this to a local database or file so that
+    // you can load it next time you stream new payments.
+    console.log("StellarAccountService::savePagingToken() token: " + token);
+    this.pagingToken = token;
+  }
 
-            onerror: function (error) {
-                console.error('StellarAccountService::getPaymentInfo() Error in payment stream: ' + JSON.stringify(error));
-            }
-        });
-    }
+  loadLastPagingToken() {
+    // Get the last paging token from a local database or file
+    console.log("StellarAccountService::loadLastPagingToken called");
+    return this.pagingToken;
+  }
 
-    savePagingToken(token) {
-        // In most cases, you should save this to a local database or file so that
-        // you can load it next time you stream new payments.
-        console.log("StellarAccountService::savePagingToken() token: " + token);
-        this.pagingToken = token;
-    }
+  loadAccount(addr_p) {
+    let self = this;
+    let promise = new Promise(function (resolve, reject) {
+      let server = self.srsSrvc.getServer();
+      // returns {"_accountId":"","sequence":""}
+      server.loadAccount(addr_p).then((account) => {
+        console.log('StellarAccountService::loadAccount() Balances for account: ' + addr_p);
+        console.log('StellarAccountService::loadAccount() Account info: ' + JSON.stringify(account));
+        resolve(account);
+      });
+    });
+    return promise;
 
-    loadLastPagingToken() {
-        // Get the last paging token from a local database or file
-        console.log("StellarAccountService::loadLastPagingToken called");
-        return this.pagingToken;
-    }
-
-    loadAccount(addr_p) {
-        let self = this;
-        let promise = new Promise(function (resolve, reject) {
-            let server = self.srsSrvc.getServer();
-            // returns {"_accountId":"","sequence":""}
-            server.loadAccount(addr_p).then((account) => {
-                console.log('StellarAccountService::loadAccount() Balances for account: ' + addr_p);
-                console.log('StellarAccountService::loadAccount() Account info: ' + JSON.stringify(account));
-                resolve(account);
-            });
-        });
-        return promise;
-
-    }
+  }
 
 }
 

@@ -51,7 +51,7 @@ export class AccountService{
     }
 
     getAccountBalances(source?: string) {
-        //console.log("AccountService::getAccountBalances() source: " + source);
+        console.log("AccountService::getAccountBalances() source: " + source);
         return this.sas.getAccountBalances(source);
     }
 
